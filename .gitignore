@@ -1,0 +1,5 @@
+node_modules/
+preview-carousel/.next/
+preview-carousel/out/
+.DS_Store
+Thumbs.db

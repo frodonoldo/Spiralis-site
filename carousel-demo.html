@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiralis — Carousel WebGL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+  <script src="gsap.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0A050F;
+      --ink:       #16111F;
+      --text:      #EBE4F6;
+      --text-dim:  #5B5470;
+      --violet:    #4918A5;
+      --violet-400:#7C4DDB;
+      --violet-100:#E4D8FF;
+      --ff-head:   'Comfortaa', sans-serif;
+      --ff-body:   'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --ease-soft: cubic-bezier(.22,1,.36,1);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff-body);
+    }
+
+    /* ── WEBGL CANVAS ─────────────────────── */
+    #gl {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+    #gl.dragging { cursor: grabbing; }
+
+    /* ── CORNER BRACKETS ──────────────────── */
+    .rc-bracket {
+      position: fixed; z-index: 20;
+      width: 22px; height: 22px;
+      border-color: rgba(124,77,219,.5);
+      border-style: solid;
+      pointer-events: none;
+    }
+    .rc-bracket.tl { top: 14px; left: 14px;   border-width: 1px 0 0 1px; }
+    .rc-bracket.tr { top: 14px; right: 14px;  border-width: 1px 1px 0 0; }
+    .rc-bracket.bl { bottom: 14px; left: 14px;  border-width: 0 0 1px 1px; }
+    .rc-bracket.br { bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+
+    /* ── COUNTER ──────────────────────────── */
+    .rc-counter {
+      position: fixed;
+      top: 8.5rem; right: 3.5rem;
+      z-index: 10;
+      font-size: .9rem;
+      letter-spacing: .06em;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+      pointer-events: none;
+    }
+    .rc-counter .rc-slash { color: var(--text-dim); }
+    .rc-counter .rc-total { color: var(--text-dim); }
+
+    /* ── DETAIL PANEL ─────────────────────── */
+    .rc-detail {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1.4fr 1.4fr 1.4fr auto;
+      align-items: end;
+      gap: 2rem;
+      padding: 0 3.5rem 2.6rem;
+      pointer-events: none;
+    }
+    .rc-detail > * { pointer-events: auto; }
+
+    .rc-detail-title {
+      font-family: var(--ff-head);
+      font-weight: 600;
+      font-size: clamp(1.8rem, 3.4vw, 3rem);
+      line-height: 1.05;
+      color: var(--text);
+    }
+    .rc-detail-role {
+      margin-top: .45rem;
+      font-size: .74rem;
+      color: var(--text-dim);
+      letter-spacing: .03em;
+    }
+
+    .rc-detail h4 {
+      font-family: var(--ff-head);
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: .55rem;
+    }
+    .rc-detail ul {
+      list-style: none;
+      font-size: .78rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+    }
+
+    .rc-see-live {
+      font-size: .92rem;
+      font-style: italic;
+      color: var(--text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      white-space: nowrap;
+      transition: color .3s;
+    }
+    .rc-see-live:hover { color: var(--violet-400); }
+    .rc-see-live .arr { transition: transform .3s var(--ease-soft); font-style: normal; }
+    .rc-see-live:hover .arr { transform: translateX(4px); }
+
+    /* each block animates independently */
+    .rc-reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      filter: blur(6px);
+      will-change: transform, filter, opacity;
+    }
+
+    /* ── NEXT ARROW ───────────────────────── */
+    .rc-next {
+      position: fixed;
+      right: 3.5rem; bottom: 2.4rem;
+      z-index: 11;
+      background: none; border: none;
+      color: var(--text);
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: .4rem .2rem;
+      transition: transform .35s var(--ease-soft), color .3s, opacity .4s;
+    }
+    .rc-next:hover { transform: translateX(5px); color: var(--violet-400); }
+    .rc-detail-on .rc-next { opacity: 0; pointer-events: none; }
+
+    @media (max-width: 900px) {
+      .rc-detail {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.2rem;
+        padding: 0 1.5rem 4.4rem;
+      }
+      .rc-detail-block-title { grid-column: 1 / -1; }
+      .rc-counter { right: 1.5rem; top: 6rem; }
+      .rc-next { right: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+
+<div class="rc-bracket tl"></div>
+<div class="rc-bracket tr"></div>
+<div class="rc-bracket bl"></div>
+<div class="rc-bracket br"></div>
+
+<div class="rc-counter">
+  <span id="rc-cur">01</span><span class="rc-slash">/</span><span class="rc-total" id="rc-total">04</span>
+</div>
+
+<div class="rc-detail" id="rc-detail">
+  <div class="rc-detail-block-title rc-reveal">
+    <h2 class="rc-detail-title" id="rc-title">Projeto Alpha</h2>
+    <p class="rc-detail-role" id="rc-role">Role: Full-Stack Development</p>
+  </div>
+  <div class="rc-reveal">
+    <h4>Serviços</h4>
+    <ul id="rc-services">
+      <li>Desenvolvimento Web</li>
+      <li>Automação</li>
+    </ul>
+  </div>
+  <div class="rc-reveal">
+    <h4>Ferramentas e Tecnologias</h4>
+    <ul id="rc-tech">
+      <li>Next.js, Node.js, PostgreSQL</li>
+    </ul>
+  </div>
+  <div class="rc-reveal" style="text-align:right;">
+    <a href="#" class="rc-see-live" id="rc-live">See live <span class="arr">→</span></a>
+  </div>
+</div>
+
+<button class="rc-next" id="rc-next" aria-label="Próximo projeto">→</button>
+
+<script>
+(function(){
+  /* ════════════════════════════════════════════════════
+     Réplica do carrossel de ricardochance.com/work
+     — planos WebGL subdivididos, curvatura cilíndrica,
+       inércia lenta (lerp) e deformação por velocidade.
+  ════════════════════════════════════════════════════ */
+
+  const PROJECTS = [
+    {
+      title: 'Projeto Alpha',
+      role: 'Role: Full-Stack Development',
+      services: ['Desenvolvimento Web', 'Automação'],
+      tech: ['Next.js, Node.js, PostgreSQL'],
+      grad: ['#0a4d2e', '#0d6b3e', '#062e1c'],
+      glow: 'rgba(16,185,129,.55)',
+      label: 'projeto alpha'
+    },
+    {
+      title: 'Projeto Beta',
+      role: 'Role: Creative Developer',
+      services: ['WebGL & Shaders', 'Motion Design'],
+      tech: ['Three.js, GSAP, GLSL'],
+      grad: ['#12082b', '#2d1566', '#4918A5'],
+      glow: 'rgba(124,77,219,.6)',
+      label: '/beta.studio'
+    },
+    {
+      title: 'Projeto Gama',
+      role: 'Role: Lead Developer',
+      services: ['Integração de Sistemas', 'API Design'],
+      tech: ['Python, FastAPI, Docker'],
+      grad: ['#4a1259', '#8b2f8f', '#5c1a6e'],
+      glow: 'rgba(217,124,237,.5)',
+      label: 'GAMA'
+    },
+    {
+      title: 'Projeto Delta',
+      role: 'Role: Security Engineer',
+      services: ['Pentest', 'Auditoria de Código'],
+      tech: ['Kali Linux, Burp Suite'],
+      grad: ['#071c38', '#12406e', '#0a2a52'],
+      glow: 'rgba(96,165,250,.5)',
+      label: 'delta⌁sec'
+    }
+  ];
+
+  const N = PROJECTS.length;
+  const canvas = document.getElementById('gl');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 10;
+
+  /* viewport em unidades de mundo na profundidade z=0 */
+  function viewSize() {
+    const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+    return { w: h * camera.aspect, h };
+  }
+
+  /* ── geometria dos cards ─────────────────
+     réplica: ~37.5vw de largura, ~50vh de altura,
+     gap pequeno, centro ligeiramente acima do meio */
+  let CARD_W, CARD_H, GAP, STEP, view;
+
+  function computeLayout() {
+    view = viewSize();
+    CARD_W = view.w * 0.375;
+    CARD_H = view.h * 0.50;
+    GAP    = view.w * 0.015;
+    STEP   = CARD_W + GAP;
+  }
+
+  /* ── textura por projeto (canvas 2D) ───── */
+  function makeTexture(p) {
+    const c = document.createElement('canvas');
+    c.width = 1024; c.height = 680;
+    const x = c.getContext('2d');
+
+    const g = x.createLinearGradient(0, 0, 1024, 680);
+    g.addColorStop(0, p.grad[0]);
+    g.addColorStop(.45, p.grad[1]);
+    g.addColorStop(1, p.grad[2]);
+    x.fillStyle = g;
+    x.fillRect(0, 0, 1024, 680);
+
+    /* glow suave tipo o original */
+    const rg = x.createRadialGradient(700, 220, 40, 700, 220, 420);
+    rg.addColorStop(0, p.glow);
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = rg;
+    x.fillRect(0, 0, 1024, 680);
+
+    /* ruído leve */
+    for (let i = 0; i < 2600; i++) {
+      x.fillStyle = 'rgba(255,255,255,' + (Math.random() * 0.035) + ')';
+      x.fillRect(Math.random() * 1024, Math.random() * 680, 1, 1);
+    }
+
+    /* logo central */
+    x.fillStyle = 'rgba(255,255,255,.96)';
+    x.font = '600 84px Comfortaa, sans-serif';
+    x.textAlign = 'center';
+    x.textBaseline = 'middle';
+    x.fillText(p.label, 512, 340);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    return tex;
+  }
+
+  /* ── shader: curvatura + jelly ───────────
+     uCurve  — arqueamento cilíndrico permanente
+     uVel    — velocidade do track → shear + wobble  */
+  const uniforms = { uVel: { value: 0 } };
+
+  function makeMaterial(tex) {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uMap:  { value: tex },
+        uVel:  uniforms.uVel,
+        uView: { value: 1 }
+      },
+      vertexShader: `
+        uniform float uVel;
+        uniform float uView;
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          vec3 p = position;
+          vec4 world = modelMatrix * vec4(p, 1.0);
+
+          /* curvatura cilíndrica: quanto mais longe do centro
+             da tela, mais o card recua e inclina (arco suave) */
+          float nx = world.x / uView;          /* -0.5 .. 0.5 aprox */
+          world.z -= nx * nx * 2.2;
+          world.y -= nx * nx * 0.35;
+
+          /* jelly: shear vertical proporcional à velocidade,
+             maior nas bordas do próprio card                  */
+          world.y += uVel * (uv.x - 0.5) * 1.6;
+          /* leve ondulação interna durante o movimento        */
+          world.z += sin(uv.x * 3.14159) * abs(uVel) * 0.6;
+
+          gl_Position = projectionMatrix * viewMatrix * world;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uMap;
+        uniform float uVel;
+        varying vec2 vUv;
+        void main() {
+          /* leve distorção da textura com a velocidade (RGB shift sutil) */
+          float k = uVel * 0.03;
+          vec2 uv = vUv;
+          uv.x += sin(vUv.y * 3.14159) * k;
+          gl_FragColor = texture2D(uMap, uv);
+        }
+      `
+    });
+  }
+
+  /* ── meshes ──────────────────────────── */
+  const cards = [];
+  function buildCards() {
+    for (const card of cards) { scene.remove(card.mesh); card.mesh.geometry.dispose(); }
+    cards.length = 0;
+    for (let i = 0; i < N; i++) {
+      const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 48, 12);
+      const mat = makeMaterial(textures[i]);
+      mat.uniforms.uView.value = view.w;
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.y = view.h * 0.04; /* levemente acima do centro */
+      mesh.userData.index = i;
+      scene.add(mesh);
+      cards.push({ mesh, index: i });
+    }
+  }
+
+  const textures = PROJECTS.map(makeTexture);
+
+  /* ── estado de scroll com inércia ─────── */
+  let target = 0;        /* deslocamento alvo (em unidades de mundo) */
+  let current = 0;       /* deslocamento atual (lerp) */
+  let selected = 0;
+  const LERP = 0.045;    /* inércia pesada — assentamento lento, igual ao original */
+
+  function totalWidth() { return N * STEP; }
+
+  /* posiciona cada card com wrap infinito em torno do centro */
+  function layout() {
+    const tw = totalWidth();
+    for (const c of cards) {
+      let x = c.index * STEP - current;
+      /* wrap para manter os cards em torno do centro */
+      x = ((x % tw) + tw) % tw;
+      if (x > tw / 2) x -= tw;
+      c.mesh.position.x = x;
+    }
+  }
+
+  /* ── seleção / contador / painel ──────── */
+  const curEl   = document.getElementById('rc-cur');
+  const totalEl = document.getElementById('rc-total');
+  const detail  = document.getElementById('rc-detail');
+  const reveals = [...detail.querySelectorAll('.rc-reveal')];
+  totalEl.textContent = String(N).padStart(2, '0');
+
+  let detailShown = false;
+
+  function showDetail(i) {
+    const p = PROJECTS[i];
+    document.getElementById('rc-title').textContent = p.title;
+    document.getElementById('rc-role').textContent = p.role;
+    document.getElementById('rc-services').innerHTML = p.services.map(s => '<li>' + s + '</li>').join('');
+    document.getElementById('rc-tech').innerHTML = p.tech.map(t => '<li>' + t + '</li>').join('');
+
+    document.body.classList.add('rc-detail-on');
+    detailShown = true;
+    gsap.fromTo(reveals,
+      { opacity: 0, y: 26, filter: 'blur(6px)' },
+      { opacity: 1, y: 0, filter: 'blur(0px)', duration: .8, ease: 'power3.out', stagger: .07 }
+    );
+  }
+
+  function hideDetail() {
+    if (!detailShown) return;
+    detailShown = false;
+    document.body.classList.remove('rc-detail-on');
+    gsap.to(reveals, { opacity: 0, y: 14, filter: 'blur(4px)', duration: .35, ease: 'power2.in' });
+  }
+
+  function select(i, centre) {
+    selected = ((i % N) + N) % N;
+    curEl.textContent = String(selected + 1).padStart(2, '0');
+    if (centre !== false) {
+      /* leva o card selecionado ao centro — caminho mais curto */
+      const tw = totalWidth();
+      const want = selected * STEP;
+      let delta = want - (((target % tw) + tw) % tw);
+      if (delta > tw / 2) delta -= tw;
+      if (delta < -tw / 2) delta += tw;
+      target += delta;
+    }
+    showDetail(selected);
+  }
+
+  /* ── expandir card selecionado (preview) ── */
+  let expanded = false;
+  function toggleExpand() {
+    expanded = !expanded;
+    if (expanded) showDetail(selected); else hideDetail();
+    const sel = cards[selected].mesh;
+    gsap.to(sel.scale, {
+      x: expanded ? 1.32 : 1, y: expanded ? 1.32 : 1,
+      duration: .9, ease: 'expo.out'
+    });
+    /* vizinhos afastam-se levemente para dar espaço */
+    cards.forEach(c => {
+      if (c.index === selected) return;
+      gsap.to(c.mesh.scale, {
+        x: expanded ? .92 : 1, y: expanded ? .92 : 1,
+        duration: .9, ease: 'expo.out'
+      });
+    });
+  }
+  function collapseExpand() {
+    if (expanded) toggleExpand();
+  }
+
+  /* ── input: wheel / drag / clique / teclado ── */
+  let dragging = false, dragX = 0, dragT = 0, moved = false;
+
+  canvas.addEventListener('pointerdown', e => {
+    dragging = true; moved = false;
+    dragX = e.clientX; dragT = target;
+    canvas.classList.add('dragging');
+  });
+  window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - dragX;
+    if (Math.abs(dx) > 4) moved = true;
+    target = dragT - dx * (view.w / window.innerWidth);
+  });
+  window.addEventListener('pointerup', e => {
+    if (!dragging) return;
+    dragging = false;
+    canvas.classList.remove('dragging');
+    if (moved) {
+      /* snap para o card mais próximo */
+      const idx = Math.round(target / STEP);
+      target = idx * STEP;
+      select(idx, false);
+      hideDetail();
+    } else {
+      /* clique: raycast para achar o card */
+      const ray = new THREE.Raycaster();
+      const m = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      ray.setFromCamera(m, camera);
+      const hit = ray.intersectObjects(cards.map(c => c.mesh))[0];
+      if (hit) {
+        const i = hit.object.userData.index;
+        if (i === selected) toggleExpand();
+        else { collapseExpand(); select(i); }
+      } else {
+        collapseExpand();
+        hideDetail();
+      }
+    }
+  });
+
+  let wheelAcc = 0, wheelTimer = null;
+  window.addEventListener('wheel', e => {
+    wheelAcc += (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX);
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => {
+      if (Math.abs(wheelAcc) > 30) {
+        collapseExpand();
+        select(selected + (wheelAcc > 0 ? 1 : -1));
+      }
+      wheelAcc = 0;
+    }, 60);
+  }, { passive: true });
+
+  document.getElementById('rc-next').addEventListener('click', () => { collapseExpand(); select(selected + 1); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') { collapseExpand(); select(selected + 1); }
+    if (e.key === 'ArrowLeft')  { collapseExpand(); select(selected - 1); }
+    if (e.key === 'Escape')     { collapseExpand(); hideDetail(); }
+  });
+
+  /* ── resize ──────────────────────────── */
+  function resize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    computeLayout();
+    buildCards();
+    target = selected * STEP;
+    current = target;
+  }
+  window.addEventListener('resize', resize);
+
+  /* ── loop ────────────────────────────── */
+  let prev = 0;
+  function tick() {
+    current += (target - current) * LERP;
+    const vel = current - prev;
+    prev = current;
+
+    /* velocidade → uniform do shader (suavizada e limitada) */
+    uniforms.uVel.value += ((THREE.MathUtils.clamp(vel * 0.55, -0.9, 0.9)) - uniforms.uVel.value) * 0.12;
+
+    layout();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+
+  /* init imediato; regenera texturas quando a Comfortaa carregar */
+  resize();
+  tick();
+  document.fonts.ready.then(() => {
+    cards.forEach((c, i) => {
+      textures[i].dispose();
+      textures[i] = makeTexture(PROJECTS[i]);
+      c.mesh.material.uniforms.uMap.value = textures[i];
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiralis — Automação, Sistemas e Cyber Segurança</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="gsap.min.js"></script>
+  <script src="ScrollTrigger.min.js"></script>
+  <script src="ScrollToPlugin.min.js"></script>
+  <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: auto; }
+    img, video { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    :root {
+      /* ── Spiralis brand palette ─────────────── */
+      --bg:        #0A050F;   /* Midnight  */
+      --ink:       #16111F;   /* Ink panel */
+      --text:      #EBE4F6;   /* Mist      */
+      --text-dim:  #5B5470;   /* Slate     */
+      --ink-deep:  #1A0B33;   /* deep violet text on light */
+
+      --violet-900: #23084D;
+      --violet-800: #330F6E;
+      --violet:     #4918A5;  /* Spiralis Violet — primary */
+      --violet-400: #7C4DDB;  /* bright violet  */
+      --violet-100: #E4D8FF;
+      --accent:     #7C4DDB;  /* bright violet accent */
+
+      --gray:      var(--violet-400);
+      --cream:     #EBE4F6;   /* Mist (light sections) */
+      --paper:     #FFFFFF;
+
+      /* Duas fontes da marca: Comfortaa (primária) · Helvetica (secundária) */
+      --ff-head:    'Comfortaa', sans-serif;
+      --ff-body:    'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --ff-mono:    'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --ff-display: 'Comfortaa', sans-serif;
+      --ff-section: 'Comfortaa', sans-serif;
+
+      --ease-soft: cubic-bezier(.22,1,.36,1);
+      --ease-expo: cubic-bezier(.76,0,.24,1);
+      --gutter: clamp(1.5rem, 5vw, 5rem);
+    }
+
+    body {
+      font-family: var(--ff-body);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── LOADER ─────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; flex-direction: column;
+      animation: loaderDone 0s 2.5s forwards;
+    }
+    @keyframes loaderDone { to { visibility: hidden; pointer-events: none; } }
+    .loader-belt {
+      flex: 1;
+      background: linear-gradient(to bottom,
+        var(--violet-900) 0%,
+        var(--violet-800) 30%,
+        var(--violet) 55%,
+        var(--violet-400) 80%,
+        var(--violet-800) 100%
+      );
+      background-attachment: fixed;
+      background-size: 100vw 100vh;
+      transform-origin: bottom;
+      animation: beltCollapse 0.75s var(--ease-expo) forwards;
+    }
+    .loader-belt:nth-child(1) { animation-delay: 1.25s; }
+    .loader-belt:nth-child(2) { animation-delay: 1.33s; }
+    .loader-belt:nth-child(3) { animation-delay: 1.41s; }
+    .loader-belt:nth-child(4) { animation-delay: 1.49s; }
+    .loader-belt:nth-child(5) { animation-delay: 1.57s; }
+    @keyframes beltCollapse { to { transform: scaleY(0); } }
+    #loader-logo {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%); z-index: 10000;
+      display: flex; align-items: center; gap: .7rem;
+      font-family: var(--ff-display); font-weight: 700;
+      font-size: clamp(3.2rem, 8vw, 6rem);
+      letter-spacing: -.02em; color: var(--paper);
+      animation: lFade .4s ease .1s both, lOut .3s ease 1s forwards;
+    }
+    #loader-logo .mark { width: 1.05em; height: 1.05em; }
+    #loader-counter {
+      position: fixed; bottom: 3rem; left: 50%;
+      transform: translateX(-50%); z-index: 10000;
+      font-family: var(--ff-mono); font-size: .75rem;
+      letter-spacing: .1em; color: var(--text-dim);
+      animation: lFade .3s ease 0s both, lOut .3s ease 1s forwards;
+    }
+    @keyframes lFade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes lOut  { to   { opacity: 0; } }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000; display: flex;
+      align-items: center; justify-content: space-between;
+      padding: 1.5rem var(--gutter);
+      background: transparent;
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      -webkit-mask-image: linear-gradient(to bottom, black 35%, rgba(0,0,0,.5) 75%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 35%, rgba(0,0,0,.5) 75%, transparent 100%);
+    }
+    /* ── BRAND MARK ──────────────────────────────── */
+    .mark { display: inline-block; vertical-align: middle; }
+    .brand-lockup { display: flex; align-items: center; gap: .55rem; }
+    .wordmark { display: block; width: auto; }
+    #loader-logo .wordmark { height: .82em; }
+    .nav-logo .wordmark  { height: .9em; }
+    .footer-logo .wordmark { height: .8em; }
+
+    .nav-logo {
+      font-family: var(--ff-display); font-weight: 700;
+      font-size: 1.72rem; letter-spacing: -.01em; color: white;
+    }
+    .nav-logo .mark { width: 1.5em; height: 1.5em; }
+    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .nav-pill {
+      font-family: var(--ff-mono); font-size: .65rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 999px; padding: .55rem 1.1rem;
+      color: white; background: none;
+      transition: background .25s, color .25s;
+    }
+    .nav-pill:hover { background: white; color: black; }
+
+    /* ── HERO ────────────────────────────────────── */
+    #hero-section {
+      position: relative; min-height: 100dvh;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      justify-content: space-between;
+      padding: 7rem var(--gutter) 4rem;
+      overflow: hidden;
+    }
+    #gradient-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block; pointer-events: none;
+      z-index: 0;
+    }
+    #hero-section::after {
+      content: ''; position: absolute; inset: 0;
+      background: var(--bg);
+      z-index: 2; pointer-events: none;
+      animation: heroReveal 2s var(--ease-soft) 2.4s forwards;
+    }
+    @keyframes heroReveal {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    #hero-section > * { position: relative; z-index: 3; }
+    .hero-heading {
+      font-family: var(--ff-section);
+      font-size: clamp(3.2rem, 8.5vw, 8.5rem);
+      font-weight: 500; line-height: 1.0;
+      letter-spacing: -.01em; color: #ffffff;
+      max-width: 65%;
+    }
+    .hero-heading .blur-word {
+      display: inline-block;
+      opacity: 0; filter: blur(10px);
+      transform: translateY(-24px);
+      will-change: transform, filter, opacity;
+    }
+    .hero-heading em { display: inline; }
+    /* blend wrapper direto no hero — composita contra o canvas */
+    .hero-blend {
+      mix-blend-mode: difference;
+    }
+    .hero-heading em { font-style: italic; }
+    @keyframes hReveal {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-bottom {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      opacity: 0;
+      animation: hReveal 1s var(--ease-soft) 2.65s both;
+    }
+    .hero-cta-link {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--text);
+      border-bottom: 1px solid rgba(216,216,216,.4);
+      padding-bottom: .3rem;
+    }
+    .hero-cta-link .arr { display: inline-block; transition: transform .3s var(--ease-soft); }
+    .hero-cta-link:hover .arr { transform: translateX(5px); }
+    .hero-info { text-align: right; max-width: 380px; }
+    .hero-est {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: .75rem;
+    }
+    .hero-desc { font-size: clamp(.8rem,1.1vw,.95rem); line-height: 1.65; color: var(--text); }
+    .hero-scroll {
+      position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 1px; height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--text-dim));
+      animation: lineGrow 1s var(--ease-soft) 3.1s both;
+    }
+    @keyframes lineGrow { from { height: 0; opacity: 0; } to { height: 80px; opacity: 1; } }
+
+    /* ── HOME-ABOUT (char scrub) ─────────────────── */
+    .home-about {
+      position: relative; min-height: 100dvh;
+      background: var(--bg);
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 8rem var(--gutter); overflow: hidden;
+    }
+    .tr__container { max-width: 1400px; margin: 0 auto; width: 100%; }
+    .about-text-large {
+      font-family: var(--ff-head);
+      font-size: clamp(2rem, 4.2vw, 5rem);
+      font-weight: 500; line-height: 1.18;
+      letter-spacing: -.02em;
+    }
+    .about-text-large .char { display: inline; }
+    .about-bottom-row {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-top: 5rem; padding-top: 2rem;
+      border-top: 1px solid #201540;
+    }
+    .about-sub {
+      font-size: clamp(.8rem,1.1vw,.95rem); line-height: 1.7;
+      color: var(--text-dim); max-width: 480px;
+    }
+    .about-link {
+      font-family: var(--ff-mono); font-size: .65rem;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--text-dim);
+      padding-bottom: .2rem; white-space: nowrap;
+    }
+
+    /* ── KEYFACTS (light gradient) ───────────────── */
+    #keyfacts-section {
+      background: linear-gradient(0deg,#ffffff 0%,#E4D8FF 100%);
+      padding: 8rem var(--gutter);
+      position: relative; z-index: 20;
+    }
+    .kf-title { text-align: center; margin-bottom: 5rem; }
+    .kf-title h2 {
+      font-family: var(--ff-section);
+      font-size: clamp(2rem,4vw,4.5rem);
+      font-weight: 500; letter-spacing: -.01em;
+      color: var(--ink-deep); line-height: 1.1;
+    }
+    .kf-label {
+      margin-top: .75rem;
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .18em; text-transform: uppercase; color: #888;
+    }
+    .kf-cards-wrap { position: relative; }
+    .kf-cards-wrap::after {
+      content: ''; position: absolute; top: 0; right: 0; bottom: .5rem; width: 5rem;
+      background: linear-gradient(to right, transparent, #ffffff 90%);
+      pointer-events: none; opacity: 0; transition: opacity .3s;
+    }
+    .kf-cards-wrap.has-overflow::after { opacity: 1; }
+    .kf-cards {
+      display: flex; gap: 1.25rem;
+      overflow-x: auto; scrollbar-width: none;
+      padding-bottom: .5rem;
+      scroll-snap-type: x proximity;
+      cursor: grab;
+    }
+    .kf-cards.dragging { cursor: grabbing; scroll-snap-type: none; }
+    .kf-cards::-webkit-scrollbar { display: none; }
+    .kf-card {
+      flex-shrink: 0; border-radius: 10px; overflow: hidden;
+      position: relative; scroll-snap-align: start;
+    }
+    .kf-card.feat {
+      width: 340px; min-height: 400px;
+      background: linear-gradient(135deg,rgba(35,8,77,.45),rgba(73,24,165,.35)),
+        url('https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=80');
+      background-size: cover; background-position: center;
+    }
+    .kf-card.stat {
+      width: 240px; min-height: 280px;
+      background: white;
+      padding: 1.75rem; display: flex;
+      flex-direction: column; justify-content: space-between;
+    }
+    .kf-card.dark {
+      background: var(--violet-900); width: 240px; min-height: 280px;
+      padding: 1.75rem; display: flex;
+      flex-direction: column; justify-content: space-between;
+    }
+    .kf-card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top,rgba(0,0,0,.75) 0%,transparent 55%);
+    }
+    .kf-card-body {
+      position: relative; z-index: 2;
+      padding: 2rem; height: 100%;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .kf-card-tag {
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(255,255,255,.55); margin-bottom: .4rem;
+    }
+    .kf-card-label {
+      font-family: var(--ff-head); font-size: 1.1rem;
+      font-weight: 700; color: white; line-height: 1.2;
+    }
+    .stat-num {
+      font-family: var(--ff-display); font-weight: 700;
+      font-size: clamp(2.2rem,4.2vw,3.4rem);
+      line-height: 1; letter-spacing: -.02em; color: var(--ink-deep);
+      white-space: nowrap;
+    }
+    .stat-num.light { color: var(--text); }
+    .stat-lbl { font-size: .8rem; color: #666; margin-top: .4rem; line-height: 1.45; }
+    .stat-lbl.light { color: var(--text-dim); }
+
+    /* ── SERVICES (pinned) ───────────────────────── */
+    #servicos { position: relative; background: var(--bg); }
+    .svc-pinned {
+      position: relative; width: 100%; height: 100dvh;
+      display: grid;
+      grid-template-columns: minmax(96px, 140px) 1fr clamp(340px, 36vw, 520px);
+      align-items: center;
+    }
+    .svc-top-label {
+      position: absolute; top: 2.2rem; left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .svc-center-wrap {
+      position: relative; width: 100%;
+      perspective: 1100px;
+    }
+    .svc-center {
+      position: relative; width: 100%;
+      height: min(62vh, 560px); border-radius: 14px; overflow: hidden;
+      background: var(--ink);
+      transform-style: preserve-3d;
+      will-change: transform;
+      box-shadow: 0 30px 60px -20px rgba(35,8,77,.7),
+                  0 0 0 1px rgba(124,77,219,.18);
+    }
+    .svc-center > * { transform-style: preserve-3d; }
+    .svc-img {
+      position: absolute; inset: 0; opacity: 0;
+      transition: opacity .8s var(--ease-soft);
+    }
+    .svc-img.on { opacity: 1; }
+    .svc-img-bg { width: 100%; height: 100%; }
+    .svc-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0; transition: opacity 1s var(--ease-soft);
+    }
+    .svc-video.ready { opacity: 1; }
+    .svc-tint {
+      position: absolute; inset: 0; pointer-events: none;
+      background: linear-gradient(160deg, rgba(35,8,77,.4), rgba(73,24,165,.22) 55%, rgba(10,5,15,.35));
+    }
+    /* floating depth layers for the 3D card */
+    .svc-card-overlay {
+      position: absolute; inset: 0; pointer-events: none;
+      padding: 1.6rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .svc-card-tag {
+      align-self: flex-start;
+      height: auto; width: auto;
+      background: rgba(10,5,15,.35);
+      border: 1px solid rgba(228,216,255,.22);
+      padding: .5rem 1rem; border-radius: 100px;
+      backdrop-filter: blur(4px);
+    }
+    img.svc-card-wm {
+      display: block; height: 22px;
+      aspect-ratio: 1416 / 406;
+    }
+    .svc-card-num {
+      align-self: flex-end;
+      font-family: var(--ff-section);
+      font-size: clamp(3rem,7vw,5.5rem); font-weight: 600;
+      line-height: 1; color: var(--text);
+      text-shadow: 0 12px 40px rgba(35,8,77,.9);
+    }
+    .svc-img-bg.s1 { background: linear-gradient(145deg,#0A050F,#23084D,#4918A5); }
+    .svc-img-bg.s2 { background: linear-gradient(145deg,#16111F,#330F6E,#7C4DDB); }
+    .svc-img-bg.s3 { background: linear-gradient(145deg,#0A050F,#330F6E,#4918A5); }
+    .svc-img-bg.s4 { background: linear-gradient(145deg,#23084D,#4918A5,#7C4DDB); }
+
+    .svc-left { padding: 0 2.5rem; }
+    .svc-idx {
+      font-family: var(--ff-mono); font-size: .65rem;
+      letter-spacing: .14em; color: var(--text-dim);
+    }
+    .svc-right { padding: 0 var(--gutter) 0 2.5rem; position: relative; min-height: 260px; }
+    .svc-panel {
+      position: absolute; top: 0; left: 2.5rem; right: 0;
+      opacity: 0; pointer-events: none;
+      transition: opacity .55s var(--ease-soft), transform .55s var(--ease-soft);
+      transform: translateY(12px);
+    }
+    .svc-panel.on { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .svc-title {
+      font-family: var(--ff-section);
+      font-size: clamp(1.8rem,3vw,3.2rem);
+      font-weight: 600; letter-spacing: -.02em;
+      color: var(--text); line-height: 1.1; margin-bottom: 1.25rem;
+    }
+    .svc-desc {
+      font-size: .9rem; line-height: 1.72;
+      color: var(--text-dim); max-width: 300px;
+    }
+    .svc-bottom {
+      position: absolute; bottom: 2rem; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 var(--gutter);
+    }
+    .svc-tagline {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim);
+    }
+    .svc-dots { display: flex; gap: .5rem; }
+    .svc-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--text-dim);
+      transition: background .3s, transform .3s;
+    }
+    .svc-dot.on { background: var(--accent); transform: scale(1.4); }
+    .svc-view {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--text-dim); padding-bottom: .15rem;
+    }
+
+    /* ── PROJECTS (pinned WebGL carousel) ─────────── */
+    #projetos {
+      background: var(--cream);
+      position: relative; z-index: 10;
+    }
+    .proj-heading {
+      font-family: var(--ff-section);
+      font-size: clamp(2rem,4vw,4.5rem);
+      font-weight: 500; letter-spacing: -.01em;
+      color: var(--ink-deep); line-height: 1.1;
+    }
+    .proj-link {
+      font-family: var(--ff-mono); font-size: .65rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: #555; border-bottom: 1px solid #555;
+      padding-bottom: .2rem;
+    }
+
+    /* pinned desktop carousel */
+    .proj-pinned {
+      display: none;
+      position: relative; width: 100%; height: 100dvh;
+      flex-direction: column;
+      padding: 6rem var(--gutter) 3rem;
+    }
+    .proj-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 2rem; flex-shrink: 0;
+    }
+    .proj-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; }
+    .proj-counter {
+      font-family: var(--ff-mono); font-size: .8rem;
+      letter-spacing: .06em; color: #9d92b8;
+      font-variant-numeric: tabular-nums;
+    }
+    .proj-counter #proj-cur { color: var(--ink-deep); font-weight: 700; }
+    .proj-canvas-wrap {
+      position: relative; flex: 1; min-height: 0;
+      border-radius: 14px; overflow: hidden;
+    }
+    #proj-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
+    .proj-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 2rem; margin-top: 2rem; flex-shrink: 0;
+    }
+    .proj-detail { display: flex; align-items: baseline; gap: 1.1rem; min-width: 0; }
+    .proj-detail-num {
+      font-family: var(--ff-mono); font-size: .7rem;
+      color: #9d92b8; flex-shrink: 0;
+    }
+    .proj-detail-name {
+      font-family: var(--ff-head); font-size: 1.3rem;
+      font-weight: 700; color: var(--ink-deep);
+      display: inline; margin-right: .6rem;
+    }
+    .proj-detail-tag { font-size: .8rem; color: #79708f; display: inline; }
+    .proj-dots { display: flex; gap: .5rem; flex-shrink: 0; }
+    .proj-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #c7bfe0;
+      transition: background .3s, transform .3s;
+    }
+    .proj-dot.on { background: var(--violet); transform: scale(1.4); }
+    .proj-arrow {
+      flex-shrink: 0; background: none; border: 1px solid rgba(35,8,77,.22);
+      color: var(--ink-deep); width: 2.6rem; height: 2.6rem; border-radius: 50%;
+      font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .3s var(--ease-soft), color .3s, border-color .3s, transform .3s var(--ease-soft);
+    }
+    .proj-arrow:hover { background: var(--violet); color: #fff; border-color: var(--violet); transform: translateX(3px); }
+
+    /* mobile fallback (native horizontal scroll) */
+    .proj-mobile { padding: 6rem var(--gutter) 5rem; }
+    .proj-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 3rem;
+    }
+    .proj-mobile-grid {
+      display: flex; flex-wrap: nowrap;
+      gap: 1.25rem; overflow-x: auto;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      padding-bottom: .5rem; scrollbar-width: none;
+    }
+    .proj-mobile-grid::-webkit-scrollbar { display: none; }
+    .proj-card {
+      position: relative; border-radius: 10px;
+      overflow: hidden; aspect-ratio: 16/11;
+      width: clamp(280px, 78vw, 480px); flex-shrink: 0;
+      background: #ccc; scroll-snap-align: start;
+    }
+    .proj-inner { width: 100%; height: 100%; }
+    .proj-bg { width: 100%; height: 100%; }
+    .proj-bg {
+      background-size: cover; background-position: center;
+      background-repeat: no-repeat;
+    }
+    .proj-card:nth-child(1) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80'); }
+    .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
+    .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
+    .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
+    .proj-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 2rem;
+      background: linear-gradient(to top,rgba(0,0,0,.85),transparent);
+    }
+    .proj-num {
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .1em; color: rgba(255,255,255,.4); margin-bottom: .4rem;
+    }
+    .proj-name {
+      font-family: var(--ff-head); font-size: 1.3rem;
+      font-weight: 700; color: white; margin-bottom: .2rem;
+    }
+    .proj-tag { font-size: .75rem; color: rgba(255,255,255,.45); }
+
+    @media (min-width: 760px) {
+      .proj-pinned { display: flex; }
+      .proj-mobile { display: none; }
+    }
+
+    /* ── TESTIMONIALS ────────────────────────────── */
+    .testimonials {
+      background: #F1ECFA;
+      padding: 8rem var(--gutter); overflow: hidden;
+    }
+    .test-head { margin-bottom: 4rem; }
+    .test-heading {
+      font-family: var(--ff-section);
+      font-size: clamp(2rem,4vw,4rem);
+      font-weight: 500; letter-spacing: -.01em;
+      color: var(--ink-deep); line-height: 1.1; margin-bottom: .75rem;
+    }
+    .test-sub { font-size: .9rem; color: #6b6480; max-width: 480px; line-height: 1.6; }
+    .test-track {
+      display: flex; gap: 1.25rem;
+      overflow-x: auto; scrollbar-width: none;
+      cursor: grab; user-select: none;
+    }
+    .test-track:active { cursor: grabbing; }
+    .test-track::-webkit-scrollbar { display: none; }
+    .test-card {
+      flex-shrink: 0; width: 360px;
+      background: white; border-radius: 10px;
+      padding: 2.5rem;
+    }
+    .test-co {
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: #9a90b8; margin-bottom: 1.5rem;
+    }
+    .test-quote { font-size: .9rem; line-height: 1.72; color: #3a3450; margin-bottom: 2rem; }
+    .test-auth strong { color: var(--ink-deep); display: block; margin-bottom: .2rem; font-size: .85rem; }
+    .test-auth span { font-size: .78rem; color: #8a83a0; }
+
+    /* ── CTA ──────────────────────────────────────── */
+    #contato {
+      background: var(--bg); min-height: 85dvh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 8rem var(--gutter); text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-label-text {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 3rem;
+    }
+    .cta-heading {
+      font-family: var(--ff-section);
+      font-size: clamp(3.5rem,9vw,10rem);
+      font-weight: 500; letter-spacing: -.01em;
+      color: var(--text); line-height: .95;
+      margin-bottom: 3.5rem;
+    }
+    .cta-heading em { font-style: italic; }
+    .cta-wordmark {
+      display: inline-block;
+      height: 0.82em; width: auto;
+      aspect-ratio: 1416 / 406;
+      vertical-align: -0.08em;
+      margin: 0 .04em 0 .06em;
+    }
+    html[data-theme="light"] .cta-wordmark { filter: invert(1) brightness(0.15); }
+    .cta-acts { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+    .btn-fill {
+      background: var(--violet); color: #fff;
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      padding: 1rem 2.5rem; border-radius: 4px;
+      transition: transform .3s var(--ease-soft), background .25s;
+      display: inline-block;
+    }
+    .btn-fill:hover { background: var(--violet-400); transform: translateY(-2px); }
+    .btn-ghost-link {
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .1em; color: var(--text-dim);
+      border-bottom: 1px solid var(--text-dim); padding-bottom: .2rem;
+    }
+
+    /* ── FOOTER ───────────────────────────────────── */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid #1b1233;
+      padding: 3.5rem var(--gutter);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 2rem;
+    }
+    .footer-logo {
+      font-family: var(--ff-display); font-weight: 700;
+      font-size: 1.5rem; letter-spacing: -.01em; color: var(--text);
+    }
+    .footer-logo .mark { width: 1.3em; height: 1.3em; }
+    .footer-nav { display: flex; gap: 2rem; list-style: none; }
+    .footer-nav a {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-dim);
+      transition: color .25s;
+    }
+    .footer-nav a:hover { color: var(--text); }
+    .footer-copy {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .05em; color: var(--text-dim);
+    }
+
+    /* ── UTILS ────────────────────────────────────── */
+    .fade-in { opacity: 0; }
+
+    /* ── THEME TRANSITION ────────────────────────── */
+    *, *::before, *::after {
+      transition:
+        background-color .4s cubic-bezier(.22,1,.36,1),
+        border-color .4s cubic-bezier(.22,1,.36,1),
+        color .4s cubic-bezier(.22,1,.36,1);
+    }
+    /* don't animate things that shouldn't transition */
+    .loader-belt, #loader, [style*="animation"], canvas {
+      transition: none !important;
+    }
+
+    /* ── THEME TOGGLE BUTTON ─────────────────────── */
+    #theme-toggle {
+      display: flex; align-items: center; justify-content: center;
+      width: 2.2rem; height: 2.2rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.4);
+      background: none;
+      color: white;
+      flex-shrink: 0;
+      transition: background .25s, border-color .25s, color .25s !important;
+      position: relative;
+    }
+    #theme-toggle:hover { background: rgba(255,255,255,.12); }
+    .theme-toggle-icon {
+      width: 1rem; height: 1rem; display: block;
+      position: absolute;
+      transition: opacity .35s ease, transform .35s ease !important;
+    }
+    #icon-moon  { opacity: 1;  transform: rotate(0deg) scale(1); }
+    #icon-sun   { opacity: 0;  transform: rotate(-90deg) scale(0.5); }
+    html[data-theme="light"] #icon-moon { opacity: 0;  transform: rotate(90deg) scale(0.5); }
+    html[data-theme="light"] #icon-sun  { opacity: 1;  transform: rotate(0deg) scale(1); }
+
+    /* ── LIGHT THEME ─────────────────────────────── */
+    html[data-theme="light"] {
+      --bg:        #FFFFFF;
+      --ink:       #F0EBFB;
+      --text:      #1A0B33;
+      --text-dim:  #7B6A9B;
+      --cream:     #EDE8F8;
+      color-scheme: light;
+    }
+    html[data-theme="light"] body { background: var(--bg); color: var(--text); }
+    html[data-theme="light"] .about-bottom-row { border-top-color: #D4CBE8; }
+    html[data-theme="light"] footer { border-top-color: #D4CBE8; }
+    html[data-theme="light"] .testimonials { background: #EDE8F8; }
+    html[data-theme="light"] .test-card { background: #fff; box-shadow: 0 2px 12px rgba(73,24,165,.08); }
+    html[data-theme="light"] #keyfacts-section { background: linear-gradient(0deg,#EDE8F8 0%,#D8CCFA 100%); }
+    html[data-theme="light"] #projetos { background: var(--cream); }
+    html[data-theme="light"] .proj-heading { color: var(--text); }
+    html[data-theme="light"] .kf-title h2 { color: var(--text); }
+    html[data-theme="light"] .stat-num { color: var(--text); }
+    html[data-theme="light"] .test-heading { color: var(--text); }
+    html[data-theme="light"] .test-quote { color: #3a3450; }
+    html[data-theme="light"] nav {
+      border-bottom: 1px solid rgba(73,24,165,.12);
+    }
+    html[data-theme="light"] .nav-logo { color: var(--text); }
+    html[data-theme="light"] .nav-pill {
+      border-color: rgba(26,11,51,.3);
+      color: var(--text);
+    }
+    html[data-theme="light"] .nav-pill:hover { background: var(--text); color: white; }
+    html[data-theme="light"] #theme-toggle {
+      border-color: rgba(26,11,51,.3);
+      color: var(--text);
+    }
+    html[data-theme="light"] #theme-toggle:hover { background: rgba(26,11,51,.08); }
+    html[data-theme="light"] .hero-cta-link { color: var(--text); border-bottom-color: rgba(26,11,51,.3); }
+    html[data-theme="light"] .hero-desc { color: var(--text); }
+    html[data-theme="light"] .hero-est { color: var(--text-dim); }
+    html[data-theme="light"] .svc-center { background: var(--ink); }
+    html[data-theme="light"] .svc-img-bg.s1 { background: linear-gradient(145deg,#D8CCFA,#A07AE8,#6B3FC0); }
+    html[data-theme="light"] .svc-img-bg.s2 { background: linear-gradient(145deg,#EDE8F8,#B89AF0,#7C4DDB); }
+    html[data-theme="light"] .svc-img-bg.s3 { background: linear-gradient(145deg,#D8CCFA,#9870E0,#5A2DB0); }
+    html[data-theme="light"] .svc-img-bg.s4 { background: linear-gradient(145deg,#C8BAF5,#A07AE8,#7C4DDB); }
+    html[data-theme="light"] .footer-logo { color: var(--text); }
+    html[data-theme="light"] .footer-copy { color: var(--text-dim); }
+    html[data-theme="light"] .footer-nav a { color: var(--text-dim); }
+    html[data-theme="light"] .footer-nav a:hover { color: var(--text); }
+    html[data-theme="light"] .hero-scroll { background: linear-gradient(to bottom, transparent, var(--text-dim)); }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-belt"></div>
+  <div class="loader-belt"></div>
+  <div class="loader-belt"></div>
+  <div class="loader-belt"></div>
+  <div class="loader-belt"></div>
+  <div id="loader-logo">
+    <svg class="mark" viewBox="0 0 1000 1000" fill="none" aria-hidden="true">
+      <path fill="currentColor" fill-rule="evenodd" d="M472.18 153.42 L470.59 155.01 L446.74 156.60 L445.15 158.19 L438.79 158.19 L437.20 159.78 L430.84 159.78 L429.25 161.37 L411.76 164.55 L410.17 166.14 L407.00 166.14 L400.64 169.32 L395.87 169.32 L391.10 172.50 L383.15 174.09 L370.43 180.45 L367.25 180.45 L329.09 201.11 L303.66 218.60 L284.58 236.09 L282.99 236.09 L263.12 255.96 L263.12 257.55 L251.99 268.68 L251.99 270.27 L236.09 289.35 L231.32 298.89 L220.19 314.79 L205.88 343.40 L205.88 346.58 L202.70 351.35 L202.70 354.53 L199.52 359.30 L199.52 362.48 L193.16 378.38 L193.16 383.15 L191.57 384.74 L191.57 389.51 L188.39 397.46 L188.39 403.82 L186.80 405.41 L186.80 411.76 L185.21 413.35 L185.21 422.89 L183.62 424.48 L183.62 438.79 L182.03 440.38 L183.62 478.54 L185.21 480.13 L185.21 488.08 L186.80 489.67 L186.80 494.44 L188.39 496.03 L188.39 500.79 L189.98 502.38 L189.98 507.15 L191.57 508.74 L194.75 521.46 L205.88 543.72 L205.88 546.90 L210.65 553.26 L218.60 569.16 L247.22 607.31 L270.27 630.37 L271.86 630.37 L287.76 644.67 L324.32 668.52 L333.86 673.29 L337.04 673.29 L340.22 676.47 L343.40 676.47 L348.17 679.65 L351.35 679.65 L356.12 682.83 L359.30 682.83 L375.20 689.19 L379.97 689.19 L387.92 692.37 L394.28 692.37 L395.87 693.96 L403.82 693.96 L405.41 695.55 L418.12 695.55 L419.71 697.14 L451.51 697.14 L453.10 695.55 L475.36 693.96 L476.95 692.37 L488.08 690.78 L489.67 689.19 L507.15 684.42 L529.41 673.29 L543.72 663.75 L568.36 637.52 L576.31 618.44 L577.90 602.54 L576.31 600.95 L574.72 586.65 L571.54 580.29 L568.36 575.52 L548.49 557.23 L535.77 550.87 L532.59 550.87 L521.46 546.10 L510.33 544.52 L508.74 542.93 L486.49 541.34 L484.90 539.75 L473.77 539.75 L472.18 538.16 L462.64 538.16 L461.05 536.57 L443.56 534.98 L441.97 533.39 L435.61 533.39 L427.66 530.21 L421.30 530.21 L414.94 527.03 L410.17 527.03 L408.59 525.44 L399.05 523.85 L389.51 519.08 L381.56 517.49 L373.61 512.72 L370.43 512.72 L360.89 507.95 L337.04 492.05 L320.35 475.36 L309.22 459.46 L301.27 443.56 L298.09 427.66 L296.50 426.07 L296.50 418.12 L294.91 416.53 L294.91 392.69 L296.50 391.10 L296.50 381.56 L298.09 379.97 L298.09 373.61 L302.86 362.48 L302.86 357.71 L315.58 330.68 L334.66 303.66 L359.30 279.01 L386.33 259.94 L407.00 248.81 L410.17 248.81 L421.30 242.45 L429.25 240.86 L434.02 237.68 L437.20 237.68 L443.56 234.50 L448.33 234.50 L454.69 231.32 L459.46 231.32 L467.41 228.14 L473.77 228.14 L475.36 226.55 L494.44 224.96 L496.03 223.37 L508.74 223.37 L510.33 221.78 L559.62 221.78 L561.21 223.37 L572.34 223.37 L573.93 224.96 L583.47 224.96 L585.06 226.55 L591.41 226.55 L593.00 228.14 L604.13 229.73 L605.72 231.32 L615.26 232.91 L624.80 237.68 L632.75 239.27 L667.73 256.76 L686.80 269.48 L693.16 275.83 L702.70 282.19 L743.24 324.32 L771.86 367.25 L787.76 400.64 L787.76 403.82 L790.94 408.59 L790.94 411.76 L798.89 432.43 L798.89 437.20 L802.07 443.56 L802.07 449.92 L803.66 451.51 L805.25 465.82 L806.84 467.41 L806.84 475.36 L808.43 475.36 L808.43 462.64 L810.02 461.05 L810.02 449.92 L808.43 448.33 L808.43 424.48 L806.84 422.89 L805.25 403.82 L803.66 402.23 L803.66 395.87 L802.07 394.28 L798.89 376.79 L795.71 370.43 L795.71 365.66 L792.53 360.89 L786.17 340.22 L771.86 311.61 L751.19 279.81 L740.06 267.09 L740.06 265.50 L730.52 255.96 L730.52 254.37 L709.06 232.91 L707.47 232.91 L697.93 223.37 L667.73 201.11 L662.96 199.52 L651.83 191.57 L626.39 178.86 L623.21 178.86 L620.03 175.68 L615.26 175.68 L610.49 172.50 L607.31 172.50 L586.65 164.55 L581.88 164.55 L580.29 162.96 L575.52 162.96 L567.57 159.78 L561.21 159.78 L559.62 158.19 L553.26 158.19 L551.67 156.60 L543.72 156.60 L542.13 155.01 L527.82 155.01 L526.23 153.42 L473.77 153.42 Z M542.13 285.37 L540.54 286.96 L516.69 288.55 L515.10 290.14 L497.62 293.32 L496.03 294.91 L483.31 298.09 L478.54 301.27 L475.36 301.27 L448.33 315.58 L435.61 325.12 L417.33 344.99 L415.74 349.76 L410.97 356.12 L410.97 359.30 L407.79 365.66 L407.79 375.20 L406.20 376.79 L406.20 379.97 L407.79 381.56 L407.79 389.51 L414.15 403.82 L422.89 414.15 L434.02 422.10 L446.74 428.46 L449.92 428.46 L454.69 431.64 L459.46 431.64 L465.82 434.82 L481.72 436.41 L483.31 438.00 L492.85 438.00 L494.44 439.59 L508.74 439.59 L510.33 441.18 L521.46 441.18 L523.05 442.77 L543.72 444.36 L545.31 445.95 L551.67 445.95 L553.26 447.54 L559.62 447.54 L561.21 449.13 L567.57 449.13 L569.16 450.72 L580.29 452.31 L586.65 455.48 L591.41 455.48 L593.00 457.07 L605.72 460.25 L621.62 468.20 L624.80 468.20 L627.98 471.38 L635.93 474.56 L639.11 477.74 L648.65 482.51 L674.88 507.15 L682.83 518.28 L686.01 526.23 L689.19 529.41 L689.19 532.59 L695.55 545.31 L697.14 558.03 L698.73 559.62 L698.73 596.18 L697.14 597.77 L697.14 604.13 L695.55 605.72 L692.37 621.62 L689.19 626.39 L687.60 634.34 L674.88 658.19 L657.39 682.03 L637.52 701.91 L605.72 725.76 L578.70 740.06 L575.52 740.06 L567.57 744.83 L564.39 744.83 L538.95 754.37 L526.23 755.96 L518.28 759.14 L500.79 760.73 L499.21 762.32 L484.90 762.32 L483.31 763.91 L443.56 763.91 L441.97 762.32 L416.53 760.73 L414.94 759.14 L400.64 757.55 L399.05 755.96 L387.92 754.37 L381.56 751.19 L376.79 751.19 L359.30 743.24 L356.12 743.24 L348.17 738.47 L344.99 738.47 L335.45 733.70 L332.27 730.52 L321.14 725.76 L282.99 698.73 L247.22 662.96 L247.22 661.37 L234.50 647.06 L213.83 615.26 L197.93 583.47 L196.34 575.52 L193.16 570.75 L193.16 567.57 L189.98 561.21 L189.98 556.44 L186.80 551.67 L186.80 546.90 L185.21 545.31 L185.21 540.54 L182.03 532.59 L182.03 526.23 L180.45 524.64 L178.86 507.15 L177.27 507.15 L177.27 511.92 L175.68 513.51 L175.68 542.13 L177.27 543.72 L177.27 561.21 L178.86 562.80 L178.86 572.34 L180.45 573.93 L182.03 589.83 L183.62 591.41 L186.80 607.31 L191.57 618.44 L191.57 623.21 L194.75 627.98 L197.93 639.11 L213.83 670.91 L231.32 697.93 L248.81 718.60 L248.81 720.19 L292.53 762.32 L340.22 794.12 L356.12 802.07 L359.30 802.07 L370.43 808.43 L373.61 808.43 L378.38 811.61 L386.33 813.20 L395.87 817.97 L400.64 817.97 L407.00 821.14 L411.76 821.14 L413.35 822.73 L418.12 822.73 L426.07 825.91 L432.43 825.91 L434.02 827.50 L441.97 827.50 L443.56 829.09 L451.51 829.09 L453.10 830.68 L469.00 830.68 L470.59 832.27 L513.51 832.27 L515.10 830.68 L529.41 830.68 L531.00 829.09 L540.54 829.09 L542.13 827.50 L556.44 825.91 L564.39 822.73 L570.75 822.73 L572.34 821.14 L604.13 811.61 L640.70 794.12 L643.88 790.94 L648.65 789.35 L651.83 786.17 L656.60 784.58 L670.91 775.04 L689.98 759.14 L691.57 759.14 L705.88 744.83 L707.47 744.83 L733.70 717.01 L733.70 715.42 L746.42 701.11 L767.09 669.32 L789.35 621.62 L790.94 612.08 L795.71 600.95 L798.89 583.47 L800.48 581.88 L800.48 573.93 L802.07 572.34 L802.07 564.39 L803.66 562.80 L803.66 510.33 L802.07 508.74 L802.07 499.21 L798.89 491.26 L798.89 484.90 L797.30 483.31 L797.30 478.54 L795.71 476.95 L790.94 459.46 L787.76 454.69 L784.58 443.56 L765.50 408.59 L736.88 370.43 L715.42 348.97 L713.83 348.97 L691.57 329.89 L677.27 320.35 L672.50 318.76 L669.32 315.58 L647.06 304.45 L643.88 304.45 L639.11 301.27 L631.16 299.68 L621.62 294.91 L616.85 294.91 L615.26 293.32 L610.49 293.32 L602.54 290.14 L596.18 290.14 L594.59 288.55 L570.75 286.96 L569.16 285.37 L543.72 285.37 Z"/>
+    </svg>
+    <img class="wordmark" src="spiralis-wordmark.svg" alt="Spiralis">
+  </div>
+  <div id="loader-counter">000</div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo brand-lockup">
+    <svg class="mark" viewBox="0 0 1000 1000" fill="none" aria-hidden="true">
+      <path fill="currentColor" fill-rule="evenodd" d="M472.18 153.42 L470.59 155.01 L446.74 156.60 L445.15 158.19 L438.79 158.19 L437.20 159.78 L430.84 159.78 L429.25 161.37 L411.76 164.55 L410.17 166.14 L407.00 166.14 L400.64 169.32 L395.87 169.32 L391.10 172.50 L383.15 174.09 L370.43 180.45 L367.25 180.45 L329.09 201.11 L303.66 218.60 L284.58 236.09 L282.99 236.09 L263.12 255.96 L263.12 257.55 L251.99 268.68 L251.99 270.27 L236.09 289.35 L231.32 298.89 L220.19 314.79 L205.88 343.40 L205.88 346.58 L202.70 351.35 L202.70 354.53 L199.52 359.30 L199.52 362.48 L193.16 378.38 L193.16 383.15 L191.57 384.74 L191.57 389.51 L188.39 397.46 L188.39 403.82 L186.80 405.41 L186.80 411.76 L185.21 413.35 L185.21 422.89 L183.62 424.48 L183.62 438.79 L182.03 440.38 L183.62 478.54 L185.21 480.13 L185.21 488.08 L186.80 489.67 L186.80 494.44 L188.39 496.03 L188.39 500.79 L189.98 502.38 L189.98 507.15 L191.57 508.74 L194.75 521.46 L205.88 543.72 L205.88 546.90 L210.65 553.26 L218.60 569.16 L247.22 607.31 L270.27 630.37 L271.86 630.37 L287.76 644.67 L324.32 668.52 L333.86 673.29 L337.04 673.29 L340.22 676.47 L343.40 676.47 L348.17 679.65 L351.35 679.65 L356.12 682.83 L359.30 682.83 L375.20 689.19 L379.97 689.19 L387.92 692.37 L394.28 692.37 L395.87 693.96 L403.82 693.96 L405.41 695.55 L418.12 695.55 L419.71 697.14 L451.51 697.14 L453.10 695.55 L475.36 693.96 L476.95 692.37 L488.08 690.78 L489.67 689.19 L507.15 684.42 L529.41 673.29 L543.72 663.75 L568.36 637.52 L576.31 618.44 L577.90 602.54 L576.31 600.95 L574.72 586.65 L571.54 580.29 L568.36 575.52 L548.49 557.23 L535.77 550.87 L532.59 550.87 L521.46 546.10 L510.33 544.52 L508.74 542.93 L486.49 541.34 L484.90 539.75 L473.77 539.75 L472.18 538.16 L462.64 538.16 L461.05 536.57 L443.56 534.98 L441.97 533.39 L435.61 533.39 L427.66 530.21 L421.30 530.21 L414.94 527.03 L410.17 527.03 L408.59 525.44 L399.05 523.85 L389.51 519.08 L381.56 517.49 L373.61 512.72 L370.43 512.72 L360.89 507.95 L337.04 492.05 L320.35 475.36 L309.22 459.46 L301.27 443.56 L298.09 427.66 L296.50 426.07 L296.50 418.12 L294.91 416.53 L294.91 392.69 L296.50 391.10 L296.50 381.56 L298.09 379.97 L298.09 373.61 L302.86 362.48 L302.86 357.71 L315.58 330.68 L334.66 303.66 L359.30 279.01 L386.33 259.94 L407.00 248.81 L410.17 248.81 L421.30 242.45 L429.25 240.86 L434.02 237.68 L437.20 237.68 L443.56 234.50 L448.33 234.50 L454.69 231.32 L459.46 231.32 L467.41 228.14 L473.77 228.14 L475.36 226.55 L494.44 224.96 L496.03 223.37 L508.74 223.37 L510.33 221.78 L559.62 221.78 L561.21 223.37 L572.34 223.37 L573.93 224.96 L583.47 224.96 L585.06 226.55 L591.41 226.55 L593.00 228.14 L604.13 229.73 L605.72 231.32 L615.26 232.91 L624.80 237.68 L632.75 239.27 L667.73 256.76 L686.80 269.48 L693.16 275.83 L702.70 282.19 L743.24 324.32 L771.86 367.25 L787.76 400.64 L787.76 403.82 L790.94 408.59 L790.94 411.76 L798.89 432.43 L798.89 437.20 L802.07 443.56 L802.07 449.92 L803.66 451.51 L805.25 465.82 L806.84 467.41 L806.84 475.36 L808.43 475.36 L808.43 462.64 L810.02 461.05 L810.02 449.92 L808.43 448.33 L808.43 424.48 L806.84 422.89 L805.25 403.82 L803.66 402.23 L803.66 395.87 L802.07 394.28 L798.89 376.79 L795.71 370.43 L795.71 365.66 L792.53 360.89 L786.17 340.22 L771.86 311.61 L751.19 279.81 L740.06 267.09 L740.06 265.50 L730.52 255.96 L730.52 254.37 L709.06 232.91 L707.47 232.91 L697.93 223.37 L667.73 201.11 L662.96 199.52 L651.83 191.57 L626.39 178.86 L623.21 178.86 L620.03 175.68 L615.26 175.68 L610.49 172.50 L607.31 172.50 L586.65 164.55 L581.88 164.55 L580.29 162.96 L575.52 162.96 L567.57 159.78 L561.21 159.78 L559.62 158.19 L553.26 158.19 L551.67 156.60 L543.72 156.60 L542.13 155.01 L527.82 155.01 L526.23 153.42 L473.77 153.42 Z M542.13 285.37 L540.54 286.96 L516.69 288.55 L515.10 290.14 L497.62 293.32 L496.03 294.91 L483.31 298.09 L478.54 301.27 L475.36 301.27 L448.33 315.58 L435.61 325.12 L417.33 344.99 L415.74 349.76 L410.97 356.12 L410.97 359.30 L407.79 365.66 L407.79 375.20 L406.20 376.79 L406.20 379.97 L407.79 381.56 L407.79 389.51 L414.15 403.82 L422.89 414.15 L434.02 422.10 L446.74 428.46 L449.92 428.46 L454.69 431.64 L459.46 431.64 L465.82 434.82 L481.72 436.41 L483.31 438.00 L492.85 438.00 L494.44 439.59 L508.74 439.59 L510.33 441.18 L521.46 441.18 L523.05 442.77 L543.72 444.36 L545.31 445.95 L551.67 445.95 L553.26 447.54 L559.62 447.54 L561.21 449.13 L567.57 449.13 L569.16 450.72 L580.29 452.31 L586.65 455.48 L591.41 455.48 L593.00 457.07 L605.72 460.25 L621.62 468.20 L624.80 468.20 L627.98 471.38 L635.93 474.56 L639.11 477.74 L648.65 482.51 L674.88 507.15 L682.83 518.28 L686.01 526.23 L689.19 529.41 L689.19 532.59 L695.55 545.31 L697.14 558.03 L698.73 559.62 L698.73 596.18 L697.14 597.77 L697.14 604.13 L695.55 605.72 L692.37 621.62 L689.19 626.39 L687.60 634.34 L674.88 658.19 L657.39 682.03 L637.52 701.91 L605.72 725.76 L578.70 740.06 L575.52 740.06 L567.57 744.83 L564.39 744.83 L538.95 754.37 L526.23 755.96 L518.28 759.14 L500.79 760.73 L499.21 762.32 L484.90 762.32 L483.31 763.91 L443.56 763.91 L441.97 762.32 L416.53 760.73 L414.94 759.14 L400.64 757.55 L399.05 755.96 L387.92 754.37 L381.56 751.19 L376.79 751.19 L359.30 743.24 L356.12 743.24 L348.17 738.47 L344.99 738.47 L335.45 733.70 L332.27 730.52 L321.14 725.76 L282.99 698.73 L247.22 662.96 L247.22 661.37 L234.50 647.06 L213.83 615.26 L197.93 583.47 L196.34 575.52 L193.16 570.75 L193.16 567.57 L189.98 561.21 L189.98 556.44 L186.80 551.67 L186.80 546.90 L185.21 545.31 L185.21 540.54 L182.03 532.59 L182.03 526.23 L180.45 524.64 L178.86 507.15 L177.27 507.15 L177.27 511.92 L175.68 513.51 L175.68 542.13 L177.27 543.72 L177.27 561.21 L178.86 562.80 L178.86 572.34 L180.45 573.93 L182.03 589.83 L183.62 591.41 L186.80 607.31 L191.57 618.44 L191.57 623.21 L194.75 627.98 L197.93 639.11 L213.83 670.91 L231.32 697.93 L248.81 718.60 L248.81 720.19 L292.53 762.32 L340.22 794.12 L356.12 802.07 L359.30 802.07 L370.43 808.43 L373.61 808.43 L378.38 811.61 L386.33 813.20 L395.87 817.97 L400.64 817.97 L407.00 821.14 L411.76 821.14 L413.35 822.73 L418.12 822.73 L426.07 825.91 L432.43 825.91 L434.02 827.50 L441.97 827.50 L443.56 829.09 L451.51 829.09 L453.10 830.68 L469.00 830.68 L470.59 832.27 L513.51 832.27 L515.10 830.68 L529.41 830.68 L531.00 829.09 L540.54 829.09 L542.13 827.50 L556.44 825.91 L564.39 822.73 L570.75 822.73 L572.34 821.14 L604.13 811.61 L640.70 794.12 L643.88 790.94 L648.65 789.35 L651.83 786.17 L656.60 784.58 L670.91 775.04 L689.98 759.14 L691.57 759.14 L705.88 744.83 L707.47 744.83 L733.70 717.01 L733.70 715.42 L746.42 701.11 L767.09 669.32 L789.35 621.62 L790.94 612.08 L795.71 600.95 L798.89 583.47 L800.48 581.88 L800.48 573.93 L802.07 572.34 L802.07 564.39 L803.66 562.80 L803.66 510.33 L802.07 508.74 L802.07 499.21 L798.89 491.26 L798.89 484.90 L797.30 483.31 L797.30 478.54 L795.71 476.95 L790.94 459.46 L787.76 454.69 L784.58 443.56 L765.50 408.59 L736.88 370.43 L715.42 348.97 L713.83 348.97 L691.57 329.89 L677.27 320.35 L672.50 318.76 L669.32 315.58 L647.06 304.45 L643.88 304.45 L639.11 301.27 L631.16 299.68 L621.62 294.91 L616.85 294.91 L615.26 293.32 L610.49 293.32 L602.54 290.14 L596.18 290.14 L594.59 288.55 L570.75 286.96 L569.16 285.37 L543.72 285.37 Z"/>
+    </svg>
+    <img class="wordmark" src="spiralis-wordmark.svg" alt="Spiralis">
+  </div>
+  <div class="nav-right">
+    <a href="#contato" class="nav-pill">Falar com a equipe</a>
+    <button id="theme-toggle" aria-label="Alternar tema claro/escuro">
+      <svg class="theme-toggle-icon" id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="theme-toggle-icon" id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <button class="nav-pill">MENU —</button>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<div id="hero-section">
+  <canvas id="gradient-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0;"></canvas>
+  <div class="hero-blend">
+    <h1 class="hero-heading">
+      <span class="blur-word">Sistemas</span> <span class="blur-word">sob</span> <span class="blur-word">medida,</span><br>
+      <span class="blur-word">seguros</span> <span class="blur-word">de</span> <em><span class="blur-word">ponta</span> <span class="blur-word">a</span> <span class="blur-word">ponta.</span></em>
+    </h1>
+  </div>
+  <div class="hero-bottom">
+    <a href="#contato" class="hero-cta-link">
+      Iniciar projeto <span class="arr">→</span>
+    </a>
+    <div class="hero-info">
+      <div class="hero-est">Automação de processos · Sistemas sob medida · Cyber segurança</div>
+      <p class="hero-desc">Desenvolvimento de sistemas sob medida, automação de processos e cyber segurança ponta a ponta para empresas que operam sem margem para erro.</p>
+    </div>
+  </div>
+  <div class="hero-scroll"></div>
+</div>
+
+<!-- ══════════════ ABOUT ══════════════ -->
+<section class="home-about" id="sobre">
+  <div class="tr__container">
+    <p class="about-text-large" id="about-text">
+      A Spiralis reúne gestão organizacional, engenharia de automação e cyber segurança: três domínios que raramente coexistem na mesma casa. O resultado é uma empresa que entrega do diagnóstico ao deploy seguro, sem repassar a bola pra terceiros.
+    </p>
+    <div class="about-bottom-row">
+      <p class="about-sub">Atendemos empresas de porte médio e alto que querem parar de perder dinheiro com processos manuais, retrabalho e sistemas vulneráveis. Sem template. Sem genérico. Cada solução construída para o seu problema.</p>
+      <a href="#servicos" class="about-link">Ver serviços →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════ KEYFACTS ══════════════ -->
+<section id="keyfacts-section">
+  <div class="tr__container">
+    <div class="kf-title">
+      <h2 class="fade-in">Um snapshot da nossa<br>experiência e impacto.</h2>
+      <p class="kf-label">Sobre nós</p>
+    </div>
+    <div class="kf-cards-wrap" id="kf-cards-wrap">
+    <div class="kf-cards" id="kf-cards">
+      <div class="kf-card feat fade-in">
+        <div class="kf-card-overlay"></div>
+        <div class="kf-card-body">
+          <div class="kf-card-tag">Equipe especializada</div>
+          <div class="kf-card-label">Gestão, engenharia e cyber segurança trabalhando juntas, do diagnóstico ao deploy.</div>
+        </div>
+      </div>
+      <div class="kf-card stat fade-in">
+        <div class="stat-num">R$10k+</div>
+        <div class="stat-lbl">Ponto de partida por projeto. Escopo sob medida, nada de template.</div>
+      </div>
+      <div class="kf-card stat fade-in">
+        <div class="stat-num">3</div>
+        <div class="stat-lbl">Especialidades complementares sob o mesmo teto.</div>
+      </div>
+      <div class="kf-card stat fade-in">
+        <div class="stat-num">100%</div>
+        <div class="stat-lbl">Segurança ponta a ponta em toda entrega da Spiralis.</div>
+      </div>
+      <div class="kf-card dark fade-in">
+        <div class="stat-num light">B2B</div>
+        <div class="stat-lbl light">Foco exclusivo em empresas de médio e alto porte.</div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ SERVICES (pinned) ══════════════ -->
+<section id="servicos">
+  <div class="svc-pinned" id="svc-pinned">
+    <span class="svc-top-label">Nossos Serviços</span>
+
+    <div class="svc-left">
+      <div class="svc-idx" id="svc-idx">01 / 04</div>
+    </div>
+
+    <div class="svc-center-wrap" id="svc-center-wrap">
+      <div class="svc-center" id="svc-center">
+        <div class="svc-img on" id="si1">
+          <div class="svc-img-bg s1"></div>
+          <video class="svc-video" data-src="https://assets.mixkit.co/videos/5461/5461-360.mp4" muted loop playsinline preload="none"></video>
+          <div class="svc-tint"></div>
+        </div>
+        <div class="svc-img" id="si2">
+          <div class="svc-img-bg s2"></div>
+          <video class="svc-video" data-src="https://assets.mixkit.co/videos/41173/41173-360.mp4" muted loop playsinline preload="none"></video>
+          <div class="svc-tint"></div>
+        </div>
+        <div class="svc-img" id="si3">
+          <div class="svc-img-bg s3"></div>
+          <video class="svc-video" data-src="https://assets.mixkit.co/videos/47050/47050-360.mp4" muted loop playsinline preload="none"></video>
+          <div class="svc-tint"></div>
+        </div>
+        <div class="svc-img" id="si4">
+          <div class="svc-img-bg s4"></div>
+          <video class="svc-video" data-src="https://assets.mixkit.co/videos/22760/22760-360.mp4" muted loop playsinline preload="none"></video>
+          <div class="svc-tint"></div>
+        </div>
+        <div class="svc-card-overlay">
+          <span class="svc-card-tag" data-z="80"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
+          <span class="svc-card-num" id="svc-card-num" data-z="120">01</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="svc-right">
+      <div class="svc-panel on" id="sp1">
+        <h3 class="svc-title">Desenvolvimento<br>de Sistemas</h3>
+        <p class="svc-desc">Sistemas sob medida, construídos para resolver problemas reais. Back-end robusto, arquitetura pensada para crescer e documentação de verdade.</p>
+      </div>
+      <div class="svc-panel" id="sp2">
+        <h3 class="svc-title">Automações<br>e Chatbots</h3>
+        <p class="svc-desc">Fluxos automatizados, chatbots com IA e atendimento que funciona 24/7. Menos retrabalho, resposta imediata e sua equipe focada no que importa.</p>
+      </div>
+      <div class="svc-panel" id="sp3">
+        <h3 class="svc-title">Integração<br>de Sistemas</h3>
+        <p class="svc-desc">ERP, CRM, APIs externas e internas: conectamos tudo. Nenhum dado perdido entre sistemas, nenhum processo manual de sincronização.</p>
+      </div>
+      <div class="svc-panel" id="sp4">
+        <h3 class="svc-title">Cyber<br>Segurança</h3>
+        <p class="svc-desc">Pentest, hardening de infraestrutura e monitoramento contínuo. Segurança não é feature opcional. É a fundação de toda entrega Spiralis.</p>
+      </div>
+    </div>
+
+    <div class="svc-bottom">
+      <span class="svc-tagline">✦ Diferentes disciplinas. Um padrão de excelência.</span>
+      <div class="svc-dots">
+        <div class="svc-dot on"></div>
+        <div class="svc-dot"></div>
+        <div class="svc-dot"></div>
+        <div class="svc-dot"></div>
+      </div>
+      <a href="#contato" class="svc-view">Ver serviços →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PROJECTS (pinned carousel) ══════════════ -->
+<section id="projetos">
+  <div class="proj-pinned" id="proj-pinned">
+    <div class="proj-top">
+      <h2 class="proj-heading">Projetos<br>entregues.</h2>
+      <div class="proj-top-right">
+        <a href="#contato" class="proj-link">Ver todos →</a>
+        <div class="proj-counter"><span id="proj-cur">01</span><span class="proj-slash">/</span><span id="proj-total">04</span></div>
+      </div>
+    </div>
+
+    <div class="proj-canvas-wrap" id="proj-canvas-wrap">
+      <canvas id="proj-gl"></canvas>
+    </div>
+
+    <div class="proj-bottom">
+      <div class="proj-detail">
+        <div class="proj-detail-num" id="proj-detail-num">01</div>
+        <div class="proj-detail-body">
+          <h3 class="proj-detail-name" id="proj-detail-name">Plataforma de Gestão</h3>
+          <p class="proj-detail-tag" id="proj-detail-tag">Sistema de Gestão · Web App</p>
+        </div>
+      </div>
+      <div class="proj-dots" id="proj-dots">
+        <div class="proj-dot on"></div>
+        <div class="proj-dot"></div>
+        <div class="proj-dot"></div>
+        <div class="proj-dot"></div>
+      </div>
+      <button class="proj-arrow" id="proj-next" aria-label="Próximo projeto">→</button>
+    </div>
+  </div>
+
+  <!-- Mobile fallback: native horizontal scroll, no WebGL -->
+  <div class="proj-mobile" id="proj-mobile">
+    <div class="proj-header">
+      <h2 class="proj-heading fade-in">Projetos<br>entregues.</h2>
+      <a href="#contato" class="proj-link fade-in">Ver todos →</a>
+    </div>
+    <div class="proj-mobile-grid">
+      <div class="proj-card fade-in">
+        <div class="proj-inner"><div class="proj-bg"></div></div>
+        <div class="proj-info">
+          <div class="proj-num">01</div>
+          <div class="proj-name">Plataforma de Gestão</div>
+          <div class="proj-tag">Sistema de Gestão · Web App</div>
+        </div>
+      </div>
+      <div class="proj-card fade-in">
+        <div class="proj-inner"><div class="proj-bg"></div></div>
+        <div class="proj-info">
+          <div class="proj-num">02</div>
+          <div class="proj-name">Automação com IA</div>
+          <div class="proj-tag">Automação de Fluxo · IA</div>
+        </div>
+      </div>
+      <div class="proj-card fade-in">
+        <div class="proj-inner"><div class="proj-bg"></div></div>
+        <div class="proj-info">
+          <div class="proj-num">03</div>
+          <div class="proj-name">Auditoria & Hardening</div>
+          <div class="proj-tag">Pentest · Hardening</div>
+        </div>
+      </div>
+      <div class="proj-card fade-in">
+        <div class="proj-inner"><div class="proj-bg"></div></div>
+        <div class="proj-info">
+          <div class="proj-num">04</div>
+          <div class="proj-name">Integração ERP</div>
+          <div class="proj-tag">Integração ERP · API</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ TESTIMONIALS ══════════════ -->
+<section class="testimonials">
+  <div class="tr__container">
+    <div class="test-head">
+      <h2 class="test-heading fade-in">O que dizem<br>sobre a Spiralis.</h2>
+      <p class="test-sub">Resultado construído em parceria. Algumas perspectivas de quem já trabalhou conosco.</p>
+    </div>
+    <div class="test-track" id="test-track">
+      <div class="test-card">
+        <div class="test-co">Graziano Adm</div>
+        <p class="test-quote">"A Spiralis entregou um MVP que resolveu um problema que a gente tinha há dois anos. A abordagem consultiva fez toda a diferença. Eles entenderam a operação de verdade."</p>
+        <div class="test-auth"><strong>Cliente · Graziano Adm</strong><span>São Paulo, BR</span></div>
+      </div>
+      <div class="test-card">
+        <div class="test-co">FiscalWatch</div>
+        <p class="test-quote">"A segurança ponta a ponta foi o que nos convenceu. Não é só uma promessa: está dentro do projeto desde o primeiro dia. Raro de encontrar."</p>
+        <div class="test-auth"><strong>Cliente · FiscalWatch</strong><span>Florianópolis, BR</span></div>
+      </div>
+      <div class="test-card">
+        <div class="test-co">Construtora</div>
+        <p class="test-quote">"Automatizaram um fluxo que levava 3 horas por dia para funcionar sozinho. O ROI foi em semanas, não meses."</p>
+        <div class="test-auth"><strong>Diretor de Operações</strong><span>Setor de Construção, BR</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CTA ══════════════ -->
+<section id="contato">
+  <div class="cta-label-text">Pronto para começar?</div>
+  <h2 class="cta-heading">
+    Fale com<br>a <img src="spiralis-wordmark.svg" alt="Spiralis" class="cta-wordmark">
+  </h2>
+  <div class="cta-acts">
+    <a href="mailto:contato@spiralis.com.br" class="btn-fill">Iniciar conversa</a>
+    <a href="mailto:contato@spiralis.com.br" class="btn-ghost-link">contato@spiralis.com.br</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo brand-lockup">
+    <svg class="mark" viewBox="0 0 1000 1000" fill="none" aria-hidden="true">
+      <path fill="currentColor" fill-rule="evenodd" d="M472.18 153.42 L470.59 155.01 L446.74 156.60 L445.15 158.19 L438.79 158.19 L437.20 159.78 L430.84 159.78 L429.25 161.37 L411.76 164.55 L410.17 166.14 L407.00 166.14 L400.64 169.32 L395.87 169.32 L391.10 172.50 L383.15 174.09 L370.43 180.45 L367.25 180.45 L329.09 201.11 L303.66 218.60 L284.58 236.09 L282.99 236.09 L263.12 255.96 L263.12 257.55 L251.99 268.68 L251.99 270.27 L236.09 289.35 L231.32 298.89 L220.19 314.79 L205.88 343.40 L205.88 346.58 L202.70 351.35 L202.70 354.53 L199.52 359.30 L199.52 362.48 L193.16 378.38 L193.16 383.15 L191.57 384.74 L191.57 389.51 L188.39 397.46 L188.39 403.82 L186.80 405.41 L186.80 411.76 L185.21 413.35 L185.21 422.89 L183.62 424.48 L183.62 438.79 L182.03 440.38 L183.62 478.54 L185.21 480.13 L185.21 488.08 L186.80 489.67 L186.80 494.44 L188.39 496.03 L188.39 500.79 L189.98 502.38 L189.98 507.15 L191.57 508.74 L194.75 521.46 L205.88 543.72 L205.88 546.90 L210.65 553.26 L218.60 569.16 L247.22 607.31 L270.27 630.37 L271.86 630.37 L287.76 644.67 L324.32 668.52 L333.86 673.29 L337.04 673.29 L340.22 676.47 L343.40 676.47 L348.17 679.65 L351.35 679.65 L356.12 682.83 L359.30 682.83 L375.20 689.19 L379.97 689.19 L387.92 692.37 L394.28 692.37 L395.87 693.96 L403.82 693.96 L405.41 695.55 L418.12 695.55 L419.71 697.14 L451.51 697.14 L453.10 695.55 L475.36 693.96 L476.95 692.37 L488.08 690.78 L489.67 689.19 L507.15 684.42 L529.41 673.29 L543.72 663.75 L568.36 637.52 L576.31 618.44 L577.90 602.54 L576.31 600.95 L574.72 586.65 L571.54 580.29 L568.36 575.52 L548.49 557.23 L535.77 550.87 L532.59 550.87 L521.46 546.10 L510.33 544.52 L508.74 542.93 L486.49 541.34 L484.90 539.75 L473.77 539.75 L472.18 538.16 L462.64 538.16 L461.05 536.57 L443.56 534.98 L441.97 533.39 L435.61 533.39 L427.66 530.21 L421.30 530.21 L414.94 527.03 L410.17 527.03 L408.59 525.44 L399.05 523.85 L389.51 519.08 L381.56 517.49 L373.61 512.72 L370.43 512.72 L360.89 507.95 L337.04 492.05 L320.35 475.36 L309.22 459.46 L301.27 443.56 L298.09 427.66 L296.50 426.07 L296.50 418.12 L294.91 416.53 L294.91 392.69 L296.50 391.10 L296.50 381.56 L298.09 379.97 L298.09 373.61 L302.86 362.48 L302.86 357.71 L315.58 330.68 L334.66 303.66 L359.30 279.01 L386.33 259.94 L407.00 248.81 L410.17 248.81 L421.30 242.45 L429.25 240.86 L434.02 237.68 L437.20 237.68 L443.56 234.50 L448.33 234.50 L454.69 231.32 L459.46 231.32 L467.41 228.14 L473.77 228.14 L475.36 226.55 L494.44 224.96 L496.03 223.37 L508.74 223.37 L510.33 221.78 L559.62 221.78 L561.21 223.37 L572.34 223.37 L573.93 224.96 L583.47 224.96 L585.06 226.55 L591.41 226.55 L593.00 228.14 L604.13 229.73 L605.72 231.32 L615.26 232.91 L624.80 237.68 L632.75 239.27 L667.73 256.76 L686.80 269.48 L693.16 275.83 L702.70 282.19 L743.24 324.32 L771.86 367.25 L787.76 400.64 L787.76 403.82 L790.94 408.59 L790.94 411.76 L798.89 432.43 L798.89 437.20 L802.07 443.56 L802.07 449.92 L803.66 451.51 L805.25 465.82 L806.84 467.41 L806.84 475.36 L808.43 475.36 L808.43 462.64 L810.02 461.05 L810.02 449.92 L808.43 448.33 L808.43 424.48 L806.84 422.89 L805.25 403.82 L803.66 402.23 L803.66 395.87 L802.07 394.28 L798.89 376.79 L795.71 370.43 L795.71 365.66 L792.53 360.89 L786.17 340.22 L771.86 311.61 L751.19 279.81 L740.06 267.09 L740.06 265.50 L730.52 255.96 L730.52 254.37 L709.06 232.91 L707.47 232.91 L697.93 223.37 L667.73 201.11 L662.96 199.52 L651.83 191.57 L626.39 178.86 L623.21 178.86 L620.03 175.68 L615.26 175.68 L610.49 172.50 L607.31 172.50 L586.65 164.55 L581.88 164.55 L580.29 162.96 L575.52 162.96 L567.57 159.78 L561.21 159.78 L559.62 158.19 L553.26 158.19 L551.67 156.60 L543.72 156.60 L542.13 155.01 L527.82 155.01 L526.23 153.42 L473.77 153.42 Z M542.13 285.37 L540.54 286.96 L516.69 288.55 L515.10 290.14 L497.62 293.32 L496.03 294.91 L483.31 298.09 L478.54 301.27 L475.36 301.27 L448.33 315.58 L435.61 325.12 L417.33 344.99 L415.74 349.76 L410.97 356.12 L410.97 359.30 L407.79 365.66 L407.79 375.20 L406.20 376.79 L406.20 379.97 L407.79 381.56 L407.79 389.51 L414.15 403.82 L422.89 414.15 L434.02 422.10 L446.74 428.46 L449.92 428.46 L454.69 431.64 L459.46 431.64 L465.82 434.82 L481.72 436.41 L483.31 438.00 L492.85 438.00 L494.44 439.59 L508.74 439.59 L510.33 441.18 L521.46 441.18 L523.05 442.77 L543.72 444.36 L545.31 445.95 L551.67 445.95 L553.26 447.54 L559.62 447.54 L561.21 449.13 L567.57 449.13 L569.16 450.72 L580.29 452.31 L586.65 455.48 L591.41 455.48 L593.00 457.07 L605.72 460.25 L621.62 468.20 L624.80 468.20 L627.98 471.38 L635.93 474.56 L639.11 477.74 L648.65 482.51 L674.88 507.15 L682.83 518.28 L686.01 526.23 L689.19 529.41 L689.19 532.59 L695.55 545.31 L697.14 558.03 L698.73 559.62 L698.73 596.18 L697.14 597.77 L697.14 604.13 L695.55 605.72 L692.37 621.62 L689.19 626.39 L687.60 634.34 L674.88 658.19 L657.39 682.03 L637.52 701.91 L605.72 725.76 L578.70 740.06 L575.52 740.06 L567.57 744.83 L564.39 744.83 L538.95 754.37 L526.23 755.96 L518.28 759.14 L500.79 760.73 L499.21 762.32 L484.90 762.32 L483.31 763.91 L443.56 763.91 L441.97 762.32 L416.53 760.73 L414.94 759.14 L400.64 757.55 L399.05 755.96 L387.92 754.37 L381.56 751.19 L376.79 751.19 L359.30 743.24 L356.12 743.24 L348.17 738.47 L344.99 738.47 L335.45 733.70 L332.27 730.52 L321.14 725.76 L282.99 698.73 L247.22 662.96 L247.22 661.37 L234.50 647.06 L213.83 615.26 L197.93 583.47 L196.34 575.52 L193.16 570.75 L193.16 567.57 L189.98 561.21 L189.98 556.44 L186.80 551.67 L186.80 546.90 L185.21 545.31 L185.21 540.54 L182.03 532.59 L182.03 526.23 L180.45 524.64 L178.86 507.15 L177.27 507.15 L177.27 511.92 L175.68 513.51 L175.68 542.13 L177.27 543.72 L177.27 561.21 L178.86 562.80 L178.86 572.34 L180.45 573.93 L182.03 589.83 L183.62 591.41 L186.80 607.31 L191.57 618.44 L191.57 623.21 L194.75 627.98 L197.93 639.11 L213.83 670.91 L231.32 697.93 L248.81 718.60 L248.81 720.19 L292.53 762.32 L340.22 794.12 L356.12 802.07 L359.30 802.07 L370.43 808.43 L373.61 808.43 L378.38 811.61 L386.33 813.20 L395.87 817.97 L400.64 817.97 L407.00 821.14 L411.76 821.14 L413.35 822.73 L418.12 822.73 L426.07 825.91 L432.43 825.91 L434.02 827.50 L441.97 827.50 L443.56 829.09 L451.51 829.09 L453.10 830.68 L469.00 830.68 L470.59 832.27 L513.51 832.27 L515.10 830.68 L529.41 830.68 L531.00 829.09 L540.54 829.09 L542.13 827.50 L556.44 825.91 L564.39 822.73 L570.75 822.73 L572.34 821.14 L604.13 811.61 L640.70 794.12 L643.88 790.94 L648.65 789.35 L651.83 786.17 L656.60 784.58 L670.91 775.04 L689.98 759.14 L691.57 759.14 L705.88 744.83 L707.47 744.83 L733.70 717.01 L733.70 715.42 L746.42 701.11 L767.09 669.32 L789.35 621.62 L790.94 612.08 L795.71 600.95 L798.89 583.47 L800.48 581.88 L800.48 573.93 L802.07 572.34 L802.07 564.39 L803.66 562.80 L803.66 510.33 L802.07 508.74 L802.07 499.21 L798.89 491.26 L798.89 484.90 L797.30 483.31 L797.30 478.54 L795.71 476.95 L790.94 459.46 L787.76 454.69 L784.58 443.56 L765.50 408.59 L736.88 370.43 L715.42 348.97 L713.83 348.97 L691.57 329.89 L677.27 320.35 L672.50 318.76 L669.32 315.58 L647.06 304.45 L643.88 304.45 L639.11 301.27 L631.16 299.68 L621.62 294.91 L616.85 294.91 L615.26 293.32 L610.49 293.32 L602.54 290.14 L596.18 290.14 L594.59 288.55 L570.75 286.96 L569.16 285.37 L543.72 285.37 Z"/>
+    </svg>
+    <img class="wordmark" src="spiralis-wordmark.svg" alt="Spiralis">
+  </div>
+  <ul class="footer-nav">
+    <li><a href="#sobre">Sobre</a></li>
+    <li><a href="#servicos">Serviços</a></li>
+    <li><a href="#projetos">Projetos</a></li>
+    <li><a href="#contato">Contato</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Spiralis. Todos os direitos reservados.</div>
+</footer>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+  /* ── LOADER COUNTER ─────────────────────── */
+  (function(){
+    const c = document.getElementById('loader-counter');
+    if(!c) return;
+    const s = Date.now(), d = 950;
+    (function t(){
+      const p = Math.min((Date.now()-s)/d, 1);
+      c.textContent = String(Math.round(p*p*100)).padStart(3,'0');
+      p < 1 ? requestAnimationFrame(t) : (c.textContent = '100');
+    })();
+  })();
+
+  /* ── CHAR SPLIT ─────────────────────────── */
+  function splitChars(el) {
+    const txt = el.innerText.trim();
+    el.innerHTML = '';
+    const chars = [];
+    txt.split(/(\s+)/).forEach(tok => {
+      if(/^\s+$/.test(tok)) {
+        el.appendChild(Object.assign(document.createElement('span'), {textContent:' ', style:'display:inline'}));
+      } else {
+        const w = Object.assign(document.createElement('span'), {style:'display:inline-block;white-space:nowrap'});
+        tok.split('').forEach(ch => {
+          const s = Object.assign(document.createElement('span'),{className:'char',style:'display:inline'});
+          s.textContent = ch; chars.push(s); w.appendChild(s);
+        });
+        el.appendChild(w);
+      }
+    });
+    return chars;
+  }
+
+  /* ── ABOUT TEXT CHAR SCRUB ──────────────── */
+  const aboutEl = document.getElementById('about-text');
+  if(aboutEl){
+    const chars = splitChars(aboutEl);
+    gsap.set(chars, {color:'#2a2140'});
+    gsap.to(chars, {
+      color:'#EBE4F6',
+      stagger:{each:.04, from:'start'},
+      ease:'none',
+      scrollTrigger:{
+        trigger: aboutEl,
+        start:'top 75%', end:'bottom 30%',
+        scrub:1.5, invalidateOnRefresh:true
+      }
+    });
+  }
+
+  /* ── SERVICES PINNED ────────────────────── */
+  const svcData = [
+    {img:'#si1',panel:'#sp1',idx:'01 / 04'},
+    {img:'#si2',panel:'#sp2',idx:'02 / 04'},
+    {img:'#si3',panel:'#sp3',idx:'03 / 04'},
+    {img:'#si4',panel:'#sp4',idx:'04 / 04'},
+  ];
+  let curSvc = 0;
+  const dots = document.querySelectorAll('.svc-dot');
+
+  function goSvc(i){
+    if(i === curSvc) return;
+    document.querySelector(svcData[curSvc].img).classList.remove('on');
+    document.querySelector(svcData[curSvc].panel).classList.remove('on');
+    dots[curSvc].classList.remove('on');
+    curSvc = i;
+    document.querySelector(svcData[i].img).classList.add('on');
+    document.querySelector(svcData[i].panel).classList.add('on');
+    dots[i].classList.add('on');
+    document.getElementById('svc-idx').textContent = svcData[i].idx;
+    const numEl = document.getElementById('svc-card-num');
+    if (numEl) numEl.textContent = String(i + 1).padStart(2, '0');
+    playSvcVideo(i);
+  }
+
+  /* ── SERVICES CARD VIDEOS (lazy) ────────── */
+  const svcVideos = document.querySelectorAll('.svc-video');
+  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function playSvcVideo(i){
+    svcVideos.forEach((v, k) => {
+      if (k === i && v.src) { v.play().catch(()=>{}); }
+      else { v.pause(); }
+    });
+  }
+
+  if (svcVideos.length && !noMotion) {
+    const vidObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        svcVideos.forEach(v => {
+          v.src = v.dataset.src;
+          v.addEventListener('canplay', () => v.classList.add('ready'), {once:true});
+          v.load();
+        });
+        playSvcVideo(curSvc);
+        vidObserver.disconnect();
+      }
+    }, {rootMargin: '400px'});
+    vidObserver.observe(document.getElementById('servicos'));
+  }
+
+  /* ── SERVICES 3D CARD TILT ──────────────── */
+  const svcWrap   = document.getElementById('svc-center-wrap');
+  const svcCenter = document.getElementById('svc-center');
+  if (svcWrap && svcCenter) {
+    const depthEls = svcCenter.querySelectorAll('[data-z]');
+    svcWrap.addEventListener('mousemove', e => {
+      const r = svcWrap.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width/2)  / (r.width/2);
+      const y = (e.clientY - r.top  - r.height/2) / (r.height/2);
+      gsap.to(svcCenter, {rotationY:x*6, rotationX:-y*6,
+        duration:.4, ease:'power2.out', transformPerspective:1100});
+      depthEls.forEach(el => {
+        const z = parseFloat(el.dataset.z) || 0;
+        gsap.to(el, {x:x*(z*0.08), y:y*(z*0.08), z:z,
+          duration:.4, ease:'power2.out'});
+      });
+    });
+    svcWrap.addEventListener('mouseleave', () => {
+      gsap.to(svcCenter, {rotationY:0, rotationX:0,
+        duration:.9, ease:'elastic.out(1,.5)'});
+      depthEls.forEach(el => gsap.to(el, {x:0, y:0, z:0,
+        duration:.9, ease:'elastic.out(1,.5)'}));
+    });
+  }
+
+  ScrollTrigger.create({
+    trigger: '#servicos',
+    start: 'top top',
+    end: '+=' + (window.innerHeight * 4),
+    pin: '#svc-pinned',
+    scrub: false,
+    onUpdate(self){
+      goSvc(Math.min(Math.floor(self.progress * 4), 3));
+    }
+  });
+
+  /* ── HERO BLUR-IN (word by word) ────────── */
+  const heroWords = document.querySelectorAll('.hero-heading .blur-word');
+  if (heroWords.length) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      gsap.set(heroWords, {opacity:1, filter:'blur(0px)', y:0});
+    } else {
+      gsap.to(heroWords, {
+        opacity:1, filter:'blur(0px)', y:0,
+        duration:.7, ease:'power3.out',
+        stagger:.09, delay:2.4
+      });
+    }
+  }
+
+  /* ── FADE IN ON SCROLL ──────────────────── */
+  document.querySelectorAll('.fade-in').forEach(el => {
+    gsap.fromTo(el,
+      {opacity:0, y:32},
+      {opacity:1, y:0, duration:.9, ease:'power3.out',
+        scrollTrigger:{trigger:el, start:'top 88%', toggleActions:'play none none none'}}
+    );
+  });
+
+  /* ── PROJECT CARD TILT ──────────────────── */
+  document.querySelectorAll('.proj-card').forEach(card => {
+    const inner = card.querySelector('.proj-inner');
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width/2)  / (r.width/2);
+      const y = (e.clientY - r.top  - r.height/2) / (r.height/2);
+      gsap.to(inner, {rotationY:x*10, rotationX:-y*10,
+        duration:.4, ease:'power2.out', transformPerspective:900});
+    });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(inner, {rotationY:0, rotationX:0,
+        duration:.9, ease:'elastic.out(1,.5)'});
+    });
+  });
+
+  /* ── PROJECTS PINNED WEBGL CAROUSEL ───────
+     Réplica curvada/"jelly" (ricardochance.com/work),
+     porém acionada pelo scroll da página (mais lenta
+     e progressiva que o protótipo original) em vez de
+     wheel isolado em tela cheia.                       */
+  (function initProjCarousel(){
+    const pinnedEl = document.getElementById('proj-pinned');
+    const canvas   = document.getElementById('proj-gl');
+    if (!pinnedEl || !canvas || typeof THREE === 'undefined') return;
+    if (!window.matchMedia('(min-width: 760px)').matches) return;
+
+    const PROJECTS = [
+      { num:'01', name:'Plataforma de Gestão', tag:'Sistema de Gestão · Web App',
+        img:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80' },
+      { num:'02', name:'Automação com IA', tag:'Automação de Fluxo · IA',
+        img:'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&q=80' },
+      { num:'03', name:'Auditoria & Hardening', tag:'Pentest · Hardening',
+        img:'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&q=80' },
+      { num:'04', name:'Integração ERP', tag:'Integração ERP · API',
+        img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80' }
+    ];
+    const N = PROJECTS.length;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.z = 10;
+
+    function viewSize() {
+      const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+      return { w: h * camera.aspect, h };
+    }
+
+    let CARD_W, CARD_H, GAP, STEP, view;
+    function computeLayout() {
+      view = viewSize();
+      CARD_W = view.w * 0.40;
+      CARD_H = view.h * 0.92;
+      GAP    = view.w * 0.02;
+      STEP   = CARD_W + GAP;
+    }
+
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
+    const textures = PROJECTS.map(p => {
+      const tex = loader.load(p.img);
+      tex.colorSpace = THREE.SRGBColorSpace || tex.colorSpace;
+      return tex;
+    });
+
+    const uniforms = { uVel: { value: 0 }, uTime: { value: 0 } };
+    function makeMaterial(tex, cardIdx) {
+      return new THREE.ShaderMaterial({
+        transparent: true,
+        uniforms: {
+          uMap:      { value: tex },
+          uVel:      uniforms.uVel,
+          uTime:     uniforms.uTime,
+          uSelected: { value: 0 },
+          uView:     { value: 1 },
+          uTint:     { value: new THREE.Color(0x23084D) }
+        },
+        vertexShader: `
+          uniform float uVel;
+          uniform float uView;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            vec3 p = position;
+            vec4 world = modelMatrix * vec4(p, 1.0);
+            float nx = world.x / uView;
+            world.z -= nx * nx * 1.6;
+            world.y -= nx * nx * 0.25;
+            world.y += uVel * (uv.x - 0.5) * 1.1;
+            world.z += sin(uv.x * 3.14159) * abs(uVel) * 0.4;
+            gl_Position = projectionMatrix * viewMatrix * world;
+          }
+        `,
+        fragmentShader: `
+          uniform sampler2D uMap;
+          uniform float uVel;
+          uniform float uTime;
+          uniform float uSelected;
+          uniform vec3 uTint;
+          varying vec2 vUv;
+          void main() {
+            /* textura base */
+            float k = uVel * 0.025;
+            vec2 uv = vUv;
+            uv.x += sin(vUv.y * 3.14159) * k;
+            vec4 c = texture2D(uMap, uv);
+            c.rgb = mix(c.rgb, uTint, 0.32);
+
+            /* ── rounded rect SDF ── */
+            vec2 uv2 = vUv * 2.0 - 1.0;
+            float cr  = 0.13;
+            vec2  q   = abs(uv2) - (1.0 - cr);
+            float sdf = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - cr;
+            float alpha = smoothstep(0.012, -0.008, sdf);
+
+            /* ── star border: dois pontos opostos, só no card em destaque ── */
+            float bw = 0.015;
+            float onBorder = (1.0 - smoothstep(0.0, bw, -sdf)) * step(sdf, 0.002);
+
+            /* ping-pong 0→1→0 */
+            float ping = abs(mod(uTime * 0.5, 2.0) - 1.0);
+
+            /* ponto topo (esq→dir) e baixo (dir→esq) — sempre opostos */
+            vec2 starTop = vec2(ping,       1.0);
+            vec2 starBot = vec2(1.0 - ping, 0.0);
+
+            float dT = distance(vUv, starTop);
+            float dB = distance(vUv, starBot);
+
+            float glowT = exp(-dT * dT * 1000.0);
+            float glowB = exp(-dB * dB * 1000.0);
+            float haloT = exp(-dT * dT * 180.0) * 0.20;
+            float haloB = exp(-dB * dB * 180.0) * 0.20;
+
+            vec3 violet  = vec3(0.52, 0.10, 0.95);
+            vec3 colT = mix(violet, vec3(1.0, 0.80, 1.0), smoothstep(0.05, 0.0, dT));
+            vec3 colB = mix(violet, vec3(1.0, 0.80, 1.0), smoothstep(0.05, 0.0, dB));
+
+            /* borda base muito sutil (sempre) */
+            c.rgb = mix(c.rgb, vec3(0.15, 0.04, 0.32), onBorder * 0.28);
+
+            /* brilho nos dois pontos — só no card selecionado */
+            float sel = uSelected;
+            c.rgb += (colT * (glowT + haloT) + colB * (glowB + haloB)) * sel * onBorder * 4.0;
+            /* halo leve que sangra pra dentro */
+            c.rgb += (colT * haloT + colB * haloB) * sel * 0.5;
+
+            gl_FragColor = vec4(c.rgb, alpha);
+          }
+        `
+      });
+    }
+
+    const cards = [];
+    function buildCards() {
+      for (const c of cards) { scene.remove(c.mesh); c.mesh.geometry.dispose(); }
+      cards.length = 0;
+      for (let i = 0; i < N; i++) {
+        const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 40, 16);
+        const mat = makeMaterial(textures[i]);
+        mat.uniforms.uView.value = view.w;
+        mat.uniforms.uSelected.value = (i === selected) ? 1.0 : 0.0;
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.userData.index = i;
+        scene.add(mesh);
+        cards.push({ mesh, index: i });
+      }
+    }
+
+    let target = 0, current = 0, selected = 0, prev = 0;
+    const LERP = 0.085;
+    function totalWidth() { return N * STEP; }
+    function layout() {
+      const tw = totalWidth();
+      for (const c of cards) {
+        let x = c.index * STEP - current;
+        x = ((x % tw) + tw) % tw;
+        if (x > tw / 2) x -= tw;
+        c.mesh.position.x = x;
+        const dist = Math.min(1, Math.abs(x) / (STEP * 1.15));
+        const s = 1 - dist * 0.14;
+        c.mesh.scale.set(s, s, 1);
+      }
+    }
+
+    const curEl = document.getElementById('proj-cur');
+    const totalEl = document.getElementById('proj-total');
+    const dots = [...document.querySelectorAll('#proj-dots .proj-dot')];
+    totalEl.textContent = String(N).padStart(2, '0');
+
+    function select(i) {
+      selected = ((i % N) + N) % N;
+      curEl.textContent = String(selected + 1).padStart(2, '0');
+      dots.forEach((d, k) => d.classList.toggle('on', k === selected));
+      const p = PROJECTS[selected];
+      document.getElementById('proj-detail-num').textContent = p.num;
+      document.getElementById('proj-detail-name').textContent = p.name;
+      document.getElementById('proj-detail-tag').textContent = p.tag;
+      /* acende o efeito só no card em destaque */
+      for (const c of cards) {
+        c.mesh.material.uniforms.uSelected.value = (c.index === selected) ? 1.0 : 0.0;
+      }
+    }
+    select(0);
+
+    /* clique: navega tanto o carrossel quanto a posição
+       real de rolagem da página (fonte da verdade)      */
+    canvas.addEventListener('click', e => {
+      const ray = new THREE.Raycaster();
+      const m = new THREE.Vector2(
+        (e.offsetX / canvas.clientWidth) * 2 - 1,
+        -(e.offsetY / canvas.clientHeight) * 2 + 1
+      );
+      ray.setFromCamera(m, camera);
+      const hit = ray.intersectObjects(cards.map(c => c.mesh))[0];
+      if (hit) scrollToIndex(hit.object.userData.index);
+    });
+
+    let projST = null;
+    function scrollToIndex(i) {
+      if (!projST) return;
+      const idx = ((i % N) + N) % N;
+      const prog = idx / (N - 1);
+      const y = projST.start + prog * (projST.end - projST.start);
+      gsap.to(window, { duration: 1, scrollTo: y, ease: 'power2.inOut' });
+    }
+    document.getElementById('proj-next').addEventListener('click', () => scrollToIndex(selected + 1));
+    dots.forEach((d, i) => d.addEventListener('click', () => scrollToIndex(i)));
+
+    function resize() {
+      const w = pinnedEl.querySelector('.proj-canvas-wrap').clientWidth;
+      const h = pinnedEl.querySelector('.proj-canvas-wrap').clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      computeLayout();
+      buildCards();
+      target = selected * STEP;
+      current = target;
+    }
+    window.addEventListener('resize', resize);
+
+    function tick() {
+      uniforms.uTime.value = performance.now() * 0.001;
+      current += (target - current) * LERP;
+      const vel = current - prev;
+      prev = current;
+      if (!reduceMotion) {
+        uniforms.uVel.value += ((THREE.MathUtils.clamp(vel * 0.5, -0.8, 0.8)) - uniforms.uVel.value) * 0.12;
+      }
+      layout();
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+
+    resize();
+    tick();
+
+    /* progressão acionada pelo scroll da página — bem mais
+       lenta que o protótipo isolado (mais altura de rolagem
+       por card, equivalente a ~1.75x a seção de Serviços) */
+    projST = ScrollTrigger.create({
+      trigger: '#projetos',
+      start: 'top top',
+      end: '+=' + (window.innerHeight * 7),
+      pin: '#proj-pinned',
+      scrub: true,
+      onUpdate(self){
+        target = self.progress * (N - 1) * STEP;
+        const idx = Math.min(Math.round(self.progress * (N - 1)), N - 1);
+        if (idx !== selected) select(idx);
+      }
+    });
+  })();
+
+  /* ── MAGNETIC BUTTONS ───────────────────── */
+  document.querySelectorAll('.btn-fill,.hero-cta-link,.nav-pill').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      gsap.to(btn, {
+        x:(e.clientX - r.left - r.width/2)*0.22,
+        y:(e.clientY - r.top  - r.height/2)*0.22,
+        duration:.3, ease:'power2.out'
+      });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, {x:0,y:0, duration:.5, ease:'elastic.out(1,.5)'});
+    });
+  });
+
+  /* ── DRAG SCROLL TESTIMONIALS ───────────── */
+  const tt = document.getElementById('test-track');
+  if(tt){
+    let drag=false, sx=0, sl=0;
+    tt.addEventListener('mousedown',e=>{drag=true;sx=e.pageX-tt.offsetLeft;sl=tt.scrollLeft;});
+    tt.addEventListener('mouseleave',()=>drag=false);
+    tt.addEventListener('mouseup',()=>drag=false);
+    tt.addEventListener('mousemove',e=>{
+      if(!drag)return; e.preventDefault();
+      tt.scrollLeft = sl-(e.pageX-tt.offsetLeft-sx);
+    });
+  }
+
+  /* ── DRAG SCROLL KEYFACTS ────────────────── */
+  const kfCards = document.getElementById('kf-cards');
+  const kfWrap  = document.getElementById('kf-cards-wrap');
+  if (kfCards && kfWrap) {
+    let kfDrag = false, kfSx = 0, kfSl = 0, kfMoved = false;
+    kfCards.addEventListener('mousedown', e => {
+      kfDrag = true; kfMoved = false;
+      kfSx = e.pageX - kfCards.offsetLeft; kfSl = kfCards.scrollLeft;
+      kfCards.classList.add('dragging');
+    });
+    kfCards.addEventListener('mouseleave', () => { kfDrag = false; kfCards.classList.remove('dragging'); });
+    kfCards.addEventListener('mouseup', () => { kfDrag = false; kfCards.classList.remove('dragging'); });
+    kfCards.addEventListener('mousemove', e => {
+      if (!kfDrag) return; e.preventDefault(); kfMoved = true;
+      kfCards.scrollLeft = kfSl - (e.pageX - kfCards.offsetLeft - kfSx);
+    });
+    function syncKfOverflow() {
+      kfWrap.classList.toggle('has-overflow',
+        kfCards.scrollWidth - kfCards.clientWidth > 4 &&
+        kfCards.scrollLeft < kfCards.scrollWidth - kfCards.clientWidth - 4);
+    }
+    kfCards.addEventListener('scroll', syncKfOverflow, {passive:true});
+    window.addEventListener('resize', syncKfOverflow);
+    syncKfOverflow();
+  }
+
+  /* ── KEYFACTS STAGGER ───────────────────── */
+  gsap.fromTo('.kf-card',
+    {opacity:0, y:40, rotationX:8},
+    {opacity:1, y:0, rotationX:0,
+      duration:.85, stagger:.1, ease:'power3.out',
+      transformPerspective:1000,
+      scrollTrigger:{trigger:'.kf-cards', start:'top 82%'}}
+  );
+
+  /* ── CTA ANIMATIONS ─────────────────────── */
+  gsap.fromTo('.cta-heading',
+    {opacity:0, y:50},
+    {opacity:1, y:0, duration:1.2, ease:'expo.out',
+      scrollTrigger:{trigger:'.cta-heading', start:'top 85%'}}
+  );
+  gsap.fromTo('.cta-label-text,.cta-acts',
+    {opacity:0, y:20},
+    {opacity:1, y:0, duration:.8, ease:'power3.out', stagger:.15,
+      scrollTrigger:{trigger:'#contato', start:'top 80%'}}
+  );
+
+  /* ── SMOOTH ANCHOR ──────────────────────── */
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if(id==='#') return;
+      const t = document.querySelector(id);
+      if(t){ e.preventDefault(); gsap.to(window,{duration:1.2, scrollTo:{y:t,offsetY:80}, ease:'expo.inOut'}); }
+    });
+  });
+
+  /* ── NAV BLEND ──────────────────────────── */
+  const nav = document.getElementById('nav');
+  const lightSections = ['#keyfacts-section','#projetos','.testimonials'];
+  function syncNavContrast(){
+    let onLight = false;
+    lightSections.forEach(s=>{
+      const el=document.querySelector(s);
+      if(!el)return;
+      const r=el.getBoundingClientRect();
+      if(r.top<=80&&r.bottom>=0) onLight=true;
+    });
+    const wm = nav.querySelector('.wordmark');
+    if(onLight){
+      nav.querySelectorAll('.nav-logo,.nav-pill').forEach(e=>{e.style.color='#111';e.style.borderColor='rgba(0,0,0,.3)';});
+      if(wm) wm.style.filter = 'invert(1) brightness(0.12)';
+    } else {
+      nav.querySelectorAll('.nav-logo,.nav-pill').forEach(e=>{e.style.color='';e.style.borderColor='';});
+      if(wm) wm.style.filter = '';
+    }
+  }
+  window.addEventListener('scroll',syncNavContrast,{passive:true});
+  syncNavContrast();
+</script>
+
+<!-- Theme Toggle -->
+<script>
+(function(){
+  var html = document.documentElement;
+  var btn  = document.getElementById('theme-toggle');
+  var saved = localStorage.getItem('spiralis-theme');
+  var sys   = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  applyTheme(saved || sys);
+  btn.addEventListener('click', function(){
+    var cur = html.getAttribute('data-theme') || 'dark';
+    applyTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+  function applyTheme(t){
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('spiralis-theme', t);
+    if(window.__orbEngine) window.__orbEngine.params.theme = t;
+  }
+})();
+</script>
+
+<!-- Gradient WebGL -->
+<script src="orb-engine.js"></script>
+<script>
+(function(){
+  var cv = document.getElementById('gradient-canvas');
+  var pe = document.querySelector('#nav .mark path');
+  if(!cv || !pe || !window.OrbEngine) return;
+  var hero = document.getElementById('hero-section');
+
+  var engine = OrbEngine.create(cv, {
+    logoPathD: pe.getAttribute('d'),
+    speed:2.34, mouseAmt:1.00, orbSize:0.43, orbBlend:1.15, orbGrain:0.19,
+    orbBreath:3.00, logoBreath:3.02, logoIntensity:0.50, logoWobble:0.003, logoPulse:0.08, logoBlend:0.11, logoGrain:0.41,
+    transitionMode:2, // Espiral
+    logoPos:[.75,.55], logoScale:1.01,
+    logoHold:5600, morphDur:4200,
+    theme: document.documentElement.getAttribute('data-theme') || 'dark'
+  });
+  if(!engine) return;
+  window.__orbEngine = engine;
+  /* controles de debug/ajuste legados: .hold() congela na logo, .play() dispara o morph,
+     .reset() reinicia, .pin(0..1) congela o morph num ponto, .unpin() libera */
+  window.__logoOrb = engine.controls;
+
+  /* posição/escala da logo-orb por breakpoint (lado direito em telas largas) */
+  function layout(){
+    engine.resize();
+    var w = hero.offsetWidth, h = hero.offsetHeight;
+    if(w/h>1.05){ engine.transform.pos[0]=.75; engine.transform.pos[1]=.55; engine.transform.scale=1.01; }
+    else{ engine.transform.pos[0]=.50; engine.transform.pos[1]=.50; engine.transform.scale=.70; }
+  }
+  window.addEventListener('resize', layout);
+  layout();
+  engine.start();
+})();
+</script>
+</body>
+</html>
