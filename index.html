@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spiralis — Automação, Sistemas e Cyber Segurança</title>
+  <title>Spiralis — Sistemas, Automação e Cibersegurança</title>
+  <meta name="description" content="Sistemas sob medida, automação de processos e cibersegurança para empresas que operam sem margem para erro.">
+  <meta name="theme-color" content="#0A050F">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Spiralis">
+  <meta property="og:title" content="Spiralis — Sistemas, Automação e Cibersegurança">
+  <meta property="og:description" content="Do diagnóstico ao deploy: sistemas sob medida, automação e segurança incorporada em cada etapa.">
+  <meta property="og:image" content="spiral-hero.png.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Spiralis — Sistemas, Automação e Cibersegurança">
+  <meta name="twitter:description" content="Sistemas sob medida, automação de processos e cibersegurança ponta a ponta.">
+  <meta name="twitter:image" content="spiral-hero.png.png">
+  <link rel="icon" href="spiralis-simbolo-branco.svg" type="image/svg+xml">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Spiralis",
+      "description": "Sistemas sob medida, automação de processos e cibersegurança para empresas.",
+      "email": "contato@spiralis.com.br"
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://assets.mixkit.co">
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
@@ -13,16 +38,24 @@
   <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: auto; }
+    html { scroll-behavior: auto; scroll-padding-top: 5.5rem; }
     img, video { display: block; max-width: 100%; }
     a { text-decoration: none; color: inherit; }
+    :focus-visible { outline: 2px solid var(--violet-400); outline-offset: 4px; }
+    .skip-link {
+      position: fixed; top: -100px; left: 1rem; z-index: 11000;
+      padding: .75rem 1rem; border-radius: 4px;
+      background: white; color: var(--ink-deep);
+      font: 600 .85rem/1 var(--ff-body);
+    }
+    .skip-link:focus { top: 1rem; }
 
     :root {
       /* ── Spiralis brand palette ─────────────── */
       --bg:        #0A050F;   /* Midnight  */
       --ink:       #16111F;   /* Ink panel */
       --text:      #EBE4F6;   /* Mist      */
-      --text-dim:  #5B5470;   /* Slate     */
+      --text-dim:  #9B92AD;   /* Slate     */
       --ink-deep:  #1A0B33;   /* deep violet text on light */
 
       --violet-900: #23084D;
@@ -59,7 +92,7 @@
     #loader {
       position: fixed; inset: 0; z-index: 9999;
       display: flex; flex-direction: column;
-      animation: loaderDone 0s 2.5s forwards;
+      animation: loaderDone 0s 1.3s forwards;
     }
     @keyframes loaderDone { to { visibility: hidden; pointer-events: none; } }
     .loader-belt {
@@ -74,13 +107,13 @@
       background-attachment: fixed;
       background-size: 100vw 100vh;
       transform-origin: bottom;
-      animation: beltCollapse 0.75s var(--ease-expo) forwards;
+      animation: beltCollapse 0.55s var(--ease-expo) forwards;
     }
-    .loader-belt:nth-child(1) { animation-delay: 1.25s; }
-    .loader-belt:nth-child(2) { animation-delay: 1.33s; }
-    .loader-belt:nth-child(3) { animation-delay: 1.41s; }
-    .loader-belt:nth-child(4) { animation-delay: 1.49s; }
-    .loader-belt:nth-child(5) { animation-delay: 1.57s; }
+    .loader-belt:nth-child(1) { animation-delay: 0.50s; }
+    .loader-belt:nth-child(2) { animation-delay: 0.56s; }
+    .loader-belt:nth-child(3) { animation-delay: 0.62s; }
+    .loader-belt:nth-child(4) { animation-delay: 0.68s; }
+    .loader-belt:nth-child(5) { animation-delay: 0.74s; }
     @keyframes beltCollapse { to { transform: scaleY(0); } }
     #loader-logo {
       position: fixed; top: 50%; left: 50%;
@@ -89,7 +122,7 @@
       font-family: var(--ff-display); font-weight: 700;
       font-size: clamp(3.2rem, 8vw, 6rem);
       letter-spacing: -.02em; color: var(--paper);
-      animation: lFade .4s ease .1s both, lOut .3s ease 1s forwards;
+      animation: lFade .3s ease 0s both, lOut .28s ease .5s forwards;
     }
     #loader-logo .mark { width: 1.05em; height: 1.05em; }
     #loader-counter {
@@ -97,7 +130,7 @@
       transform: translateX(-50%); z-index: 10000;
       font-family: var(--ff-mono); font-size: .75rem;
       letter-spacing: .1em; color: var(--text-dim);
-      animation: lFade .3s ease 0s both, lOut .3s ease 1s forwards;
+      animation: lFade .25s ease 0s both, lOut .28s ease .5s forwards;
     }
     @keyframes lFade { from { opacity: 0; } to { opacity: 1; } }
     @keyframes lOut  { to   { opacity: 0; } }
@@ -105,14 +138,17 @@
     /* ── NAV ─────────────────────────────────────── */
     nav {
       position: fixed; top: 0; left: 0; right: 0;
-      z-index: 1000; display: flex;
-      align-items: center; justify-content: space-between;
-      padding: 1.5rem var(--gutter);
-      background: transparent;
-      backdrop-filter: blur(16px) saturate(140%);
-      -webkit-backdrop-filter: blur(16px) saturate(140%);
-      -webkit-mask-image: linear-gradient(to bottom, black 35%, rgba(0,0,0,.5) 75%, transparent 100%);
-      mask-image: linear-gradient(to bottom, black 35%, rgba(0,0,0,.5) 75%, transparent 100%);
+      z-index: 1000; display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      min-height: 72px;
+      padding: .9rem var(--gutter);
+      color: white;
+      background: rgba(10,5,15,.82);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(14px) saturate(125%);
+      -webkit-backdrop-filter: blur(14px) saturate(125%);
+      transition: background-color .25s ease, border-color .25s ease;
     }
     /* ── BRAND MARK ──────────────────────────────── */
     .mark { display: inline-block; vertical-align: middle; }
@@ -125,10 +161,27 @@
     .nav-logo {
       font-family: var(--ff-display); font-weight: 700;
       font-size: 1.72rem; letter-spacing: -.01em; color: white;
+      justify-self: start;
     }
     .nav-logo .mark { width: 1.5em; height: 1.5em; }
-    .nav-right { display: flex; gap: 1rem; align-items: center; }
+    .nav-links {
+      display: flex; align-items: center; justify-content: center; gap: 2rem;
+    }
+    .nav-links a {
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .11em; text-transform: uppercase;
+      color: rgba(255,255,255,.7);
+      transition: color .2s ease;
+    }
+    .nav-links a:hover,
+    .nav-links a:focus-visible { color: white; }
+    .nav-right {
+      display: flex; gap: .75rem; align-items: center;
+      justify-self: end;
+    }
     .nav-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px;
       font-family: var(--ff-mono); font-size: .65rem;
       letter-spacing: .12em; text-transform: uppercase;
       border: 1px solid rgba(255,255,255,.4);
@@ -137,11 +190,69 @@
       transition: background .25s, color .25s;
     }
     .nav-pill:hover { background: white; color: black; }
+    #nav-menu-toggle {
+      display: none;
+      width: 44px; height: 44px;
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 50%;
+      background: none; color: currentColor;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 4px;
+      cursor: pointer;
+    }
+    #nav-menu-toggle span {
+      display: block; width: 16px; height: 1px;
+      background: currentColor;
+      transition: transform .25s ease, opacity .2s ease;
+    }
+    #nav-menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(2.5px) rotate(45deg); }
+    #nav-menu-toggle[aria-expanded="true"] span:last-child { transform: translateY(-2.5px) rotate(-45deg); }
+    .mobile-menu {
+      position: fixed; top: 72px; left: 0; right: 0;
+      z-index: 999;
+      display: grid; gap: .25rem;
+      padding: .75rem var(--gutter) 1rem;
+      background: rgba(10,5,15,.96);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(16px);
+      transform: translateY(-120%);
+      opacity: 0; visibility: hidden;
+      transition: transform .3s var(--ease-soft), opacity .2s ease, visibility .2s;
+    }
+    .mobile-menu.open {
+      transform: translateY(0);
+      opacity: 1; visibility: visible;
+    }
+    .mobile-menu a {
+      padding: .85rem 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      font-family: var(--ff-mono); font-size: .75rem;
+      letter-spacing: .12em; text-transform: uppercase;
+    }
+    nav.is-over-light {
+      color: var(--ink-deep);
+      background: rgba(255,255,255,.9);
+      border-bottom-color: rgba(35,8,77,.12);
+    }
+    nav.is-over-light .nav-logo,
+    nav.is-over-light .nav-links a,
+    nav.is-over-light .nav-pill { color: var(--ink-deep); }
+    nav.is-over-light .nav-pill,
+    nav.is-over-light #nav-menu-toggle { border-color: rgba(35,8,77,.28); }
+    nav.is-over-light .wordmark { filter: invert(1) brightness(.16); }
+    nav.is-over-light .nav-links a:hover,
+    nav.is-over-light .nav-links a:focus-visible { color: var(--violet); }
+    nav.is-over-light .nav-pill:hover,
+    nav.is-over-light .nav-pill:focus-visible {
+      background: var(--ink-deep);
+      color: white;
+    }
+    body.menu-open { overflow: hidden; }
 
     /* ── HERO ────────────────────────────────────── */
     #hero-section {
       position: relative; min-height: 100dvh;
-      background: var(--bg);
+      background: var(--bg) url('spiral-hero.png.png') center / cover no-repeat;
       display: flex; flex-direction: column;
       justify-content: space-between;
       padding: 7rem var(--gutter) 4rem;
@@ -157,7 +268,7 @@
       content: ''; position: absolute; inset: 0;
       background: var(--bg);
       z-index: 2; pointer-events: none;
-      animation: heroReveal 2s var(--ease-soft) 2.4s forwards;
+      animation: heroReveal .8s var(--ease-soft) .85s forwards;
     }
     @keyframes heroReveal {
       from { opacity: 1; }
@@ -170,6 +281,8 @@
       font-weight: 500; line-height: 1.0;
       letter-spacing: -.01em; color: #ffffff;
       max-width: 65%;
+      /* invisível no fundo escuro; garante legibilidade sobre a parte clara da orbe */
+      text-shadow: 0 1px 2px rgba(10,5,15,.35), 0 4px 40px rgba(10,5,15,.45);
     }
     .hero-heading .blur-word {
       display: inline-block;
@@ -178,10 +291,8 @@
       will-change: transform, filter, opacity;
     }
     .hero-heading em { display: inline; }
-    /* blend wrapper direto no hero — composita contra o canvas */
-    .hero-blend {
-      mix-blend-mode: difference;
-    }
+    /* acento distinguido só pelo itálico — branco, sempre legível sobre a orbe */
+    .hero-blend { mix-blend-mode: normal; }
     .hero-heading em { font-style: italic; }
     @keyframes hReveal {
       from { opacity: 0; transform: translateY(28px); }
@@ -190,18 +301,34 @@
     .hero-bottom {
       display: flex; justify-content: space-between; align-items: flex-end;
       opacity: 0;
-      animation: hReveal 1s var(--ease-soft) 2.65s both;
+      animation: hReveal .8s var(--ease-soft) 1.15s both;
     }
     .hero-cta-link {
-      display: inline-flex; align-items: center; gap: .6rem;
+      --hero-cta-fill: #fff;
+      --hero-cta-fill-text: #000;
+      display: inline-flex; align-items: center; gap: .55rem;
       font-family: var(--ff-mono); font-size: .68rem;
-      letter-spacing: .16em; text-transform: uppercase;
-      color: var(--text);
-      border-bottom: 1px solid rgba(216,216,216,.4);
-      padding-bottom: .3rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: white;
+      background-color: transparent;
+      background-image: linear-gradient(var(--hero-cta-fill), var(--hero-cta-fill));
+      background-repeat: no-repeat;
+      background-position: left center;
+      background-size: 0 100%;
+      border: 1px solid rgba(255,255,255,.4);
+      border-radius: 999px; padding: .7rem 1.35rem;
+      transition:
+        background-size .45s var(--ease-expo),
+        color .3s ease,
+        border-color .3s ease;
     }
-    .hero-cta-link .arr { display: inline-block; transition: transform .3s var(--ease-soft); }
-    .hero-cta-link:hover .arr { transform: translateX(5px); }
+    .hero-cta-link:hover,
+    .hero-cta-link:focus-visible {
+      background-size: 100% 100%;
+      color: var(--hero-cta-fill-text);
+      border-color: var(--hero-cta-fill);
+    }
+    .hero-cta-link .arr { display: inline-block; }
     .hero-info { text-align: right; max-width: 380px; }
     .hero-est {
       font-family: var(--ff-mono); font-size: .6rem;
@@ -243,6 +370,7 @@
       color: var(--text-dim); max-width: 480px;
     }
     .about-link {
+      display: inline-flex; align-items: center; min-height: 44px;
       font-family: var(--ff-mono); font-size: .65rem;
       letter-spacing: .15em; text-transform: uppercase;
       color: var(--text-dim);
@@ -266,7 +394,16 @@
     .kf-label {
       margin-top: .75rem;
       font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .18em; text-transform: uppercase; color: #888;
+      letter-spacing: .18em; text-transform: uppercase; color: #493B63;
+    }
+    .carousel-hint {
+      display: none;
+      margin-top: 1rem;
+      font-family: var(--ff-mono);
+      font-size: .72rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #625676;
     }
     .kf-cards-wrap { position: relative; }
     .kf-cards-wrap::after {
@@ -331,43 +468,174 @@
     }
     .stat-num.light { color: var(--text); }
     .stat-lbl { font-size: .8rem; color: #666; margin-top: .4rem; line-height: 1.45; }
-    .stat-lbl.light { color: var(--text-dim); }
+    .stat-lbl.light { color: rgba(255,255,255,.72); }
 
-    /* ── SERVICES (pinned) ───────────────────────── */
-    #servicos { position: relative; background: var(--bg); }
-    .svc-pinned {
-      position: relative; width: 100%; height: 100dvh;
+    /* ── SERVICES (pinned internal tracks) ───────── */
+    #servicos {
+      --svc-muted: #A59DB8;
+      position: relative;
+      background: var(--bg);
+    }
+    .svc-shell {
+      --svc-gap: clamp(3rem,8.5vw,8rem);
+      position: relative;
+      width: 100%;
+      height: 100svh;
+      min-height: 680px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .svc-intro-rail {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      padding: clamp(6rem,11vh,8rem) var(--gutter) clamp(2.5rem,5vh,4rem);
+    }
+    .svc-intro {
+      width: calc((100% - var(--svc-gap)) * .48);
+      max-width: 620px;
+    }
+    .svc-kicker {
+      font-family: var(--ff-mono);
+      font-size: .62rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+    .svc-heading {
+      font-family: var(--ff-section);
+      font-size: clamp(2.45rem,4.35vw,4.6rem);
+      font-weight: 500;
+      letter-spacing: -.035em;
+      line-height: 1.02;
+      color: var(--text);
+      text-wrap: balance;
+    }
+    .svc-rows {
+      position: absolute;
+      inset: 0;
+    }
+    .svc-row {
+      position: absolute;
+      inset: 0;
+      height: 100%;
+      padding: clamp(6rem,11vh,8rem) var(--gutter) clamp(2.5rem,5vh,4rem);
       display: grid;
-      grid-template-columns: minmax(96px, 140px) 1fr clamp(340px, 36vw, 520px);
+      grid-template-columns: minmax(0,.96fr) minmax(0,1.04fr);
+      column-gap: var(--svc-gap);
+      align-items: stretch;
+      pointer-events: none;
+    }
+    .svc-copy {
+      grid-column: 1;
+      align-self: end;
+      max-width: 590px;
+      position: relative;
+      z-index: 5;
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+    .svc-index {
+      display: block;
+      font-family: var(--ff-mono);
+      font-size: .62rem;
+      letter-spacing: .16em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .svc-title {
+      font-family: var(--ff-section);
+      font-size: clamp(1.65rem,2.45vw,2.8rem);
+      font-weight: 600;
+      letter-spacing: -.025em;
+      color: var(--text);
+      line-height: 1.08;
+      margin-bottom: 1rem;
+    }
+    .svc-desc {
+      max-width: 590px;
+      font-size: clamp(.92rem,1.1vw,1.05rem);
+      line-height: 1.7;
+      color: var(--svc-muted);
+    }
+    .svc-link {
+      display: inline-flex;
       align-items: center;
+      min-height: 44px;
+      gap: .55rem;
+      margin-top: 1.6rem;
+      padding: .82rem 1.25rem;
+      border-radius: 999px;
+      background: var(--violet);
+      color: #fff;
+      font-family: var(--ff-mono);
+      font-size: .64rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: background-color .3s, color .3s;
     }
-    .svc-top-label {
-      position: absolute; top: 2.2rem; left: 50%;
-      transform: translateX(-50%);
-      font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .2em; text-transform: uppercase;
-      color: var(--text-dim);
-    }
-    .svc-center-wrap {
-      position: relative; width: 100%;
-      perspective: 1100px;
-    }
-    .svc-center {
-      position: relative; width: 100%;
-      height: min(62vh, 560px); border-radius: 14px; overflow: hidden;
+    .svc-link:hover,
+    .svc-link:focus-visible { background: var(--violet-400); }
+    .svc-media {
+      grid-column: 2;
+      align-self: center;
+      justify-self: end;
+      width: min(100%,68svh);
+      aspect-ratio: 1;
+      position: relative;
+      border-radius: clamp(14px,1.5vw,24px);
+      overflow: hidden;
       background: var(--ink);
-      transform-style: preserve-3d;
-      will-change: transform;
-      box-shadow: 0 30px 60px -20px rgba(35,8,77,.7),
-                  0 0 0 1px rgba(124,77,219,.18);
+      box-shadow: 0 32px 80px -36px rgba(35,8,77,.72);
+      pointer-events: none;
+      will-change: transform, opacity;
     }
-    .svc-center > * { transform-style: preserve-3d; }
-    .svc-img {
-      position: absolute; inset: 0; opacity: 0;
-      transition: opacity .8s var(--ease-soft);
+    .svc-row.is-active .svc-copy,
+    .svc-row.is-active .svc-media { pointer-events: auto; }
+    @media (min-width: 821px) and (prefers-reduced-motion: no-preference) {
+      .svc-row:not(:first-child) .svc-copy,
+      .svc-row:not(:first-child) .svc-media {
+        opacity: 0;
+      }
     }
-    .svc-img.on { opacity: 1; }
-    .svc-img-bg { width: 100%; height: 100%; }
+    @media (min-width: 821px) and (prefers-reduced-motion: reduce) {
+      .svc-shell {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        padding: 7rem var(--gutter);
+      }
+      .svc-intro-rail {
+        position: static;
+        padding: 0;
+        margin-bottom: 5rem;
+      }
+      .svc-intro { width: min(100%,620px); }
+      .svc-rows { position: static; }
+      .svc-row {
+        position: static;
+        height: auto;
+        min-height: 560px;
+        padding: 0;
+        margin-bottom: 5rem;
+        pointer-events: auto;
+      }
+      .svc-row:last-child { margin-bottom: 0; }
+      .svc-copy,
+      .svc-media {
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto;
+      }
+    }
+    .svc-img-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
     .svc-video {
       position: absolute; inset: 0;
       width: 100%; height: 100%;
@@ -379,10 +647,9 @@
       position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(160deg, rgba(35,8,77,.4), rgba(73,24,165,.22) 55%, rgba(10,5,15,.35));
     }
-    /* floating depth layers for the 3D card */
     .svc-card-overlay {
       position: absolute; inset: 0; pointer-events: none;
-      padding: 1.6rem;
+      padding: clamp(1rem,2vw,1.7rem);
       display: flex; flex-direction: column; justify-content: space-between;
     }
     .svc-card-tag {
@@ -400,7 +667,7 @@
     .svc-card-num {
       align-self: flex-end;
       font-family: var(--ff-section);
-      font-size: clamp(3rem,7vw,5.5rem); font-weight: 600;
+      font-size: clamp(3rem,6vw,5.5rem); font-weight: 600;
       line-height: 1; color: var(--text);
       text-shadow: 0 12px 40px rgba(35,8,77,.9);
     }
@@ -409,50 +676,284 @@
     .svc-img-bg.s3 { background: linear-gradient(145deg,#0A050F,#330F6E,#4918A5); }
     .svc-img-bg.s4 { background: linear-gradient(145deg,#23084D,#4918A5,#7C4DDB); }
 
-    .svc-left { padding: 0 2.5rem; }
-    .svc-idx {
-      font-family: var(--ff-mono); font-size: .65rem;
-      letter-spacing: .14em; color: var(--text-dim);
+    @media (max-width: 820px) {
+      #servicos { padding: 5rem var(--gutter) 4rem; }
+      .svc-shell {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+      }
+      .svc-intro-rail {
+        position: static;
+        padding: 0;
+        margin-bottom: 3rem;
+      }
+      .svc-intro { width: 100%; max-width: 680px; }
+      .svc-heading { font-size: clamp(2.2rem,10vw,3.8rem); }
+      .svc-rows { position: static; }
+      .svc-row {
+        position: static;
+        inset: auto;
+        height: auto;
+        min-height: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: clamp(4.5rem,14vw,7rem);
+        pointer-events: auto;
+      }
+      .svc-copy,
+      .svc-media { pointer-events: auto; }
+      .svc-media {
+        order: 1;
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        border-radius: 16px;
+      }
+      .svc-copy {
+        order: 2;
+        max-width: 680px;
+        padding: 1.75rem 0 0;
+      }
+      .svc-desc { max-width: 620px; }
     }
-    .svc-right { padding: 0 var(--gutter) 0 2.5rem; position: relative; min-height: 260px; }
-    .svc-panel {
-      position: absolute; top: 0; left: 2.5rem; right: 0;
-      opacity: 0; pointer-events: none;
-      transition: opacity .55s var(--ease-soft), transform .55s var(--ease-soft);
-      transform: translateY(12px);
+
+    /* ── PROCESS JOURNEY ─────────────────────────── */
+    .journey-section {
+      --journey-accent: var(--violet-400);
+      position: relative;
+      z-index: 9;
+      padding: 140px 0 100px;
+      background: #050308;
+      color: #fff;
+      overflow: hidden;
     }
-    .svc-panel.on { opacity: 1; pointer-events: auto; transform: translateY(0); }
-    .svc-title {
+    .journey-header {
+      max-width: 760px;
+      margin: 0 auto 80px;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .journey-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      font-family: var(--ff-mono);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.45);
+    }
+    .journey-eyebrow .journey-mark {
+      display: block;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      object-fit: contain;
+      filter: brightness(0) saturate(100%) invert(31%) sepia(95%) saturate(2733%) hue-rotate(245deg) brightness(91%) contrast(88%);
+    }
+    .journey-title {
+      margin: 0 0 20px;
       font-family: var(--ff-section);
-      font-size: clamp(1.8rem,3vw,3.2rem);
-      font-weight: 600; letter-spacing: -.02em;
-      color: var(--text); line-height: 1.1; margin-bottom: 1.25rem;
+      font-size: clamp(2rem,1.648rem + 1.5vw,3rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -.03em;
+      color: #fff;
     }
-    .svc-desc {
-      font-size: .9rem; line-height: 1.72;
-      color: var(--text-dim); max-width: 300px;
+    .journey-desc {
+      max-width: 600px;
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,.55);
     }
-    .svc-bottom {
-      position: absolute; bottom: 2rem; left: 0; right: 0;
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0 var(--gutter);
+    .journey-header .journey-desc { margin-inline: auto; }
+    .journey-timeline {
+      position: relative;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
     }
-    .svc-tagline {
-      font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .14em; text-transform: uppercase; color: var(--text-dim);
+    .journey-ink {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
     }
-    .svc-dots { display: flex; gap: .5rem; }
-    .svc-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--text-dim);
-      transition: background .3s, transform .3s;
+    .journey-track {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+      background: rgba(255,255,255,.06);
+      transform: translateX(-50%);
     }
-    .svc-dot.on { background: var(--accent); transform: scale(1.4); }
-    .svc-view {
-      font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .14em; text-transform: uppercase;
-      color: var(--text-dim);
-      border-bottom: 1px solid var(--text-dim); padding-bottom: .15rem;
+    .journey-track-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 0;
+      background: linear-gradient(to bottom,rgba(255,255,255,.08),rgba(255,255,255,.22));
+    }
+    .journey-track-dot {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 14px rgba(255,255,255,.8),0 0 36px rgba(255,255,255,.25);
+      opacity: 0;
+      transform: translate(-50%,-50%);
+      transition: opacity .3s;
+    }
+    .journey-track-dot.on { opacity: 1; }
+    .journey-event {
+      position: relative;
+      z-index: 1;
+      padding-bottom: 56px;
+    }
+    .journey-event:last-child { padding-bottom: 0; }
+    .journey-event.left {
+      width: 50%;
+      padding-right: 48px;
+      text-align: right;
+    }
+    .journey-event.right {
+      width: 50%;
+      margin-left: 50%;
+      padding-left: 48px;
+    }
+    .journey-event::before {
+      content: "";
+      position: absolute;
+      top: 5px;
+      z-index: 2;
+      width: 11px;
+      height: 11px;
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 50%;
+      background: #050308;
+      transition:
+        border-color .5s cubic-bezier(.22,1,.36,1),
+        background .5s cubic-bezier(.22,1,.36,1),
+        box-shadow .5s cubic-bezier(.22,1,.36,1);
+    }
+    .journey-event.left::before { right: -6px; }
+    .journey-event.right::before { left: -6px; }
+    .journey-event::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      width: 28px;
+      height: 1px;
+      background: rgba(255,255,255,.04);
+      transition: background .5s;
+    }
+    .journey-event.left::after { right: 6px; }
+    .journey-event.right::after { left: 6px; }
+    .journey-event.visible::before {
+      border-color: var(--journey-accent);
+      background: var(--journey-accent);
+      box-shadow:
+        0 0 10px rgba(124,77,219,.5),
+        0 0 28px rgba(124,77,219,.15);
+      animation: journeyNodePulse .8s cubic-bezier(.22,1,.36,1);
+    }
+    .journey-event.visible::after { background: rgba(124,77,219,.25); }
+    @keyframes journeyNodePulse {
+      from {
+        box-shadow:
+          0 0 0 0 rgba(124,77,219,.6),
+          0 0 10px rgba(124,77,219,.5);
+      }
+      to {
+        box-shadow:
+          0 0 0 18px rgba(124,77,219,0),
+          0 0 10px rgba(124,77,219,.5);
+      }
+    }
+    .journey-event-body {
+      opacity: 0;
+      transition:
+        opacity .7s cubic-bezier(.22,1,.36,1),
+        transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .journey-event.left .journey-event-body { transform: translateX(-20px); }
+    .journey-event.right .journey-event-body { transform: translateX(20px); }
+    .journey-event.visible .journey-event-body {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .journey-step {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--ff-mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      color: rgba(255,255,255,.2);
+      transition: color .5s;
+    }
+    .journey-event.visible .journey-step { color: var(--journey-accent); }
+    .journey-event-title {
+      margin: 0 0 8px;
+      font-family: var(--ff-body);
+      font-size: 1.1rem;
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: -.01em;
+      color: #fff;
+    }
+    .journey-event-desc {
+      max-width: 320px;
+      margin: 0;
+      font-size: .92rem;
+      line-height: 1.6;
+      color: rgba(255,255,255,.45);
+    }
+    .journey-event.left .journey-event-desc { margin-left: auto; }
+
+    @media (max-width: 767px) {
+      .journey-section { padding: 80px 0 60px; }
+      .journey-header { margin-bottom: 48px; }
+      .journey-title { font-size: clamp(1.5rem,1.2rem + 1.5vw,2rem); }
+      .journey-desc { font-size: .95rem; }
+      .journey-track {
+        left: 20px;
+        transform: none;
+      }
+      .journey-event.left,
+      .journey-event.right {
+        width: 100%;
+        margin-left: 0;
+        padding: 0 20px 48px 48px;
+        text-align: left;
+      }
+      .journey-event.left::before,
+      .journey-event.right::before {
+        right: auto;
+        left: 15px;
+      }
+      .journey-event.left::after,
+      .journey-event.right::after {
+        right: auto;
+        left: 27px;
+        width: 12px;
+      }
+      .journey-event.left .journey-event-body { transform: translateX(20px); }
+      .journey-event.left .journey-event-desc { margin-left: 0; }
     }
 
     /* ── PROJECTS (pinned WebGL carousel) ─────────── */
@@ -513,11 +1014,18 @@
     .proj-detail-tag { font-size: .8rem; color: #79708f; display: inline; }
     .proj-dots { display: flex; gap: .5rem; flex-shrink: 0; }
     .proj-dot {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: transparent;
+      border: 0; padding: 0; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .proj-dot::after {
+      content: '';
       width: 6px; height: 6px; border-radius: 50%;
       background: #c7bfe0;
       transition: background .3s, transform .3s;
     }
-    .proj-dot.on { background: var(--violet); transform: scale(1.4); }
+    .proj-dot.on::after { background: var(--violet); transform: scale(1.4); }
     .proj-arrow {
       flex-shrink: 0; background: none; border: 1px solid rgba(35,8,77,.22);
       color: var(--ink-deep); width: 2.6rem; height: 2.6rem; border-radius: 50%;
@@ -551,10 +1059,18 @@
       background-size: cover; background-position: center;
       background-repeat: no-repeat;
     }
-    .proj-card:nth-child(1) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80'); }
-    .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
-    .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
-    .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
+    @media (max-width: 1023px), (hover: none), (prefers-reduced-motion: reduce) {
+      .proj-card:nth-child(1) .proj-bg { background-image: url('kimura-control-dashboard.png'); }
+      .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
+      .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
+      .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
+    }
+    .no-project-webgl .proj-pinned { display: none !important; }
+    .no-project-webgl .proj-mobile { display: block !important; }
+    .no-project-webgl .proj-card:nth-child(1) .proj-bg { background-image: url('kimura-control-dashboard.png'); }
+    .no-project-webgl .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
+    .no-project-webgl .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
+    .no-project-webgl .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
     .proj-info {
       position: absolute; bottom: 0; left: 0; right: 0;
       padding: 2rem;
@@ -570,7 +1086,7 @@
     }
     .proj-tag { font-size: .75rem; color: rgba(255,255,255,.45); }
 
-    @media (min-width: 760px) {
+    @media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
       .proj-pinned { display: flex; }
       .proj-mobile { display: none; }
     }
@@ -649,6 +1165,7 @@
     }
     .btn-fill:hover { background: var(--violet-400); transform: translateY(-2px); }
     .btn-ghost-link {
+      display: inline-flex; align-items: center; min-height: 44px;
       font-family: var(--ff-mono); font-size: .68rem;
       letter-spacing: .1em; color: var(--text-dim);
       border-bottom: 1px solid var(--text-dim); padding-bottom: .2rem;
@@ -669,14 +1186,15 @@
     .footer-logo .mark { width: 1.3em; height: 1.3em; }
     .footer-nav { display: flex; gap: 2rem; list-style: none; }
     .footer-nav a {
-      font-family: var(--ff-mono); font-size: .6rem;
+      display: inline-flex; align-items: center; min-height: 44px;
+      font-family: var(--ff-mono); font-size: .75rem;
       letter-spacing: .1em; text-transform: uppercase;
       color: var(--text-dim);
       transition: color .25s;
     }
     .footer-nav a:hover { color: var(--text); }
     .footer-copy {
-      font-family: var(--ff-mono); font-size: .6rem;
+      font-family: var(--ff-mono); font-size: .72rem;
       letter-spacing: .05em; color: var(--text-dim);
     }
 
@@ -753,22 +1271,352 @@
       color: var(--text);
     }
     html[data-theme="light"] #theme-toggle:hover { background: rgba(26,11,51,.08); }
-    html[data-theme="light"] .hero-cta-link { color: var(--text); border-bottom-color: rgba(26,11,51,.3); }
+    html[data-theme="light"] .hero-cta-link {
+      --hero-cta-fill: var(--text);
+      --hero-cta-fill-text: #fff;
+      color: var(--text);
+      border-color: rgba(26,11,51,.3);
+    }
     html[data-theme="light"] .hero-desc { color: var(--text); }
     html[data-theme="light"] .hero-est { color: var(--text-dim); }
-    html[data-theme="light"] .svc-center { background: var(--ink); }
     html[data-theme="light"] .svc-img-bg.s1 { background: linear-gradient(145deg,#D8CCFA,#A07AE8,#6B3FC0); }
     html[data-theme="light"] .svc-img-bg.s2 { background: linear-gradient(145deg,#EDE8F8,#B89AF0,#7C4DDB); }
     html[data-theme="light"] .svc-img-bg.s3 { background: linear-gradient(145deg,#D8CCFA,#9870E0,#5A2DB0); }
     html[data-theme="light"] .svc-img-bg.s4 { background: linear-gradient(145deg,#C8BAF5,#A07AE8,#7C4DDB); }
+    html[data-theme="light"] #servicos { --svc-muted: var(--text-dim); }
     html[data-theme="light"] .footer-logo { color: var(--text); }
     html[data-theme="light"] .footer-copy { color: var(--text-dim); }
     html[data-theme="light"] .footer-nav a { color: var(--text-dim); }
     html[data-theme="light"] .footer-nav a:hover { color: var(--text); }
     html[data-theme="light"] .hero-scroll { background: linear-gradient(to bottom, transparent, var(--text-dim)); }
+
+    /* ── SHOWCASE (container scroll) ─────────────── */
+    #showcase {
+      padding: clamp(4rem,10vw,9rem) var(--gutter) clamp(3rem,7vw,6rem);
+      background: var(--paper);
+      overflow: hidden;
+    }
+    .cs-perspective { perspective: 1100px; max-width: 1120px; margin: 0 auto; }
+    .cs-head {
+      text-align: center; margin-bottom: clamp(2rem,5vw,3.5rem);
+      will-change: transform, opacity;
+    }
+    .cs-kicker {
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--violet-400); margin-bottom: 1rem;
+    }
+    .cs-title {
+      font-family: var(--ff-section); font-weight: 500;
+      font-size: clamp(2rem,5vw,3.6rem); line-height: 1.05;
+      letter-spacing: -.01em; color: var(--ink-deep);
+    }
+    .cs-card {
+      transform-style: preserve-3d;
+      border-radius: 22px;
+      border: 1px solid rgba(124,77,219,.25);
+      background: var(--ink);
+      padding: .7rem;
+      box-shadow: 0 70px 150px -30px rgba(23,4,50,.72), 0 35px 70px -25px rgba(23,4,50,.55), 0 12px 28px -10px rgba(23,4,50,.4), inset 0 0 0 1px rgba(255,255,255,.05);
+      will-change: transform;
+    }
+    .cs-chrome {
+      display: flex; align-items: center; gap: .5rem;
+      padding: .5rem .85rem .75rem;
+    }
+    .cs-dot { width: .6rem; height: .6rem; border-radius: 50%; background: rgba(235,228,246,.18); }
+    .cs-dot:nth-child(1) { background: #FF5F57; }
+    .cs-dot:nth-child(2) { background: #FEBC2E; }
+    .cs-dot:nth-child(3) { background: #28C840; }
+    .cs-screen {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      border-radius: 13px;
+      overflow: hidden;
+      background:
+        radial-gradient(130% 110% at 72% 0%, rgba(124,77,219,.38), transparent 62%),
+        linear-gradient(160deg, #1A0B33, #0A050F);
+      display: grid; place-items: center;
+    }
+    .cs-screen > img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── SISTEMA INTERATIVO (dentro da telinha) ──── */
+    .sys {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      font-family: var(--ff-body); color: #EBE4F6;
+      font-size: clamp(9px, 1.02vw, 13px);
+    }
+    .sys-topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: .6rem;
+      padding: clamp(.5rem,1.2vw,.85rem) clamp(.6rem,1.4vw,1rem);
+      border-bottom: 1px solid rgba(235,228,246,.08); flex-shrink: 0;
+    }
+    .sys-brand { display: flex; align-items: center; gap: .45em; font-family: var(--ff-head); font-weight: 600; }
+    .sys-brand img { width: 1.5em; height: 1.5em; }
+    .sys-brand span { font-size: 1.05em; letter-spacing: -.01em; }
+    .sys-sectors { display: flex; gap: .3em; flex-wrap: wrap; justify-content: flex-end; }
+    .sys-sector {
+      font: inherit; font-size: .82em; padding: .35em .75em; border-radius: 999px;
+      border: 1px solid rgba(124,77,219,.35); color: #C9BEEA;
+      background: rgba(124,77,219,.08); cursor: pointer; white-space: nowrap;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .sys-sector:hover { border-color: rgba(124,77,219,.75); color: #fff; }
+    .sys-sector.on { background: var(--violet); border-color: var(--violet); color: #fff; }
+
+    .sys-body { flex: 1; display: flex; min-height: 0; }
+    .sys-side {
+      width: clamp(7.5em, 24%, 10.5em); flex-shrink: 0;
+      border-right: 1px solid rgba(235,228,246,.08);
+      padding: clamp(.4rem,1vw,.6rem); display: flex; flex-direction: column; gap: .1em; overflow: hidden;
+    }
+    .sys-nav {
+      font: inherit; display: flex; align-items: center; gap: .6em; width: 100%;
+      padding: .5em .6em; border-radius: .5em; border: none; background: none;
+      color: #9A90B8; cursor: pointer; text-align: left; white-space: nowrap;
+      transition: background .15s, color .15s;
+    }
+    .sys-nav svg { width: 1.2em; height: 1.2em; flex-shrink: 0; stroke: currentColor; }
+    .sys-nav span { overflow: hidden; text-overflow: ellipsis; }
+    .sys-nav:hover { background: rgba(235,228,246,.05); color: #EBE4F6; }
+    .sys-nav.on { background: rgba(124,77,219,.18); color: #fff; box-shadow: inset 2px 0 0 var(--violet-400); }
+
+    .sys-main { flex: 1; min-width: 0; display: flex; flex-direction: column;
+      padding: clamp(.5rem,1.2vw,.85rem); gap: clamp(.45rem,1vw,.7rem); overflow: hidden; }
+    .sys-head { display: flex; align-items: baseline; justify-content: space-between; gap: .6em; }
+    .sys-head h4 { font-family: var(--ff-head); font-weight: 600; font-size: 1.15em; color: #fff; }
+    .sys-head em { font-style: normal; font-size: .78em; color: #8A83A0; white-space: nowrap; }
+
+    .sys-kpis { display: grid; grid-template-columns: repeat(3,1fr); gap: .5em; }
+    .sys-kpi { background: rgba(235,228,246,.05); border: 1px solid rgba(235,228,246,.08); border-radius: .55em; padding: .55em .65em; }
+    .sys-kpi b { display: block; font-family: var(--ff-head); font-weight: 600; font-size: 1.45em; line-height: 1; color: #fff; }
+    .sys-kpi span { font-size: .8em; color: #8A83A0; }
+
+    .sys-grid { flex: 1; display: grid; grid-template-columns: 1.7fr 1fr; gap: .55em; min-height: 0; }
+    .sys-panel { background: rgba(10,5,15,.4); border: 1px solid rgba(235,228,246,.08); border-radius: .55em; padding: .6em .7em; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .sys-panel-h { font-size: .78em; color: #8A83A0; margin-bottom: .5em; text-transform: uppercase; letter-spacing: .09em; }
+    .sys-tbl { width: 100%; border-collapse: collapse; font-size: .9em; }
+    .sys-tbl th { text-align: left; font-weight: 500; color: #6E6788; font-size: .85em; padding: .28em .4em; border-bottom: 1px solid rgba(235,228,246,.08); }
+    .sys-tbl td { padding: .38em .4em; border-bottom: 1px solid rgba(235,228,246,.05); color: #D8CFEC; white-space: nowrap; }
+    .sys-tbl tr:last-child td { border-bottom: none; }
+    .sys-badge { font-size: .85em; padding: .16em .55em; border-radius: 999px; white-space: nowrap; }
+    .sys-badge.g { background: rgba(40,200,64,.16);  color: #6BE486; }
+    .sys-badge.a { background: rgba(254,188,46,.16);  color: #FFCE6A; }
+    .sys-badge.r { background: rgba(255,95,87,.16);   color: #FF8F8A; }
+    .sys-badge.n { background: rgba(124,77,219,.18);  color: #B79CF0; }
+
+    .sys-prog { display: flex; flex-direction: column; gap: .55em; }
+    .sys-prog-top { display: flex; justify-content: space-between; margin-bottom: .28em; font-size: .88em; color: #C9BEEA; }
+    .sys-prog-top b { font-weight: 600; color: #fff; }
+    .sys-track { height: .42em; border-radius: 999px; background: rgba(235,228,246,.09); overflow: hidden; }
+    .sys-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--violet-400)); width: 0; transition: width .55s var(--ease-soft); }
+
+    .sys-fade { animation: sysFade .35s ease; }
+    @keyframes sysFade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+    /* ── HOME / WIDGETS PERSONALIZÁVEIS ──────────── */
+    .sys-home-bar { display: flex; align-items: center; justify-content: space-between; gap: .5em; }
+    .sys-home-bar h4 { font-family: var(--ff-head); font-weight: 600; font-size: 1.1em; color: #fff; }
+    .sys-home-bar em { font-style: normal; font-size: .76em; color: #8A83A0; display: block; margin-top: .1em; }
+    .sys-home-actions { display: flex; gap: .4em; flex-shrink: 0; }
+    .sys-add-wrap { position: relative; }
+    .sys-btn {
+      font: inherit; font-size: .84em; padding: .4em .7em; border-radius: .5em;
+      border: 1px solid rgba(235,228,246,.14); background: rgba(235,228,246,.05);
+      color: #C9BEEA; cursor: pointer; white-space: nowrap; transition: background .15s, border-color .15s, color .15s;
+    }
+    .sys-btn:hover { background: rgba(124,77,219,.22); color: #fff; border-color: rgba(124,77,219,.5); }
+    .sys-add-menu {
+      display: none; position: absolute; top: 118%; right: 0; z-index: 6;
+      background: #160E24; border: 1px solid rgba(235,228,246,.14); border-radius: .6em;
+      padding: .3em; min-width: 12em; box-shadow: 0 14px 34px rgba(0,0,0,.55);
+    }
+    .sys-add-menu.open { display: block; }
+    .sys-add-item {
+      font: inherit; font-size: .84em; width: 100%; text-align: left; padding: .45em .6em;
+      border-radius: .4em; background: none; border: none; color: #D8CFEC; cursor: pointer;
+    }
+    .sys-add-item:hover { background: rgba(124,77,219,.2); color: #fff; }
+    .sys-add-empty { font-size: .8em; color: #8A83A0; padding: .5em .6em; }
+    .sys-widgets { flex: 1; display: grid; grid-template-columns: repeat(2,1fr); gap: .5em; align-content: start; overflow: auto; min-height: 0; }
+    .sys-w { position: relative; background: rgba(10,5,15,.4); border: 1px solid rgba(235,228,246,.08); border-radius: .55em; padding: .6em .7em; }
+    .sys-w.span2 { grid-column: span 2; }
+    .sys-w-h { font-size: .74em; color: #8A83A0; margin-bottom: .45em; text-transform: uppercase; letter-spacing: .08em; padding-right: 1.3em; }
+    .sys-w-x {
+      position: absolute; top: .35em; right: .4em; width: 1.35em; height: 1.35em;
+      border: none; background: none; color: #6E6788; cursor: pointer; font-size: 1.05em;
+      line-height: 1; border-radius: .35em; transition: color .15s, background .15s;
+    }
+    .sys-w-x:hover { color: #FF8F8A; background: rgba(255,95,87,.14); }
+    .sys-w-stat b { display: block; font-family: var(--ff-head); font-weight: 600; font-size: 1.9em; line-height: 1; color: #fff; }
+    .sys-w-stat span { font-size: .8em; color: #8A83A0; }
+    .sys-wlist { display: flex; flex-direction: column; gap: .35em; font-size: .9em; }
+    .sys-wlist-row { display: flex; align-items: center; justify-content: space-between; gap: .5em; }
+    .sys-wlist-row > span:first-child { color: #D8CFEC; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sys-bars { display: flex; align-items: flex-end; gap: .3em; height: 3.4em; padding-top: .3em; }
+    .sys-bar { flex: 1; background: linear-gradient(to top, var(--violet), var(--violet-400)); border-radius: .2em .2em 0 0; min-height: 6%; height: 0; transition: height .55s var(--ease-soft); }
+
+    @media (max-width: 960px) {
+      nav { grid-template-columns: 1fr auto; }
+      .nav-links { display: none; }
+      #nav-menu-toggle { display: flex; }
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        min-height: 68px;
+        padding: .75rem var(--gutter);
+      }
+      .nav-logo { font-size: 1.45rem; }
+      .nav-logo .wordmark { height: .78em; }
+      .nav-right { gap: .5rem; }
+      .nav-pill {
+        padding: .5rem .8rem;
+        font-size: .58rem;
+        letter-spacing: .1em;
+        line-height: 1.15;
+        text-align: center;
+      }
+      .mobile-menu { top: 68px; }
+
+      #hero-section {
+        min-height: 100dvh;
+        padding: 6.5rem var(--gutter) 3.5rem;
+      }
+      .hero-heading {
+        max-width: 100%;
+        font-size: clamp(3rem,15vw,4.25rem);
+        line-height: .98;
+      }
+      .hero-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+      }
+      .hero-info {
+        order: 1;
+        max-width: none;
+        text-align: left;
+      }
+      .hero-cta-link { order: 2; min-height: 48px; }
+      .hero-scroll { display: none; }
+
+      .home-about {
+        min-height: 0;
+        padding: 6rem var(--gutter);
+      }
+      .about-text-large {
+        font-size: clamp(2rem,9vw,2.75rem);
+        line-height: 1.16;
+      }
+      .about-bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+        margin-top: 3rem;
+      }
+      .about-sub { max-width: none; }
+
+      #keyfacts-section,
+      .testimonials { padding: 5.5rem var(--gutter); }
+      .kf-title { margin-bottom: 3.5rem; }
+      .carousel-hint { display: block; }
+      .kf-card.feat {
+        width: calc(100vw - 2 * var(--gutter));
+        min-height: 360px;
+      }
+      .kf-card.stat,
+      .kf-card.dark { width: min(240px, calc(100vw - 2 * var(--gutter))); }
+
+      #servicos { padding-top: 5.5rem; padding-bottom: 1rem; }
+      .svc-heading { font-size: clamp(2.25rem,10vw,3.25rem); }
+      .svc-row { margin-bottom: 4.75rem; }
+      .svc-copy { padding-top: 1.5rem; }
+      .svc-title { font-size: 1.65rem; }
+      .svc-desc { font-size: .95rem; line-height: 1.6; }
+
+      .proj-mobile { padding: 5.5rem var(--gutter) 4rem; }
+      .proj-header {
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+      .proj-card { width: min(82vw, calc(100vw - 2 * var(--gutter))); }
+
+      .test-head { margin-bottom: 3rem; }
+      .test-card {
+        width: calc(100vw - 2 * var(--gutter));
+        padding: 2rem;
+      }
+
+      #contato {
+        min-height: 72dvh;
+        padding: 6rem var(--gutter);
+      }
+      .cta-label-text { margin-bottom: 2rem; }
+      .cta-heading {
+        font-size: clamp(3rem,15vw,4.5rem);
+        margin-bottom: 2.5rem;
+      }
+      .cta-acts { flex-direction: column; gap: .5rem; }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 2.5rem var(--gutter);
+      }
+      .footer-nav {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0 1.25rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .nav-logo .wordmark { display: none; }
+      .footer-nav { gap: 0 1rem; }
+    }
+
+    @media (max-width: 720px) {
+      .sys-widgets { grid-template-columns: 1fr; }
+      .sys-w.span2 { grid-column: span 1; }
+      .sys-home-bar { flex-wrap: wrap; }
+      .cs-card { padding: .45rem; border-radius: 15px; }
+      .cs-perspective { perspective: 800px; }
+      .cs-screen { aspect-ratio: 3 / 4; }
+      .sys { font-size: 10px; }
+      .sys { pointer-events: none; }
+      .sys-side { width: 2.9em; }
+      .sys-nav { justify-content: center; padding: .55em; }
+      .sys-nav span { display: none; }
+      .sys-brand span { display: none; }
+      .sys-grid { grid-template-columns: 1fr; }
+      .sys-panel.sys-aside { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .fade-in,
+      .hero-heading .blur-word,
+      .hero-bottom {
+        opacity: 1 !important;
+        filter: none !important;
+        transform: none !important;
+      }
+      #loader { display: none !important; }
+    }
   </style>
 </head>
 <body>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
 <!-- LOADER -->
 <div id="loader">
@@ -788,26 +1636,34 @@
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="nav-logo brand-lockup">
+  <a href="#hero-section" class="nav-logo brand-lockup" aria-label="Spiralis — início">
     <svg class="mark" viewBox="0 0 1000 1000" fill="none" aria-hidden="true">
       <path fill="currentColor" fill-rule="evenodd" d="M472.18 153.42 L470.59 155.01 L446.74 156.60 L445.15 158.19 L438.79 158.19 L437.20 159.78 L430.84 159.78 L429.25 161.37 L411.76 164.55 L410.17 166.14 L407.00 166.14 L400.64 169.32 L395.87 169.32 L391.10 172.50 L383.15 174.09 L370.43 180.45 L367.25 180.45 L329.09 201.11 L303.66 218.60 L284.58 236.09 L282.99 236.09 L263.12 255.96 L263.12 257.55 L251.99 268.68 L251.99 270.27 L236.09 289.35 L231.32 298.89 L220.19 314.79 L205.88 343.40 L205.88 346.58 L202.70 351.35 L202.70 354.53 L199.52 359.30 L199.52 362.48 L193.16 378.38 L193.16 383.15 L191.57 384.74 L191.57 389.51 L188.39 397.46 L188.39 403.82 L186.80 405.41 L186.80 411.76 L185.21 413.35 L185.21 422.89 L183.62 424.48 L183.62 438.79 L182.03 440.38 L183.62 478.54 L185.21 480.13 L185.21 488.08 L186.80 489.67 L186.80 494.44 L188.39 496.03 L188.39 500.79 L189.98 502.38 L189.98 507.15 L191.57 508.74 L194.75 521.46 L205.88 543.72 L205.88 546.90 L210.65 553.26 L218.60 569.16 L247.22 607.31 L270.27 630.37 L271.86 630.37 L287.76 644.67 L324.32 668.52 L333.86 673.29 L337.04 673.29 L340.22 676.47 L343.40 676.47 L348.17 679.65 L351.35 679.65 L356.12 682.83 L359.30 682.83 L375.20 689.19 L379.97 689.19 L387.92 692.37 L394.28 692.37 L395.87 693.96 L403.82 693.96 L405.41 695.55 L418.12 695.55 L419.71 697.14 L451.51 697.14 L453.10 695.55 L475.36 693.96 L476.95 692.37 L488.08 690.78 L489.67 689.19 L507.15 684.42 L529.41 673.29 L543.72 663.75 L568.36 637.52 L576.31 618.44 L577.90 602.54 L576.31 600.95 L574.72 586.65 L571.54 580.29 L568.36 575.52 L548.49 557.23 L535.77 550.87 L532.59 550.87 L521.46 546.10 L510.33 544.52 L508.74 542.93 L486.49 541.34 L484.90 539.75 L473.77 539.75 L472.18 538.16 L462.64 538.16 L461.05 536.57 L443.56 534.98 L441.97 533.39 L435.61 533.39 L427.66 530.21 L421.30 530.21 L414.94 527.03 L410.17 527.03 L408.59 525.44 L399.05 523.85 L389.51 519.08 L381.56 517.49 L373.61 512.72 L370.43 512.72 L360.89 507.95 L337.04 492.05 L320.35 475.36 L309.22 459.46 L301.27 443.56 L298.09 427.66 L296.50 426.07 L296.50 418.12 L294.91 416.53 L294.91 392.69 L296.50 391.10 L296.50 381.56 L298.09 379.97 L298.09 373.61 L302.86 362.48 L302.86 357.71 L315.58 330.68 L334.66 303.66 L359.30 279.01 L386.33 259.94 L407.00 248.81 L410.17 248.81 L421.30 242.45 L429.25 240.86 L434.02 237.68 L437.20 237.68 L443.56 234.50 L448.33 234.50 L454.69 231.32 L459.46 231.32 L467.41 228.14 L473.77 228.14 L475.36 226.55 L494.44 224.96 L496.03 223.37 L508.74 223.37 L510.33 221.78 L559.62 221.78 L561.21 223.37 L572.34 223.37 L573.93 224.96 L583.47 224.96 L585.06 226.55 L591.41 226.55 L593.00 228.14 L604.13 229.73 L605.72 231.32 L615.26 232.91 L624.80 237.68 L632.75 239.27 L667.73 256.76 L686.80 269.48 L693.16 275.83 L702.70 282.19 L743.24 324.32 L771.86 367.25 L787.76 400.64 L787.76 403.82 L790.94 408.59 L790.94 411.76 L798.89 432.43 L798.89 437.20 L802.07 443.56 L802.07 449.92 L803.66 451.51 L805.25 465.82 L806.84 467.41 L806.84 475.36 L808.43 475.36 L808.43 462.64 L810.02 461.05 L810.02 449.92 L808.43 448.33 L808.43 424.48 L806.84 422.89 L805.25 403.82 L803.66 402.23 L803.66 395.87 L802.07 394.28 L798.89 376.79 L795.71 370.43 L795.71 365.66 L792.53 360.89 L786.17 340.22 L771.86 311.61 L751.19 279.81 L740.06 267.09 L740.06 265.50 L730.52 255.96 L730.52 254.37 L709.06 232.91 L707.47 232.91 L697.93 223.37 L667.73 201.11 L662.96 199.52 L651.83 191.57 L626.39 178.86 L623.21 178.86 L620.03 175.68 L615.26 175.68 L610.49 172.50 L607.31 172.50 L586.65 164.55 L581.88 164.55 L580.29 162.96 L575.52 162.96 L567.57 159.78 L561.21 159.78 L559.62 158.19 L553.26 158.19 L551.67 156.60 L543.72 156.60 L542.13 155.01 L527.82 155.01 L526.23 153.42 L473.77 153.42 Z M542.13 285.37 L540.54 286.96 L516.69 288.55 L515.10 290.14 L497.62 293.32 L496.03 294.91 L483.31 298.09 L478.54 301.27 L475.36 301.27 L448.33 315.58 L435.61 325.12 L417.33 344.99 L415.74 349.76 L410.97 356.12 L410.97 359.30 L407.79 365.66 L407.79 375.20 L406.20 376.79 L406.20 379.97 L407.79 381.56 L407.79 389.51 L414.15 403.82 L422.89 414.15 L434.02 422.10 L446.74 428.46 L449.92 428.46 L454.69 431.64 L459.46 431.64 L465.82 434.82 L481.72 436.41 L483.31 438.00 L492.85 438.00 L494.44 439.59 L508.74 439.59 L510.33 441.18 L521.46 441.18 L523.05 442.77 L543.72 444.36 L545.31 445.95 L551.67 445.95 L553.26 447.54 L559.62 447.54 L561.21 449.13 L567.57 449.13 L569.16 450.72 L580.29 452.31 L586.65 455.48 L591.41 455.48 L593.00 457.07 L605.72 460.25 L621.62 468.20 L624.80 468.20 L627.98 471.38 L635.93 474.56 L639.11 477.74 L648.65 482.51 L674.88 507.15 L682.83 518.28 L686.01 526.23 L689.19 529.41 L689.19 532.59 L695.55 545.31 L697.14 558.03 L698.73 559.62 L698.73 596.18 L697.14 597.77 L697.14 604.13 L695.55 605.72 L692.37 621.62 L689.19 626.39 L687.60 634.34 L674.88 658.19 L657.39 682.03 L637.52 701.91 L605.72 725.76 L578.70 740.06 L575.52 740.06 L567.57 744.83 L564.39 744.83 L538.95 754.37 L526.23 755.96 L518.28 759.14 L500.79 760.73 L499.21 762.32 L484.90 762.32 L483.31 763.91 L443.56 763.91 L441.97 762.32 L416.53 760.73 L414.94 759.14 L400.64 757.55 L399.05 755.96 L387.92 754.37 L381.56 751.19 L376.79 751.19 L359.30 743.24 L356.12 743.24 L348.17 738.47 L344.99 738.47 L335.45 733.70 L332.27 730.52 L321.14 725.76 L282.99 698.73 L247.22 662.96 L247.22 661.37 L234.50 647.06 L213.83 615.26 L197.93 583.47 L196.34 575.52 L193.16 570.75 L193.16 567.57 L189.98 561.21 L189.98 556.44 L186.80 551.67 L186.80 546.90 L185.21 545.31 L185.21 540.54 L182.03 532.59 L182.03 526.23 L180.45 524.64 L178.86 507.15 L177.27 507.15 L177.27 511.92 L175.68 513.51 L175.68 542.13 L177.27 543.72 L177.27 561.21 L178.86 562.80 L178.86 572.34 L180.45 573.93 L182.03 589.83 L183.62 591.41 L186.80 607.31 L191.57 618.44 L191.57 623.21 L194.75 627.98 L197.93 639.11 L213.83 670.91 L231.32 697.93 L248.81 718.60 L248.81 720.19 L292.53 762.32 L340.22 794.12 L356.12 802.07 L359.30 802.07 L370.43 808.43 L373.61 808.43 L378.38 811.61 L386.33 813.20 L395.87 817.97 L400.64 817.97 L407.00 821.14 L411.76 821.14 L413.35 822.73 L418.12 822.73 L426.07 825.91 L432.43 825.91 L434.02 827.50 L441.97 827.50 L443.56 829.09 L451.51 829.09 L453.10 830.68 L469.00 830.68 L470.59 832.27 L513.51 832.27 L515.10 830.68 L529.41 830.68 L531.00 829.09 L540.54 829.09 L542.13 827.50 L556.44 825.91 L564.39 822.73 L570.75 822.73 L572.34 821.14 L604.13 811.61 L640.70 794.12 L643.88 790.94 L648.65 789.35 L651.83 786.17 L656.60 784.58 L670.91 775.04 L689.98 759.14 L691.57 759.14 L705.88 744.83 L707.47 744.83 L733.70 717.01 L733.70 715.42 L746.42 701.11 L767.09 669.32 L789.35 621.62 L790.94 612.08 L795.71 600.95 L798.89 583.47 L800.48 581.88 L800.48 573.93 L802.07 572.34 L802.07 564.39 L803.66 562.80 L803.66 510.33 L802.07 508.74 L802.07 499.21 L798.89 491.26 L798.89 484.90 L797.30 483.31 L797.30 478.54 L795.71 476.95 L790.94 459.46 L787.76 454.69 L784.58 443.56 L765.50 408.59 L736.88 370.43 L715.42 348.97 L713.83 348.97 L691.57 329.89 L677.27 320.35 L672.50 318.76 L669.32 315.58 L647.06 304.45 L643.88 304.45 L639.11 301.27 L631.16 299.68 L621.62 294.91 L616.85 294.91 L615.26 293.32 L610.49 293.32 L602.54 290.14 L596.18 290.14 L594.59 288.55 L570.75 286.96 L569.16 285.37 L543.72 285.37 Z"/>
     </svg>
     <img class="wordmark" src="spiralis-wordmark.svg" alt="Spiralis">
+  </a>
+  <div class="nav-links" aria-label="Navegação principal">
+    <a href="#sobre">Sobre</a>
+    <a href="#servicos">Serviços</a>
+    <a href="#processo">Processo</a>
+    <a href="#projetos">Projetos</a>
   </div>
   <div class="nav-right">
-    <a href="#contato" class="nav-pill">Falar com a equipe</a>
-    <button id="theme-toggle" aria-label="Alternar tema claro/escuro">
-      <svg class="theme-toggle-icon" id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-      <svg class="theme-toggle-icon" id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
+    <button id="nav-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menu">
+      <span></span>
+      <span></span>
     </button>
-    <button class="nav-pill">MENU —</button>
+    <a href="#contato" class="nav-pill nav-cta">Falar com a equipe</a>
   </div>
 </nav>
+<div class="mobile-menu" id="mobile-menu" aria-hidden="true" inert>
+  <a href="#sobre">Sobre</a>
+  <a href="#servicos">Serviços</a>
+  <a href="#processo">Processo</a>
+  <a href="#projetos">Projetos</a>
+</div>
 
+<main id="conteudo">
 <!-- ══════════════ HERO ══════════════ -->
 <div id="hero-section">
   <canvas id="gradient-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;z-index:0;"></canvas>
@@ -822,18 +1678,36 @@
       Iniciar projeto <span class="arr">→</span>
     </a>
     <div class="hero-info">
-      <div class="hero-est">Automação de processos · Sistemas sob medida · Cyber segurança</div>
-      <p class="hero-desc">Desenvolvimento de sistemas sob medida, automação de processos e cyber segurança ponta a ponta para empresas que operam sem margem para erro.</p>
+      <div class="hero-est">Automação de processos · Sistemas sob medida · Cibersegurança</div>
+      <p class="hero-desc">Desenvolvimento de sistemas sob medida, automação de processos e cibersegurança para empresas que precisam operar com confiança.</p>
     </div>
   </div>
   <div class="hero-scroll"></div>
 </div>
 
+<!-- ══════════════ SHOWCASE (container scroll) ══════════════ -->
+<section id="showcase">
+  <div class="cs-perspective">
+    <div class="cs-head">
+      <p class="cs-kicker">Do diagnóstico ao deploy</p>
+      <h2 class="cs-title">O sistema que a sua<br>operação realmente usa.</h2>
+    </div>
+    <div class="cs-card" id="cs-card">
+      <div class="cs-chrome">
+        <span class="cs-dot"></span><span class="cs-dot"></span><span class="cs-dot"></span>
+      </div>
+      <div class="cs-screen">
+        <div class="sys" id="sys"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══════════════ ABOUT ══════════════ -->
 <section class="home-about" id="sobre">
   <div class="tr__container">
     <p class="about-text-large" id="about-text">
-      A Spiralis reúne gestão organizacional, engenharia de automação e cyber segurança: três domínios que raramente coexistem na mesma casa. O resultado é uma empresa que entrega do diagnóstico ao deploy seguro, sem repassar a bola pra terceiros.
+      A Spiralis reúne gestão organizacional, engenharia de automação e cibersegurança: três domínios que raramente coexistem na mesma casa. O resultado é uma empresa que entrega do diagnóstico ao deploy seguro, sem repassar a bola pra terceiros.
     </p>
     <div class="about-bottom-row">
       <p class="about-sub">Atendemos empresas de porte médio e alto que querem parar de perder dinheiro com processos manuais, retrabalho e sistemas vulneráveis. Sem template. Sem genérico. Cada solução construída para o seu problema.</p>
@@ -847,29 +1721,30 @@
 <section id="keyfacts-section">
   <div class="tr__container">
     <div class="kf-title">
-      <h2 class="fade-in">Um snapshot da nossa<br>experiência e impacto.</h2>
-      <p class="kf-label">Sobre nós</p>
+      <h2 class="fade-in">Como trabalhamos<br>e o que priorizamos.</h2>
+      <p class="kf-label">Nosso modelo</p>
+      <span class="carousel-hint" aria-hidden="true">Arraste para explorar →</span>
     </div>
     <div class="kf-cards-wrap" id="kf-cards-wrap">
-    <div class="kf-cards" id="kf-cards">
+    <div class="kf-cards" id="kf-cards" tabindex="0" aria-label="Diferenciais da Spiralis">
       <div class="kf-card feat fade-in">
         <div class="kf-card-overlay"></div>
         <div class="kf-card-body">
           <div class="kf-card-tag">Equipe especializada</div>
-          <div class="kf-card-label">Gestão, engenharia e cyber segurança trabalhando juntas, do diagnóstico ao deploy.</div>
+          <div class="kf-card-label">Gestão, engenharia e cibersegurança trabalhando juntas, do diagnóstico ao deploy.</div>
         </div>
       </div>
       <div class="kf-card stat fade-in">
-        <div class="stat-num">R$10k+</div>
-        <div class="stat-lbl">Ponto de partida por projeto. Escopo sob medida, nada de template.</div>
+        <div class="stat-num">Escopo</div>
+        <div class="stat-lbl">Cada projeto parte do problema real, com prioridades e critérios de sucesso definidos.</div>
       </div>
       <div class="kf-card stat fade-in">
         <div class="stat-num">3</div>
         <div class="stat-lbl">Especialidades complementares sob o mesmo teto.</div>
       </div>
       <div class="kf-card stat fade-in">
-        <div class="stat-num">100%</div>
-        <div class="stat-lbl">Segurança ponta a ponta em toda entrega da Spiralis.</div>
+        <div class="stat-num">Seguro</div>
+        <div class="stat-lbl">Segurança incorporada da arquitetura ao deploy, sem depender de uma etapa final.</div>
       </div>
       <div class="kf-card dark fade-in">
         <div class="stat-num light">B2B</div>
@@ -880,73 +1755,157 @@
   </div>
 </section>
 
-<!-- ══════════════ SERVICES (pinned) ══════════════ -->
+<!-- ══════════════ SERVICES (sticky editorial) ══════════════ -->
 <section id="servicos">
-  <div class="svc-pinned" id="svc-pinned">
-    <span class="svc-top-label">Nossos Serviços</span>
-
-    <div class="svc-left">
-      <div class="svc-idx" id="svc-idx">01 / 04</div>
+  <div class="svc-shell">
+    <div class="svc-intro-rail">
+      <header class="svc-intro">
+        <p class="svc-kicker">Nossos serviços</p>
+        <h2 class="svc-heading">Diferentes disciplinas. Um padrão de excelência.</h2>
+      </header>
     </div>
 
-    <div class="svc-center-wrap" id="svc-center-wrap">
-      <div class="svc-center" id="svc-center">
-        <div class="svc-img on" id="si1">
+    <div class="svc-rows">
+      <article class="svc-row">
+        <div class="svc-copy">
+          <span class="svc-index">01 / 04</span>
+          <h3 class="svc-title">Desenvolvimento de Sistemas</h3>
+          <p class="svc-desc">Sistemas sob medida, construídos para resolver problemas reais. Back-end robusto, arquitetura pensada para crescer e documentação de verdade.</p>
+          <a href="#contato" class="svc-link">Falar sobre sistemas <span aria-hidden="true">→</span></a>
+        </div>
+        <figure class="svc-media" aria-label="Desenvolvimento de Sistemas">
           <div class="svc-img-bg s1"></div>
           <video class="svc-video" data-src="https://assets.mixkit.co/videos/5461/5461-360.mp4" muted loop playsinline preload="none"></video>
           <div class="svc-tint"></div>
+          <figcaption class="svc-card-overlay">
+            <span class="svc-card-tag"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
+            <span class="svc-card-num">01</span>
+          </figcaption>
+        </figure>
+      </article>
+
+      <article class="svc-row">
+        <div class="svc-copy">
+          <span class="svc-index">02 / 04</span>
+          <h3 class="svc-title">Automações e Chatbots</h3>
+          <p class="svc-desc">Fluxos automatizados, chatbots com IA e atendimento que funciona 24/7. Menos retrabalho, resposta imediata e sua equipe focada no que importa.</p>
+          <a href="#contato" class="svc-link">Falar sobre automação <span aria-hidden="true">→</span></a>
         </div>
-        <div class="svc-img" id="si2">
+        <figure class="svc-media" aria-label="Automações e Chatbots">
           <div class="svc-img-bg s2"></div>
           <video class="svc-video" data-src="https://assets.mixkit.co/videos/41173/41173-360.mp4" muted loop playsinline preload="none"></video>
           <div class="svc-tint"></div>
+          <figcaption class="svc-card-overlay">
+            <span class="svc-card-tag"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
+            <span class="svc-card-num">02</span>
+          </figcaption>
+        </figure>
+      </article>
+
+      <article class="svc-row">
+        <div class="svc-copy">
+          <span class="svc-index">03 / 04</span>
+          <h3 class="svc-title">Integração de Sistemas</h3>
+          <p class="svc-desc">ERP, CRM, APIs externas e internas: conectamos tudo. Nenhum dado perdido entre sistemas, nenhum processo manual de sincronização.</p>
+          <a href="#contato" class="svc-link">Falar sobre integrações <span aria-hidden="true">→</span></a>
         </div>
-        <div class="svc-img" id="si3">
+        <figure class="svc-media" aria-label="Integração de Sistemas">
           <div class="svc-img-bg s3"></div>
           <video class="svc-video" data-src="https://assets.mixkit.co/videos/47050/47050-360.mp4" muted loop playsinline preload="none"></video>
           <div class="svc-tint"></div>
+          <figcaption class="svc-card-overlay">
+            <span class="svc-card-tag"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
+            <span class="svc-card-num">03</span>
+          </figcaption>
+        </figure>
+      </article>
+
+      <article class="svc-row">
+        <div class="svc-copy">
+          <span class="svc-index">04 / 04</span>
+          <h3 class="svc-title">Cibersegurança</h3>
+          <p class="svc-desc">Pentest, hardening de infraestrutura e monitoramento contínuo. Segurança não é feature opcional. É a fundação de toda entrega Spiralis.</p>
+          <a href="#contato" class="svc-link">Falar sobre segurança <span aria-hidden="true">→</span></a>
         </div>
-        <div class="svc-img" id="si4">
+        <figure class="svc-media" aria-label="Cibersegurança">
           <div class="svc-img-bg s4"></div>
           <video class="svc-video" data-src="https://assets.mixkit.co/videos/22760/22760-360.mp4" muted loop playsinline preload="none"></video>
           <div class="svc-tint"></div>
-        </div>
-        <div class="svc-card-overlay">
-          <span class="svc-card-tag" data-z="80"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
-          <span class="svc-card-num" id="svc-card-num" data-z="120">01</span>
-        </div>
-      </div>
+          <figcaption class="svc-card-overlay">
+            <span class="svc-card-tag"><img src="spiralis-wordmark-branco.svg" alt="Spiralis" class="svc-card-wm" width="77" height="22"></span>
+            <span class="svc-card-num">04</span>
+          </figcaption>
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PROCESS JOURNEY ══════════════ -->
+<section class="journey-section" id="processo">
+  <header class="journey-header">
+    <span class="journey-eyebrow">
+      <img src="spiralis-simbolo-branco.svg" class="journey-mark" alt="" aria-hidden="true">
+      Processo
+    </span>
+    <h2 class="journey-title">Do diagnóstico à entrega.</h2>
+    <p class="journey-desc">Cada projeto avança por um caminho claro, com decisões validadas, segurança incorporada e visibilidade do início ao fim.</p>
+  </header>
+
+  <div class="journey-timeline" id="journey-timeline">
+    <svg class="journey-ink" id="journey-ink" fill="none" stroke-linecap="round" aria-hidden="true"></svg>
+    <div class="journey-track" aria-hidden="true">
+      <div class="journey-track-fill" id="journey-fill"></div>
+      <div class="journey-track-dot" id="journey-dot"></div>
     </div>
 
-    <div class="svc-right">
-      <div class="svc-panel on" id="sp1">
-        <h3 class="svc-title">Desenvolvimento<br>de Sistemas</h3>
-        <p class="svc-desc">Sistemas sob medida, construídos para resolver problemas reais. Back-end robusto, arquitetura pensada para crescer e documentação de verdade.</p>
+    <article class="journey-event left">
+      <div class="journey-event-body">
+        <span class="journey-step">01</span>
+        <h3 class="journey-event-title">Diagnóstico da operação</h3>
+        <p class="journey-event-desc">Mergulhamos nos processos, sistemas, riscos e objetivos para identificar o problema real antes de propor qualquer solução.</p>
       </div>
-      <div class="svc-panel" id="sp2">
-        <h3 class="svc-title">Automações<br>e Chatbots</h3>
-        <p class="svc-desc">Fluxos automatizados, chatbots com IA e atendimento que funciona 24/7. Menos retrabalho, resposta imediata e sua equipe focada no que importa.</p>
-      </div>
-      <div class="svc-panel" id="sp3">
-        <h3 class="svc-title">Integração<br>de Sistemas</h3>
-        <p class="svc-desc">ERP, CRM, APIs externas e internas: conectamos tudo. Nenhum dado perdido entre sistemas, nenhum processo manual de sincronização.</p>
-      </div>
-      <div class="svc-panel" id="sp4">
-        <h3 class="svc-title">Cyber<br>Segurança</h3>
-        <p class="svc-desc">Pentest, hardening de infraestrutura e monitoramento contínuo. Segurança não é feature opcional. É a fundação de toda entrega Spiralis.</p>
-      </div>
-    </div>
+    </article>
 
-    <div class="svc-bottom">
-      <span class="svc-tagline">✦ Diferentes disciplinas. Um padrão de excelência.</span>
-      <div class="svc-dots">
-        <div class="svc-dot on"></div>
-        <div class="svc-dot"></div>
-        <div class="svc-dot"></div>
-        <div class="svc-dot"></div>
+    <article class="journey-event right">
+      <div class="journey-event-body">
+        <span class="journey-step">02</span>
+        <h3 class="journey-event-title">Estratégia e prioridades</h3>
+        <p class="journey-event-desc">Transformamos o diagnóstico em escopo, prioridades, indicadores de sucesso e um plano de execução compartilhado.</p>
       </div>
-      <a href="#contato" class="svc-view">Ver serviços →</a>
-    </div>
+    </article>
+
+    <article class="journey-event left">
+      <div class="journey-event-body">
+        <span class="journey-step">03</span>
+        <h3 class="journey-event-title">Arquitetura e protótipo</h3>
+        <p class="journey-event-desc">Desenhamos fluxos, arquitetura e experiência. O protótipo valida as decisões críticas antes do desenvolvimento.</p>
+      </div>
+    </article>
+
+    <article class="journey-event right">
+      <div class="journey-event-body">
+        <span class="journey-step">04</span>
+        <h3 class="journey-event-title">Desenvolvimento e integrações</h3>
+        <p class="journey-event-desc">Construímos em ciclos curtos, conectando sistemas, automatizando processos e demonstrando evolução contínua.</p>
+      </div>
+    </article>
+
+    <article class="journey-event left">
+      <div class="journey-event-body">
+        <span class="journey-step">05</span>
+        <h3 class="journey-event-title">Qualidade, segurança e homologação</h3>
+        <p class="journey-event-desc">Testamos regras, desempenho e segurança com usuários-chave até a solução estar pronta para operar sem margem para erro.</p>
+      </div>
+    </article>
+
+    <article class="journey-event right">
+      <div class="journey-event-body">
+        <span class="journey-step">06</span>
+        <h3 class="journey-event-title">Deploy e entrega final</h3>
+        <p class="journey-event-desc">Colocamos em produção, documentamos, treinamos a equipe e acompanhamos a estabilização para uma entrega segura e sustentável.</p>
+      </div>
+    </article>
   </div>
 </section>
 
@@ -956,28 +1915,28 @@
     <div class="proj-top">
       <h2 class="proj-heading">Projetos<br>entregues.</h2>
       <div class="proj-top-right">
-        <a href="#contato" class="proj-link">Ver todos →</a>
+        <a href="#contato" class="proj-link">Quero um projeto →</a>
         <div class="proj-counter"><span id="proj-cur">01</span><span class="proj-slash">/</span><span id="proj-total">04</span></div>
       </div>
     </div>
 
     <div class="proj-canvas-wrap" id="proj-canvas-wrap">
-      <canvas id="proj-gl"></canvas>
+      <canvas id="proj-gl" aria-hidden="true"></canvas>
     </div>
 
     <div class="proj-bottom">
-      <div class="proj-detail">
+      <div class="proj-detail" aria-live="polite">
         <div class="proj-detail-num" id="proj-detail-num">01</div>
         <div class="proj-detail-body">
-          <h3 class="proj-detail-name" id="proj-detail-name">Plataforma de Gestão</h3>
-          <p class="proj-detail-tag" id="proj-detail-tag">Sistema de Gestão · Web App</p>
+          <h3 class="proj-detail-name" id="proj-detail-name">Kimura Control</h3>
+          <p class="proj-detail-tag" id="proj-detail-tag">Plataforma de Gestão para Academias de Artes Marciais · Web App</p>
         </div>
       </div>
       <div class="proj-dots" id="proj-dots">
-        <div class="proj-dot on"></div>
-        <div class="proj-dot"></div>
-        <div class="proj-dot"></div>
-        <div class="proj-dot"></div>
+        <button class="proj-dot on" type="button" aria-label="Ver projeto 1"></button>
+        <button class="proj-dot" type="button" aria-label="Ver projeto 2"></button>
+        <button class="proj-dot" type="button" aria-label="Ver projeto 3"></button>
+        <button class="proj-dot" type="button" aria-label="Ver projeto 4"></button>
       </div>
       <button class="proj-arrow" id="proj-next" aria-label="Próximo projeto">→</button>
     </div>
@@ -987,15 +1946,15 @@
   <div class="proj-mobile" id="proj-mobile">
     <div class="proj-header">
       <h2 class="proj-heading fade-in">Projetos<br>entregues.</h2>
-      <a href="#contato" class="proj-link fade-in">Ver todos →</a>
+      <a href="#contato" class="proj-link fade-in">Quero um projeto →</a>
     </div>
-    <div class="proj-mobile-grid">
+    <div class="proj-mobile-grid" tabindex="0" aria-label="Projetos da Spiralis">
       <div class="proj-card fade-in">
         <div class="proj-inner"><div class="proj-bg"></div></div>
         <div class="proj-info">
           <div class="proj-num">01</div>
-          <div class="proj-name">Plataforma de Gestão</div>
-          <div class="proj-tag">Sistema de Gestão · Web App</div>
+          <div class="proj-name">Kimura Control</div>
+          <div class="proj-tag">Plataforma de Gestão para Academias de Artes Marciais · Web App</div>
         </div>
       </div>
       <div class="proj-card fade-in">
@@ -1032,8 +1991,9 @@
     <div class="test-head">
       <h2 class="test-heading fade-in">O que dizem<br>sobre a Spiralis.</h2>
       <p class="test-sub">Resultado construído em parceria. Algumas perspectivas de quem já trabalhou conosco.</p>
+      <span class="carousel-hint" aria-hidden="true">Arraste para ver mais →</span>
     </div>
-    <div class="test-track" id="test-track">
+    <div class="test-track" id="test-track" tabindex="0" aria-label="Depoimentos de clientes">
       <div class="test-card">
         <div class="test-co">Graziano Adm</div>
         <p class="test-quote">"A Spiralis entregou um MVP que resolveu um problema que a gente tinha há dois anos. A abordagem consultiva fez toda a diferença. Eles entenderam a operação de verdade."</p>
@@ -1064,6 +2024,7 @@
     <a href="mailto:contato@spiralis.com.br" class="btn-ghost-link">contato@spiralis.com.br</a>
   </div>
 </section>
+</main>
 
 <!-- FOOTER -->
 <footer>
@@ -1089,7 +2050,7 @@
   (function(){
     const c = document.getElementById('loader-counter');
     if(!c) return;
-    const s = Date.now(), d = 950;
+    const s = Date.now(), d = 550;
     (function t(){
       const p = Math.min((Date.now()-s)/d, 1);
       c.textContent = String(Math.round(p*p*100)).padStart(3,'0');
@@ -1120,106 +2081,253 @@
   /* ── ABOUT TEXT CHAR SCRUB ──────────────── */
   const aboutEl = document.getElementById('about-text');
   if(aboutEl){
-    const chars = splitChars(aboutEl);
-    gsap.set(chars, {color:'#2a2140'});
-    gsap.to(chars, {
-      color:'#EBE4F6',
-      stagger:{each:.04, from:'start'},
-      ease:'none',
-      scrollTrigger:{
-        trigger: aboutEl,
-        start:'top 75%', end:'bottom 30%',
-        scrub:1.5, invalidateOnRefresh:true
-      }
-    });
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      gsap.set(aboutEl, {color:'#EBE4F6'});
+    } else {
+      const chars = splitChars(aboutEl);
+      gsap.set(chars, {color:'#6F637F'});
+      gsap.to(chars, {
+        color:'#EBE4F6',
+        stagger:{each:.04, from:'start'},
+        ease:'none',
+        scrollTrigger:{
+          trigger: aboutEl,
+          start:'top 75%', end:'bottom 30%',
+          scrub:1.5, invalidateOnRefresh:true
+        }
+      });
+    }
   }
 
-  /* ── SERVICES PINNED ────────────────────── */
-  const svcData = [
-    {img:'#si1',panel:'#sp1',idx:'01 / 04'},
-    {img:'#si2',panel:'#sp2',idx:'02 / 04'},
-    {img:'#si3',panel:'#sp3',idx:'03 / 04'},
-    {img:'#si4',panel:'#sp4',idx:'04 / 04'},
-  ];
-  let curSvc = 0;
-  const dots = document.querySelectorAll('.svc-dot');
-
-  function goSvc(i){
-    if(i === curSvc) return;
-    document.querySelector(svcData[curSvc].img).classList.remove('on');
-    document.querySelector(svcData[curSvc].panel).classList.remove('on');
-    dots[curSvc].classList.remove('on');
-    curSvc = i;
-    document.querySelector(svcData[i].img).classList.add('on');
-    document.querySelector(svcData[i].panel).classList.add('on');
-    dots[i].classList.add('on');
-    document.getElementById('svc-idx').textContent = svcData[i].idx;
-    const numEl = document.getElementById('svc-card-num');
-    if (numEl) numEl.textContent = String(i + 1).padStart(2, '0');
-    playSvcVideo(i);
-  }
-
-  /* ── SERVICES CARD VIDEOS (lazy) ────────── */
+  /* ── SERVICES PINNED INTERNAL TRACKS ─────── */
+  const svcRows = gsap.utils.toArray('.svc-row');
   const svcVideos = document.querySelectorAll('.svc-video');
   const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let activeSvc = 0;
+  let servicesInRange = false;
 
-  function playSvcVideo(i){
-    svcVideos.forEach((v, k) => {
-      if (k === i && v.src) { v.play().catch(()=>{}); }
-      else { v.pause(); }
+  const loadSvcVideo = video => {
+    if (!video || video.src || noMotion) return;
+    video.src = video.dataset.src;
+    video.addEventListener('canplay', () => video.classList.add('ready'), {once:true});
+    video.load();
+  };
+
+  const setActiveSvc = index => {
+    activeSvc = Math.max(0, Math.min(index, svcRows.length - 1));
+    svcRows.forEach((row, i) => row.classList.toggle('is-active', i === activeSvc));
+    svcVideos.forEach((video, i) => {
+      if (i === activeSvc && servicesInRange) {
+        loadSvcVideo(video);
+        if (!noMotion) video.play().catch(()=>{});
+      } else {
+        video.pause();
+      }
     });
-  }
+  };
 
   if (svcVideos.length && !noMotion) {
-    const vidObserver = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        svcVideos.forEach(v => {
-          v.src = v.dataset.src;
-          v.addEventListener('canplay', () => v.classList.add('ready'), {once:true});
-          v.load();
+    const svcSection = document.getElementById('servicos');
+    const svcLoadObserver = new IntersectionObserver(entries => {
+      if (!entries[0].isIntersecting) return;
+      servicesInRange = true;
+      setActiveSvc(activeSvc);
+      svcLoadObserver.disconnect();
+    }, {rootMargin: '600px 0px'});
+    svcLoadObserver.observe(svcSection);
+  }
+
+  if (svcRows.length) {
+    const svcMatch = gsap.matchMedia();
+
+    svcMatch.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+      const copies = svcRows.map(row => row.querySelector('.svc-copy'));
+      const media = svcRows.map(row => row.querySelector('.svc-media'));
+
+      svcRows.forEach((row, i) => {
+        row.style.zIndex = String(i + 1);
+        gsap.set([copies[i], media[i]], {
+          yPercent: i === 0 ? 0 : 112,
+          opacity: i === 0 ? 1 : 0
         });
-        playSvcVideo(curSvc);
-        vidObserver.disconnect();
-      }
-    }, {rootMargin: '400px'});
-    vidObserver.observe(document.getElementById('servicos'));
-  }
-
-  /* ── SERVICES 3D CARD TILT ──────────────── */
-  const svcWrap   = document.getElementById('svc-center-wrap');
-  const svcCenter = document.getElementById('svc-center');
-  if (svcWrap && svcCenter) {
-    const depthEls = svcCenter.querySelectorAll('[data-z]');
-    svcWrap.addEventListener('mousemove', e => {
-      const r = svcWrap.getBoundingClientRect();
-      const x = (e.clientX - r.left - r.width/2)  / (r.width/2);
-      const y = (e.clientY - r.top  - r.height/2) / (r.height/2);
-      gsap.to(svcCenter, {rotationY:x*6, rotationX:-y*6,
-        duration:.4, ease:'power2.out', transformPerspective:1100});
-      depthEls.forEach(el => {
-        const z = parseFloat(el.dataset.z) || 0;
-        gsap.to(el, {x:x*(z*0.08), y:y*(z*0.08), z:z,
-          duration:.4, ease:'power2.out'});
       });
+      setActiveSvc(0);
+
+      const svcTimeline = gsap.timeline({
+        defaults: {ease: 'power1.inOut'},
+        scrollTrigger: {
+          trigger: '#servicos',
+          start: 'top top',
+          end: () => '+=' + (window.innerHeight * .72 * (svcRows.length - 1)),
+          pin: '.svc-shell',
+          scrub: .7,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate(self) {
+            setActiveSvc(Math.round(self.progress * (svcRows.length - 1)));
+          },
+          onToggle(self) {
+            if (!self.isActive) svcVideos.forEach(video => video.pause());
+            else setActiveSvc(activeSvc);
+          }
+        }
+      });
+
+      for (let i = 1; i < svcRows.length; i++) {
+        const at = i - 1;
+        svcTimeline
+          .to([copies[i - 1], media[i - 1]], {
+            yPercent: -82,
+            opacity: 0,
+            duration: .5
+          }, at)
+          .fromTo([copies[i], media[i]], {
+            yPercent: 82,
+            opacity: 0
+          }, {
+            yPercent: 0,
+            opacity: 1,
+            duration: .55
+          }, at + .05);
+      }
+
+      return () => {
+        svcTimeline.scrollTrigger?.kill();
+        svcTimeline.kill();
+        gsap.set([...copies, ...media], {clearProps: 'transform,opacity'});
+        svcRows.forEach(row => {
+          row.style.zIndex = '';
+          row.classList.remove('is-active');
+        });
+      };
     });
-    svcWrap.addEventListener('mouseleave', () => {
-      gsap.to(svcCenter, {rotationY:0, rotationX:0,
-        duration:.9, ease:'elastic.out(1,.5)'});
-      depthEls.forEach(el => gsap.to(el, {x:0, y:0, z:0,
-        duration:.9, ease:'elastic.out(1,.5)'}));
+
+    svcMatch.add('(max-width: 820px)', () => {
+      const mobileMedia = svcRows.map(row => row.querySelector('.svc-media'));
+      gsap.set(svcRows.flatMap(row => [
+        row.querySelector('.svc-copy'),
+        row.querySelector('.svc-media')
+      ]), {clearProps: 'transform,opacity'});
+      svcRows.forEach(row => row.classList.add('is-active'));
+
+      const mobileVideoObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting || entry.intersectionRatio < .5) return;
+          const index = mobileMedia.indexOf(entry.target);
+          if (index >= 0) setActiveSvc(index);
+        });
+      }, {threshold: [.5]});
+      mobileMedia.forEach(item => mobileVideoObserver.observe(item));
+
+      return () => mobileVideoObserver.disconnect();
     });
   }
 
-  ScrollTrigger.create({
-    trigger: '#servicos',
-    start: 'top top',
-    end: '+=' + (window.innerHeight * 4),
-    pin: '#svc-pinned',
-    scrub: false,
-    onUpdate(self){
-      goSvc(Math.min(Math.floor(self.progress * 4), 3));
+  /* ── PROCESS JOURNEY (reference-matched) ─── */
+  const journeyTimeline = document.getElementById('journey-timeline');
+  const journeyFill = document.getElementById('journey-fill');
+  const journeyDot = document.getElementById('journey-dot');
+  const journeyEvents = journeyTimeline
+    ? [...journeyTimeline.querySelectorAll('.journey-event')]
+    : [];
+  const journeyInk = document.getElementById('journey-ink');
+
+  if (journeyTimeline && journeyInk && !noMotion) {
+    const trailLength = 80;
+    const trailPaths = [];
+    const trailPoints = [];
+    const trailTarget = {x: journeyTimeline.offsetWidth / 2, y: 0};
+
+    for (let i = 0; i < trailLength; i++) {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute(
+        'stroke',
+        `hsla(${(260 + i * 1.25).toFixed(0)}, 80%, 65%, 0.6)`
+      );
+      journeyInk.appendChild(path);
+      trailPaths.push(path);
+      trailPoints.push({x: trailTarget.x, y: 0});
     }
-  });
+
+    const trailDistance = index => {
+      const half = trailLength / 2;
+      const wrapped = index % trailLength;
+      return wrapped <= half ? wrapped : trailLength - wrapped;
+    };
+
+    let journeyFrame = 0;
+    const updateJourney = () => {
+      const rect = journeyTimeline.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+
+      if (!(rect.top > viewportHeight || rect.bottom < 0)) {
+        const travel = viewportHeight - rect.top;
+        const distance = rect.height + viewportHeight * .3;
+        const progress = Math.max(0, Math.min(1, travel / distance));
+
+        if (journeyFill) journeyFill.style.height = `${(progress * 100).toFixed(1)}%`;
+        if (journeyDot) {
+          journeyDot.style.top = `${(progress * 100).toFixed(1)}%`;
+          journeyDot.classList.toggle('on', progress > .01);
+        }
+
+        journeyEvents.forEach(event => {
+          event.classList.toggle(
+            'visible',
+            event.getBoundingClientRect().top < viewportHeight * .78
+          );
+        });
+
+        const isMobile = window.innerWidth < 768;
+        const trackX = isMobile ? 20 : journeyTimeline.offsetWidth / 2;
+        const sway = isMobile ? 25 : 60;
+        trailTarget.x = trackX + Math.sin(progress * Math.PI * 2 * 5) * sway;
+        trailTarget.y = progress * journeyTimeline.offsetHeight;
+
+        let targetX = trailTarget.x;
+        let targetY = trailTarget.y;
+
+        for (let i = 0; i < trailLength; i++) {
+          trailPoints[i].x += (targetX - trailPoints[i].x) / 4;
+          trailPoints[i].y += (targetY - trailPoints[i].y) / 4;
+
+          if (i > 0) {
+            const previousX = trailPoints[i - 1].x;
+            const previousY = trailPoints[i - 1].y;
+            const deltaX = previousX - trailPoints[i].x;
+            const deltaY = previousY - trailPoints[i].y;
+            const segmentLength = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const strokeWidth =
+              (1 + trailDistance(i) * 5 / (trailLength / 2)) *
+              Math.min(1, segmentLength / 8);
+
+            trailPaths[i].setAttribute(
+              'd',
+              `M${previousX.toFixed(1)},${previousY.toFixed(1)} ` +
+              `L${trailPoints[i].x.toFixed(1)},${trailPoints[i].y.toFixed(1)}`
+            );
+            trailPaths[i].setAttribute('stroke-width', strokeWidth.toFixed(2));
+          }
+
+          targetX = trailPoints[i].x;
+          targetY = trailPoints[i].y;
+        }
+      }
+
+      journeyFrame = requestAnimationFrame(updateJourney);
+    };
+
+    const journeyObserver = new IntersectionObserver(entries => {
+      const shouldAnimate = entries[0].isIntersecting;
+      if (shouldAnimate && !journeyFrame) {
+        journeyFrame = requestAnimationFrame(updateJourney);
+      } else if (!shouldAnimate && journeyFrame) {
+        cancelAnimationFrame(journeyFrame);
+        journeyFrame = 0;
+      }
+    }, {rootMargin: '200px 0px'});
+    journeyObserver.observe(journeyTimeline);
+  }
 
   /* ── HERO BLUR-IN (word by word) ────────── */
   const heroWords = document.querySelectorAll('.hero-heading .blur-word');
@@ -1230,20 +2338,24 @@
     } else {
       gsap.to(heroWords, {
         opacity:1, filter:'blur(0px)', y:0,
-        duration:.7, ease:'power3.out',
-        stagger:.09, delay:2.4
+        duration:.6, ease:'power3.out',
+        stagger:.06, delay:.95
       });
     }
   }
 
   /* ── FADE IN ON SCROLL ──────────────────── */
-  document.querySelectorAll('.fade-in').forEach(el => {
-    gsap.fromTo(el,
-      {opacity:0, y:32},
-      {opacity:1, y:0, duration:.9, ease:'power3.out',
-        scrollTrigger:{trigger:el, start:'top 88%', toggleActions:'play none none none'}}
-    );
-  });
+  if (noMotion) {
+    gsap.set('.fade-in', {opacity:1, y:0});
+  } else {
+    document.querySelectorAll('.fade-in').forEach(el => {
+      gsap.fromTo(el,
+        {opacity:0, y:32},
+        {opacity:1, y:0, duration:.9, ease:'power3.out',
+          scrollTrigger:{trigger:el, start:'top 88%', toggleActions:'play none none none'}}
+      );
+    });
+  }
 
   /* ── PROJECT CARD TILT ──────────────────── */
   document.querySelectorAll('.proj-card').forEach(card => {
@@ -1269,12 +2381,21 @@
   (function initProjCarousel(){
     const pinnedEl = document.getElementById('proj-pinned');
     const canvas   = document.getElementById('proj-gl');
-    if (!pinnedEl || !canvas || typeof THREE === 'undefined') return;
-    if (!window.matchMedia('(min-width: 760px)').matches) return;
+    if (!pinnedEl || !canvas) return;
+    const supportsPinned = window.matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)').matches;
+    if (!supportsPinned) return;
+    if (location.protocol === 'file:') {
+      document.documentElement.classList.add('no-project-webgl');
+      return;
+    }
+    if (typeof THREE === 'undefined') {
+      document.documentElement.classList.add('no-project-webgl');
+      return;
+    }
 
     const PROJECTS = [
-      { num:'01', name:'Plataforma de Gestão', tag:'Sistema de Gestão · Web App',
-        img:'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80' },
+      { num:'01', name:'Kimura Control', tag:'Plataforma de Gestão para Academias de Artes Marciais · Web App',
+        img:'kimura-control-dashboard.png' },
       { num:'02', name:'Automação com IA', tag:'Automação de Fluxo · IA',
         img:'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&q=80' },
       { num:'03', name:'Auditoria & Hardening', tag:'Pentest · Hardening',
@@ -1285,7 +2406,13 @@
     const N = PROJECTS.length;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    let renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch (error) {
+      document.documentElement.classList.add('no-project-webgl');
+      return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene  = new THREE.Scene();
@@ -1306,9 +2433,9 @@
       STEP   = CARD_W + GAP;
     }
 
-    const loader = new THREE.TextureLoader();
-    loader.crossOrigin = 'anonymous';
     const textures = PROJECTS.map(p => {
+      const loader = new THREE.TextureLoader();
+      loader.crossOrigin = /^https?:/i.test(p.img) ? 'anonymous' : undefined;
       const tex = loader.load(p.img);
       tex.colorSpace = THREE.SRGBColorSpace || tex.colorSpace;
       return tex;
@@ -1324,7 +2451,8 @@
           uTime:     uniforms.uTime,
           uSelected: { value: 0 },
           uView:     { value: 1 },
-          uTint:     { value: new THREE.Color(0x23084D) }
+          uTint:     { value: new THREE.Color(0x23084D) },
+          uTintStrength: { value: cardIdx === 0 ? 0.06 : 0.32 }
         },
         vertexShader: `
           uniform float uVel;
@@ -1348,6 +2476,7 @@
           uniform float uTime;
           uniform float uSelected;
           uniform vec3 uTint;
+          uniform float uTintStrength;
           varying vec2 vUv;
           void main() {
             /* textura base */
@@ -1355,7 +2484,7 @@
             vec2 uv = vUv;
             uv.x += sin(vUv.y * 3.14159) * k;
             vec4 c = texture2D(uMap, uv);
-            c.rgb = mix(c.rgb, uTint, 0.32);
+            c.rgb = mix(c.rgb, uTint, uTintStrength);
 
             /* ── rounded rect SDF ── */
             vec2 uv2 = vUv * 2.0 - 1.0;
@@ -1408,7 +2537,7 @@
       cards.length = 0;
       for (let i = 0; i < N; i++) {
         const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 40, 16);
-        const mat = makeMaterial(textures[i]);
+        const mat = makeMaterial(textures[i], i);
         mat.uniforms.uView.value = view.w;
         mat.uniforms.uSelected.value = (i === selected) ? 1.0 : 0.0;
         const mesh = new THREE.Mesh(geo, mat);
@@ -1492,6 +2621,7 @@
     }
     window.addEventListener('resize', resize);
 
+    let projFrame = 0;
     function tick() {
       uniforms.uTime.value = performance.now() * 0.001;
       current += (target - current) * LERP;
@@ -1502,11 +2632,20 @@
       }
       layout();
       renderer.render(scene, camera);
-      requestAnimationFrame(tick);
+      projFrame = requestAnimationFrame(tick);
     }
 
     resize();
-    tick();
+    const projRenderObserver = new IntersectionObserver(entries => {
+      const shouldRender = entries[0].isIntersecting;
+      if (shouldRender && !projFrame) {
+        projFrame = requestAnimationFrame(tick);
+      } else if (!shouldRender && projFrame) {
+        cancelAnimationFrame(projFrame);
+        projFrame = 0;
+      }
+    }, {rootMargin: '600px 0px'});
+    projRenderObserver.observe(pinnedEl);
 
     /* progressão acionada pelo scroll da página — bem mais
        lenta que o protótipo isolado (mais altura de rolagem
@@ -1514,7 +2653,7 @@
     projST = ScrollTrigger.create({
       trigger: '#projetos',
       start: 'top top',
-      end: '+=' + (window.innerHeight * 7),
+      end: '+=' + (window.innerHeight * 2.8),
       pin: '#proj-pinned',
       scrub: true,
       onUpdate(self){
@@ -1526,7 +2665,7 @@
   })();
 
   /* ── MAGNETIC BUTTONS ───────────────────── */
-  document.querySelectorAll('.btn-fill,.hero-cta-link,.nav-pill').forEach(btn => {
+  document.querySelectorAll('.btn-fill,.nav-pill').forEach(btn => {
     btn.addEventListener('mousemove', e => {
       const r = btn.getBoundingClientRect();
       gsap.to(btn, {
@@ -1612,7 +2751,7 @@
 
   /* ── NAV BLEND ──────────────────────────── */
   const nav = document.getElementById('nav');
-  const lightSections = ['#keyfacts-section','#projetos','.testimonials'];
+  const lightSections = ['#showcase','#keyfacts-section','#projetos','.testimonials'];
   function syncNavContrast(){
     let onLight = false;
     lightSections.forEach(s=>{
@@ -1621,36 +2760,494 @@
       const r=el.getBoundingClientRect();
       if(r.top<=80&&r.bottom>=0) onLight=true;
     });
-    const wm = nav.querySelector('.wordmark');
-    if(onLight){
-      nav.querySelectorAll('.nav-logo,.nav-pill').forEach(e=>{e.style.color='#111';e.style.borderColor='rgba(0,0,0,.3)';});
-      if(wm) wm.style.filter = 'invert(1) brightness(0.12)';
-    } else {
-      nav.querySelectorAll('.nav-logo,.nav-pill').forEach(e=>{e.style.color='';e.style.borderColor='';});
-      if(wm) wm.style.filter = '';
-    }
+    nav.classList.toggle('is-over-light', onLight);
   }
   window.addEventListener('scroll',syncNavContrast,{passive:true});
   syncNavContrast();
 </script>
 
-<!-- Theme Toggle -->
+<!-- Showcase — container scroll (rotateX flatten on scroll) -->
 <script>
 (function(){
-  var html = document.documentElement;
-  var btn  = document.getElementById('theme-toggle');
-  var saved = localStorage.getItem('spiralis-theme');
-  var sys   = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  applyTheme(saved || sys);
-  btn.addEventListener('click', function(){
-    var cur = html.getAttribute('data-theme') || 'dark';
-    applyTheme(cur === 'dark' ? 'light' : 'dark');
-  });
-  function applyTheme(t){
-    html.setAttribute('data-theme', t);
-    localStorage.setItem('spiralis-theme', t);
-    if(window.__orbEngine) window.__orbEngine.params.theme = t;
+  var card = document.getElementById('cs-card');
+  var head = document.querySelector('#showcase .cs-head');
+  if(!card || !window.gsap || !window.ScrollTrigger) return;
+  gsap.registerPlugin(ScrollTrigger);
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    gsap.set(card, {rotateX:0, scale:1});
+    return;
   }
+  gsap.timeline({
+    scrollTrigger: { trigger:'#showcase', start:'top 62%', end:'top 8%', scrub:.6 }
+  })
+  .fromTo(card, {rotateX:32, scale:.90, y:30}, {rotateX:0, scale:1, y:0, ease:'none'}, 0)
+  .fromTo(head, {y:50, opacity:.25}, {y:0, opacity:1, ease:'none'}, 0);
+})();
+</script>
+
+<!-- Sistema interativo (telinha do showcase) -->
+<script>
+(function(){
+  var mount = document.getElementById('sys');
+  if(!mount) return;
+  var MARK = 'spiralis-simbolo-branco.svg';
+
+  var ICON = {
+    home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/><path d="M10 20v-6h4v6"/>',
+    building:'<path d="M4 21V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v17"/><path d="M2 21h20"/><path d="M8.5 8h1M8.5 12h1M8.5 16h1M14.5 8h1M14.5 12h1M14.5 16h1"/>',
+    coins:'<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+    cart:'<circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h2.2l2.3 12.2a1 1 0 0 0 1 .8h8.6a1 1 0 0 0 1-.8L20 7H6.2"/>',
+    clipboard:'<rect x="6" y="4" width="12" height="17" rx="1.5"/><path d="M9 4V3h6v1"/><path d="M9 10h6M9 14h4"/>',
+    shield:'<path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/>',
+    calendar:'<rect x="4" y="5" width="16" height="16" rx="1.5"/><path d="M8 3v4M16 3v4M4 10h16"/>',
+    heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+    box:'<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+    video:'<rect x="3" y="6" width="12" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/>',
+    users:'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5"/><path d="M16 6a3 3 0 0 1 0 6M21 20c0-2.5-1.5-4.2-3.6-4.8"/>',
+    truck:'<rect x="2" y="7" width="12" height="9" rx="1"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>',
+    route:'<circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 6h7a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h7"/>',
+    map:'<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+    store:'<path d="M4 9l1.2-5h13.6L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9a2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0 2.4 2.4 0 0 0 4.8 0"/><path d="M9 20v-5h6v5"/>',
+    globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.4 3 14.6 0 18M12 3c-3 3.4-3 14.6 0 18"/>',
+    chart:'<path d="M4 4v16h16"/><rect x="7" y="12" width="3" height="5"/><rect x="12" y="8" width="3" height="9"/><rect x="17" y="14" width="3" height="3"/>'
+  };
+  function icon(n){ return '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+(ICON[n]||'')+'</svg>'; }
+
+  var DATA = {
+    construtora: { label:'Construtora', modules:[
+      { ic:'building', name:'Obras', kpis:[{v:'12',l:'Obras ativas'},{v:'68%',l:'Avanço médio'},{v:'+4d',l:'Desvio de prazo'}],
+        cols:['Obra','Etapa','Físico','Financ.','Status'], rows:[
+          ['Residencial Aurora','Estrutura','72%','65%','Em dia'],
+          ['Corporativo Vertt','Fundação','45%','48%','Em dia'],
+          ['Condomínio Ipê','Acabamento','96%','92%','Em dia'],
+          ['Galpão Log Sul','Alvenaria','30%','41%','Atrasado'],
+          ['Loteamento Vale','Terraplen.','18%','22%','Em dia'] ],
+        aside:{ h:'Avanço por frente', items:[['Estrutura',72],['Instalações',40],['Acabamento',25],['Fachada',12]] } },
+      { ic:'coins', name:'Orçamento', kpis:[{v:'R$ 18,4M',l:'Orçado'},{v:'R$ 12,1M',l:'Realizado'},{v:'+3,2%',l:'Desvio'}],
+        cols:['Insumo','Previsto','Realizado','Desvio','Status'], rows:[
+          ['Concreto','R$ 1,2M','R$ 1,28M','+6,7%','Atenção'],
+          ['Aço CA-50','R$ 890k','R$ 860k','-3,4%','Ok'],
+          ['Mão de obra','R$ 4,1M','R$ 4,3M','+4,9%','Atenção'],
+          ['Alvenaria','R$ 610k','R$ 590k','-3,3%','Ok'],
+          ['Instalações','R$ 1,5M','R$ 1,44M','-4,0%','Ok'] ],
+        aside:{ h:'Composição do custo', items:[['Material',46],['Mão de obra',32],['Equipamento',14],['Indireto',8]] } },
+      { ic:'cart', name:'Suprimentos', kpis:[{v:'23',l:'Pedidos abertos'},{v:'8',l:'Cotações'},{v:'6,4%',l:'Economia'}],
+        cols:['Pedido','Fornecedor','Item','Valor','Status'], rows:[
+          ['#PC-1042','Votorantim','Cimento CP-II','R$ 84k','Aprovado'],
+          ['#PC-1043','Gerdau','Vergalhão','R$ 61k','Cotação'],
+          ['#PC-1044','Tigre','Tubos PVC','R$ 12k','Recebido'],
+          ['#PC-1045','Deca','Louças','R$ 28k','Pendente'],
+          ['#PC-1046','Sika','Impermeab.','R$ 9k','Aprovado'] ],
+        aside:{ h:'Compras por categoria', items:[['Estrutural',52],['Hidráulica',20],['Elétrica',16],['Acabamento',12]] } },
+      { ic:'clipboard', name:'Diário de Obra', kpis:[{v:'26',l:'RDOs no mês'},{v:'148',l:'Efetivo hoje'},{v:'Parcial',l:'Clima'}],
+        cols:['Data','Obra','Efetivo','Ocorrência','Status'], rows:[
+          ['12/07','Aurora','52','Concretagem laje','Ok'],
+          ['12/07','Vertt','38','Chuva 2h','Atenção'],
+          ['11/07','Ipê','24','Sem ocorrências','Ok'],
+          ['11/07','Log Sul','34','Falta de material','Atraso'],
+          ['10/07','Aurora','50','Montagem de forma','Ok'] ],
+        aside:{ h:'Efetivo por função', items:[['Pedreiro',38],['Servente',30],['Carpinteiro',18],['Eletricista',14]] } },
+      { ic:'shield', name:'Segurança', kpis:[{v:'214',l:'Dias sem acidente'},{v:'3',l:'ASOs vencendo'},{v:'97%',l:'Conformidade NR'}],
+        cols:['Item','Obra','Tipo','Vencim.','Status'], rows:[
+          ['EPIs — inspeção','Aurora','Inspeção','20/07','Ok'],
+          ['ASO (3 colab.)','Vertt','Exame','18/07','Vencendo'],
+          ['Treino NR-35','Ipê','Capacitação','25/07','Agendado'],
+          ['Extintores','Log Sul','Manutenção','30/07','Ok'],
+          ['CIPA — reunião','Aurora','Reunião','22/07','Agendado'] ],
+        aside:{ h:'Conformidade por NR', items:[['NR-18',98],['NR-35',95],['NR-06',99],['NR-12',92]] } }
+    ]},
+    clinica: { label:'Clínica', modules:[
+      { ic:'calendar', name:'Agenda', kpis:[{v:'37',l:'Consultas hoje'},{v:'8 min',l:'Espera média'},{v:'6%',l:'No-show'}],
+        cols:['Paciente','Profissional','Horário','Sala','Status'], rows:[
+          ['Ana Prado','Dra. Reis','09:00','02','Confirmado'],
+          ['João Mota','Dr. Salles','09:30','01','Aguardando'],
+          ['Rita Gomes','Dra. Reis','10:15','02','Confirmado'],
+          ['Luís Faria','Dr. Kim','11:00','03','Cancelado'],
+          ['Ivo Nunes','Dra. Sá','11:30','01','Confirmado'] ],
+        aside:{ h:'Ocupação por sala', items:[['Sala 01',82],['Sala 02',74],['Sala 03',60],['Telemedicina',45]] } },
+      { ic:'heart', name:'Prontuário', kpis:[{v:'1.284',l:'Pacientes ativos'},{v:'312',l:'Atend. no mês'},{v:'4,8★',l:'Satisfação'}],
+        cols:['Paciente','Idade','Última visita','CID','Status'], rows:[
+          ['Ana Prado','34','Hoje','J06','Em atend.'],
+          ['Marcos Vila','58','03/07','I10','Retorno'],
+          ['Bia Rocha','27','28/06','—','Alta'],
+          ['Caio Melo','45','15/06','E11','Acomp.'],
+          ['Sofia Dias','9','Hoje','J45','Em atend.'] ],
+        aside:{ h:'Atendimentos por especialidade', items:[['Clínica geral',40],['Cardiologia',22],['Pediatria',20],['Dermato',18]] } },
+      { ic:'coins', name:'Faturamento', kpis:[{v:'R$ 214k',l:'Faturado no mês'},{v:'R$ 38k',l:'Glosas'},{v:'22',l:'Guias pendentes'}],
+        cols:['Guia','Convênio','Procedimento','Valor','Status'], rows:[
+          ['#TISS-8841','Unimed','Consulta','R$ 220','Faturado'],
+          ['#TISS-8842','Bradesco','Ultrassom','R$ 340','Glosado'],
+          ['#TISS-8843','SulAmérica','Exame lab.','R$ 180','Enviado'],
+          ['#TISS-8844','Amil','Retorno','R$ 0','Isento'],
+          ['#TISS-8845','Particular','Consulta','R$ 260','Pago'] ],
+        aside:{ h:'Faturamento por convênio', items:[['Unimed',44],['Bradesco',24],['SulAmérica',18],['Particular',14]] } },
+      { ic:'box', name:'Farmácia', kpis:[{v:'96%',l:'Nível de estoque'},{v:'5',l:'Itens em falta'},{v:'12',l:'Vencendo (30d)'}],
+        cols:['Item','Lote','Qtd','Validade','Status'], rows:[
+          ['Luvas nitrílicas','L-2231','1.200','04/27','Ok'],
+          ['Dipirona 500mg','L-1180','640','11/26','Ok'],
+          ['Álcool 70%','L-0934','83','02/27','Baixo'],
+          ['Máscaras N95','L-4410','25','—','Repor'],
+          ['Amoxicilina','L-7702','8','08/26','Vencendo'] ],
+        aside:{ h:'Estoque por categoria', items:[['Medicamentos',52],['Descartáveis',28],['Insumos',12],['EPIs',8]] } },
+      { ic:'video', name:'Telemedicina', kpis:[{v:'58',l:'Teleconsultas/sem'},{v:'11 min',l:'Duração média'},{v:'98%',l:'Conexão ok'}],
+        cols:['Paciente','Profissional','Início','Tipo','Status'], rows:[
+          ['Rui Barros','Dr. Kim','14:00','Retorno','Em call'],
+          ['Lia Souza','Dra. Reis','14:20','1ª consulta','Sala espera'],
+          ['Tom Alves','Dra. Sá','14:40','Retorno','Agendado'],
+          ['Nina Paz','Dr. Salles','15:00','Laudo','Concluído'] ],
+        aside:{ h:'Canais de acesso', items:[['App',54],['Web',30],['WhatsApp',16]] } }
+    ]},
+    logistica: { label:'Logística', modules:[
+      { ic:'route', name:'Torre de Controle', kpis:[{v:'318',l:'Entregas hoje'},{v:'96%',l:'No prazo'},{v:'12',l:'Em exceção'}],
+        cols:['Pedido','Rota','ETA','Motorista','Status'], rows:[
+          ['#48213','SP → Campinas','16:20','C. Dias','Em rota'],
+          ['#48219','SP → Santos','18:05','R. Teles','Coletado'],
+          ['#48224','RJ → Niterói','—','M. Rocha','Entregue'],
+          ['#48231','SP → Sorocaba','atrasado','A. Souza','Exceção'],
+          ['#48237','SP → Jundiaí','15:10','P. Lima','Em rota'] ],
+        aside:{ h:'Status da operação', items:[['Em rota',48],['Entregue',34],['Coletado',12],['Exceção',6]] } },
+      { ic:'map', name:'Roteirização', kpis:[{v:'1.240',l:'Km planejados'},{v:'14%',l:'Redução de km'},{v:'42',l:'Rotas hoje'}],
+        cols:['Rota','Paradas','Km','Veículo','Status'], rows:[
+          ['R-01 Zona Sul','18','86','VUC','Otimizada'],
+          ['R-02 ABC','22','104','Truck','Otimizada'],
+          ['R-03 Interior','9','210','Van','Revisar'],
+          ['R-04 Capital','27','64','VUC','Otimizada'],
+          ['R-05 Litoral','12','168','Truck','Pendente'] ],
+        aside:{ h:'Aproveitamento de carga', items:[['R-01',92],['R-02',88],['R-03',64],['R-04',95]] } },
+      { ic:'truck', name:'Frota', kpis:[{v:'42',l:'Veículos'},{v:'88%',l:'Disponibilidade'},{v:'3',l:'Em manutenção'}],
+        cols:['Veículo','Placa','Motorista','Km/L','Status'], rows:[
+          ['Truck VW','QXR-2210','C. Dias','3,2','Em rota'],
+          ['Van Sprinter','LMB-0932','R. Teles','8,1','Disponível'],
+          ['Truck Volvo','JPA-7781','—','2,9','Manutenção'],
+          ['VUC 3/4','KTR-3390','A. Souza','6,4','Em rota'],
+          ['Bitrem','GHT-1120','P. Lima','1,8','Disponível'] ],
+        aside:{ h:'Manutenção preventiva', items:[['Em dia',78],['Próx. 7 dias',14],['Atrasada',8]] } },
+      { ic:'coins', name:'Fretes & CTe', kpis:[{v:'R$ 402k',l:'Faturado no mês'},{v:'1.940',l:'CTes emitidos'},{v:'R$ 216',l:'Frete médio'}],
+        cols:['Cliente','CTes','Valor','Prazo','Status'], rows:[
+          ['Distrib. Norte','128','R$ 84.200','30d','Faturado'],
+          ['AgroSul','76','R$ 51.900','à vista','Pago'],
+          ['TechStore','54','R$ 33.400','28d','Pendente'],
+          ['MegaVarejo','203','R$ 132.700','30d','Faturado'],
+          ['FarmaBem','61','R$ 40.100','15d','Enviado'] ],
+        aside:{ h:'Receita por região', items:[['Sudeste',56],['Sul',22],['Nordeste',14],['Centro-Oeste',8]] } },
+      { ic:'box', name:'Armazém (WMS)', kpis:[{v:'98%',l:'Acuracidade'},{v:'7.4k',l:'Posições'},{v:'1,2h',l:'Tempo de picking'}],
+        cols:['SKU','Descrição','Posição','Saldo','Status'], rows:[
+          ['SKU-4021','Cx papelão G','A-12-03','1.240','Ok'],
+          ['SKU-4088','Pallet PBR','D-04-01','86','Baixo'],
+          ['SKU-4102','Filme stretch','B-08-05','320','Ok'],
+          ['SKU-4150','Etiqueta térmica','C-01-02','40','Repor'],
+          ['SKU-4200','Fita adesiva','A-03-04','610','Ok'] ],
+        aside:{ h:'Ocupação por rua', items:[['Rua A',82],['Rua B',74],['Rua C',59],['Rua D',88]] } }
+    ]},
+    varejo: { label:'Varejo', modules:[
+      { ic:'store', name:'PDV & Vendas', kpis:[{v:'R$ 92k',l:'Vendas hoje'},{v:'1.940',l:'Pedidos no mês'},{v:'R$ 168',l:'Ticket médio'}],
+        cols:['Pedido','Canal','Itens','Valor','Status'], rows:[
+          ['#9921','Loja física','3','R$ 340','Pago'],
+          ['#9922','E-commerce','1','R$ 128','Enviado'],
+          ['#9923','Marketplace','5','R$ 512','Separando'],
+          ['#9924','E-commerce','2','R$ 89','Cancelado'],
+          ['#9925','Loja física','4','R$ 274','Pago'] ],
+        aside:{ h:'Vendas por canal', items:[['Loja física',44],['E-commerce',32],['Marketplace',24]] } },
+      { ic:'box', name:'Estoque', kpis:[{v:'12.4k',l:'SKUs ativos'},{v:'96',l:'Itens em ruptura'},{v:'R$ 1,8M',l:'Valor em estoque'}],
+        cols:['Produto','SKU','Qtd','Curva','Status'], rows:[
+          ['Tênis Runner','TR-401','230','A','Ok'],
+          ['Camiseta Basic','CB-118','40','A','Baixo'],
+          ['Jaqueta Wind','JW-905','12','B','Repor'],
+          ['Boné Trail','BT-220','560','C','Ok'],
+          ['Meia Sport','MS-330','0','B','Ruptura'] ],
+        aside:{ h:'Estoque por curva ABC', items:[['Curva A',58],['Curva B',28],['Curva C',14]] } },
+      { ic:'globe', name:'E-commerce', kpis:[{v:'24.1k',l:'Sessões/dia'},{v:'2,8%',l:'Conversão'},{v:'R$ 214',l:'Ticket online'}],
+        cols:['Pedido','Marketplace','Valor','SLA','Status'], rows:[
+          ['#ML-7781','Mercado Livre','R$ 259','no prazo','Enviado'],
+          ['#SH-2210','Shopee','R$ 88','no prazo','Separando'],
+          ['#AMZ-114','Amazon','R$ 412','atrasado','Atraso'],
+          ['#VT-9902','Loja própria','R$ 176','no prazo','Faturado'],
+          ['#ML-7788','Mercado Livre','R$ 134','no prazo','Entregue'] ],
+        aside:{ h:'Receita por marketplace', items:[['Mercado Livre',42],['Loja própria',26],['Shopee',18],['Amazon',14]] } },
+      { ic:'users', name:'CRM & Fidelidade', kpis:[{v:'38k',l:'Clientes na base'},{v:'24%',l:'Recompra'},{v:'9,1k',l:'Membros do clube'}],
+        cols:['Cliente','Pedidos','LTV','Segmento','Status'], rows:[
+          ['Marina C.','24','R$ 5.040','Fiel','VIP'],
+          ['Bruno L.','9','R$ 1.305','Ativo','Ativo'],
+          ['Célia R.','2','R$ 176','Novo','Novo'],
+          ['Diego P.','41','R$ 13.120','Fiel','VIP'],
+          ['Eva M.','0','R$ 0','Inativo','Risco'] ],
+        aside:{ h:'Base por segmento', items:[['Ativos',54],['Novos',20],['VIP',16],['Em risco',10]] } },
+      { ic:'clipboard', name:'Fiscal (NFe)', kpis:[{v:'1.940',l:'NFes no mês'},{v:'0,4%',l:'Rejeições'},{v:'R$ 42k',l:'Impostos'}],
+        cols:['Documento','Tipo','Valor','Emissão','Status'], rows:[
+          ['NFe 44.021','Venda','R$ 512','Hoje','Autorizada'],
+          ['NFCe 88.114','PDV','R$ 340','Hoje','Autorizada'],
+          ['NFe 44.019','Devolução','R$ 128','Ontem','Autorizada'],
+          ['NFe 44.018','Venda','R$ 89','Ontem','Rejeitada'],
+          ['NFe 44.020','Transferência','R$ 1.240','Hoje','Pendente'] ],
+        aside:{ h:'Documentos por tipo', items:[['Venda',62],['PDV',24],['Devolução',8],['Transf.',6]] } }
+    ]}
+  };
+
+  var HOME = {
+    construtora: [
+      { id:'fat',    def:true,  title:'Faturamento em obras', type:'stat',     data:{v:'R$ 4,2M', l:'12 obras ativas'} },
+      { id:'prazo',  def:true,  title:'Entregas no prazo',    type:'stat',     data:{v:'94%', l:'meta 90%'} },
+      { id:'avanco', def:true,  title:'Avanço por obra',      type:'progress', span:true, data:[['Aurora',72],['Vertt',45],['Ipê',96],['Log Sul',30]] },
+      { id:'custo',  def:true,  title:'Custo por mês',        type:'bars',     data:[40,65,52,78,60,90] },
+      { id:'alertas',def:false, title:'Alertas',              type:'list',     data:[['Galpão Log Sul','atrasado'],['ASO — 3 colab.','vencendo'],['PC-1045','pendente']] },
+      { id:'suprim', def:false, title:'Compras por categoria',type:'progress', data:[['Estrutural',52],['Hidráulica',20],['Elétrica',16],['Acabamento',12]] }
+    ],
+    clinica: [
+      { id:'cons',   def:true,  title:'Consultas hoje',        type:'stat',     data:{v:'37', l:'8 min de espera'} },
+      { id:'satisf', def:true,  title:'Satisfação',            type:'stat',     data:{v:'4,8★', l:'312 no mês'} },
+      { id:'salas',  def:true,  title:'Ocupação por sala',     type:'progress', span:true, data:[['Sala 01',82],['Sala 02',74],['Sala 03',60],['Telemedicina',45]] },
+      { id:'faturc', def:true,  title:'Faturamento por mês',   type:'bars',     data:[55,60,48,72,80,68] },
+      { id:'proxag', def:false, title:'Próximos da agenda',    type:'list',     data:[['Ana Prado · 09:00','confirmado'],['João Mota · 09:30','aguardando'],['Rita Gomes · 10:15','confirmado']] },
+      { id:'estc',   def:false, title:'Estoque por categoria', type:'progress', data:[['Medicamentos',52],['Descartáveis',28],['Insumos',12],['EPIs',8]] }
+    ],
+    logistica: [
+      { id:'entr',   def:true,  title:'Entregas hoje',         type:'stat',     data:{v:'318', l:'96% no prazo'} },
+      { id:'disp',   def:true,  title:'Disponibilidade',       type:'stat',     data:{v:'88%', l:'42 veículos'} },
+      { id:'oper',   def:true,  title:'Status da operação',    type:'progress', span:true, data:[['Em rota',48],['Entregue',34],['Coletado',12],['Exceção',6]] },
+      { id:'vol',    def:true,  title:'Volume por mês',        type:'bars',     data:[70,64,82,58,90,76] },
+      { id:'exc',    def:false, title:'Exceções',              type:'list',     data:[['#48231 Sorocaba','atrasado'],['Truck Volvo','manutenção'],['TechStore','pendente']] },
+      { id:'reg',    def:false, title:'Receita por região',    type:'progress', data:[['Sudeste',56],['Sul',22],['Nordeste',14],['Centro-Oeste',8]] }
+    ],
+    varejo: [
+      { id:'vend',   def:true,  title:'Vendas hoje',           type:'stat',     data:{v:'R$ 92k', l:'1.940 pedidos'} },
+      { id:'tick',   def:true,  title:'Ticket médio',          type:'stat',     data:{v:'R$ 168', l:'+8% vs. mês'} },
+      { id:'canais', def:true,  title:'Vendas por canal',      type:'progress', span:true, data:[['Loja física',44],['E-commerce',32],['Marketplace',24]] },
+      { id:'rec',    def:true,  title:'Receita por mês',       type:'bars',     data:[60,72,55,80,68,88] },
+      { id:'rupt',   def:false, title:'Rupturas',              type:'list',     data:[['Meia Sport','ruptura'],['Camiseta Basic','baixo'],['Jaqueta Wind','repor']] },
+      { id:'seg',    def:false, title:'Clientes por segmento', type:'progress', data:[['Ativos',54],['Novos',20],['VIP',16],['Em risco',10]] }
+    ]
+  };
+
+  var order = ['construtora','clinica','logistica','varejo'];
+  var state = { sec:'construtora', view:'home', mod:0 };
+  var homeState = {};
+  function ensureHome(sec){
+    if(!homeState[sec]) homeState[sec] = HOME[sec].filter(function(w){return w.def;}).map(function(w){return w.id;});
+    return homeState[sec];
+  }
+  function shuffle(a){
+    if(a.length<2) return a;
+    var before = a.join('|');
+    do { for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } }
+    while(a.join('|')===before);
+    return a;
+  }
+
+  function badge(t){
+    var s = (t||'').toLowerCase();
+    if(/atrasad|atraso|cancelad|repor|glosad|exce[çc]|ruptura|rejeit|risco/.test(s)) return 'r';
+    if(/aten[çc]|pendente|cota[çc]|aguard|vencendo|agendad|baixo|em atend|retorno|acomp|enviado|coletad|em rota|em call|espera|separ|revisar|manuten|novo/.test(s)) return 'a';
+    if(/em dia|\bok\b|aprovad|recebid|confirm|otimiz|dispon|pago|faturad|autoriz|entreg|\balta\b|conclu|vip|\bativo\b/.test(s)) return 'g';
+    return 'n';
+  }
+  function el(tag, cls, html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+
+  function progHTML(items){
+    return '<div class="sys-prog">'+items.map(function(it){
+      return '<div><div class="sys-prog-top"><span>'+it[0]+'</span><b>'+it[1]+'%</b></div>'
+        + '<div class="sys-track"><div class="sys-fill" data-w="'+it[1]+'"></div></div></div>';
+    }).join('')+'</div>';
+  }
+  function barsHTML(vals){
+    return '<div class="sys-bars">'+vals.map(function(v){return '<div class="sys-bar" data-h="'+v+'"></div>';}).join('')+'</div>';
+  }
+  function animate(root){
+    requestAnimationFrame(function(){
+      [].forEach.call(root.querySelectorAll('.sys-fill'), function(f){ f.style.width = f.getAttribute('data-w')+'%'; });
+      [].forEach.call(root.querySelectorAll('.sys-bar'), function(b){ b.style.height = b.getAttribute('data-h')+'%'; });
+    });
+  }
+  function fade(node){ node.classList.remove('sys-fade'); void node.offsetWidth; node.classList.add('sys-fade'); }
+
+  function renderModule(){
+    var s = DATA[state.sec], m = s.modules[state.view];
+    var main = document.getElementById('sysMain');
+    if(!main || !m) return;
+    main.innerHTML = '';
+    main.appendChild(el('div','sys-head','<h4>'+m.name+'</h4><em>'+s.label+' · tempo real</em>'));
+
+    var kpis = el('div','sys-kpis');
+    m.kpis.forEach(function(k){ kpis.appendChild(el('div','sys-kpi','<b>'+k.v+'</b><span>'+k.l+'</span>')); });
+    main.appendChild(kpis);
+
+    var grid = el('div','sys-grid');
+    var tp = el('div','sys-panel');
+    tp.appendChild(el('div','sys-panel-h', m.name));
+    var tbl = el('table','sys-tbl');
+    tbl.innerHTML = '<thead><tr>'+m.cols.map(function(x){return '<th>'+x+'</th>';}).join('')+'</tr></thead><tbody>'
+      + m.rows.map(function(r){ return '<tr>'+r.map(function(cell,i){
+          return i===r.length-1
+            ? '<td><span class="sys-badge '+badge(cell)+'">'+cell+'</span></td>'
+            : '<td>'+cell+'</td>';
+        }).join('')+'</tr>'; }).join('')+'</tbody>';
+    tp.appendChild(tbl); grid.appendChild(tp);
+
+    var ap = el('div','sys-panel sys-aside');
+    ap.appendChild(el('div','sys-panel-h', m.aside.h));
+    ap.insertAdjacentHTML('beforeend', progHTML(m.aside.items));
+    grid.appendChild(ap);
+    main.appendChild(grid);
+
+    animate(main); fade(main);
+  }
+
+  function widgetHTML(w){
+    var body = '';
+    if(w.type==='stat') body = '<div class="sys-w-stat"><b>'+w.data.v+'</b><span>'+w.data.l+'</span></div>';
+    else if(w.type==='progress') body = progHTML(w.data);
+    else if(w.type==='bars') body = barsHTML(w.data);
+    else if(w.type==='list') body = '<div class="sys-wlist">'+w.data.map(function(r){
+        return '<div class="sys-wlist-row"><span>'+r[0]+'</span><span class="sys-badge '+badge(r[1])+'">'+r[1]+'</span></div>';
+      }).join('')+'</div>';
+    return '<div class="sys-w'+(w.span?' span2':'')+'">'
+      + '<button class="sys-w-x" data-id="'+w.id+'" title="Remover" aria-label="Remover widget">&times;</button>'
+      + '<div class="sys-w-h">'+w.title+'</div>'+body+'</div>';
+  }
+
+  function renderHome(){
+    var main = document.getElementById('sysMain');
+    if(!main) return;
+    var cat = HOME[state.sec];
+    var active = ensureHome(state.sec);
+
+    main.innerHTML = '';
+    var bar = el('div','sys-home-bar');
+    bar.appendChild(el('div',null,'<h4>Meu painel</h4><em>'+DATA[state.sec].label+' · monte do seu jeito</em>'));
+    var acts = el('div','sys-home-actions');
+    var reorg = el('button','sys-btn','↻ Reorganizar'); reorg.type='button';
+    reorg.addEventListener('click', function(e){ e.stopPropagation(); shuffle(active); renderHome(); });
+    var addWrap = el('div','sys-add-wrap');
+    var addBtn = el('button','sys-btn','+ Adicionar'); addBtn.type='button';
+    var menu = el('div','sys-add-menu');
+    var inactive = cat.filter(function(w){ return active.indexOf(w.id)<0; });
+    if(inactive.length){
+      inactive.forEach(function(w){
+        var it = el('button','sys-add-item','+ '+w.title); it.type='button';
+        it.addEventListener('click', function(e){ e.stopPropagation(); active.push(w.id); renderHome(); });
+        menu.appendChild(it);
+      });
+    } else {
+      menu.appendChild(el('div','sys-add-empty','Todos os widgets já estão no painel'));
+    }
+    addBtn.addEventListener('click', function(e){ e.stopPropagation(); menu.classList.toggle('open'); });
+    addWrap.appendChild(addBtn); addWrap.appendChild(menu);
+    acts.appendChild(reorg); acts.appendChild(addWrap);
+    bar.appendChild(acts);
+    main.appendChild(bar);
+
+    var grid = el('div','sys-widgets');
+    grid.innerHTML = active.map(function(id){
+      var w = cat.filter(function(x){return x.id===id;})[0];
+      return w ? widgetHTML(w) : '';
+    }).join('');
+    main.appendChild(grid);
+
+    [].forEach.call(grid.querySelectorAll('.sys-w-x'), function(x){
+      x.addEventListener('click', function(){
+        var i = active.indexOf(x.getAttribute('data-id'));
+        if(i>=0){ active.splice(i,1); renderHome(); }
+      });
+    });
+    animate(grid); fade(grid);
+  }
+
+  function renderView(){
+    var side = mount.querySelector('.sys-side');
+    if(side){
+      for(var i=0;i<side.children.length;i++){
+        var on = (i===0) ? state.view==='home' : (i-1)===state.view;
+        side.children[i].classList.toggle('on', on);
+      }
+    }
+    if(state.view==='home') renderHome(); else renderModule();
+  }
+
+  function render(){
+    var s = DATA[state.sec];
+    if(typeof state.view==='number' && state.view>=s.modules.length) state.view='home';
+    if(!render._bound){
+      render._bound = true;
+      document.addEventListener('click', function(){
+        var m = mount.querySelector('.sys-add-menu.open'); if(m) m.classList.remove('open');
+      });
+    }
+    mount.innerHTML = '';
+
+    var top = el('div','sys-topbar');
+    top.appendChild(el('div','sys-brand','<img src="'+MARK+'" alt=""><span>Spiralis OS</span>'));
+    var secs = el('div','sys-sectors');
+    order.forEach(function(k){
+      var b = el('button','sys-sector'+(k===state.sec?' on':''), DATA[k].label);
+      b.type='button';
+      b.addEventListener('click', function(){ state.sec=k; state.view='home'; render(); });
+      secs.appendChild(b);
+    });
+    top.appendChild(secs);
+    mount.appendChild(top);
+
+    var body = el('div','sys-body');
+    var side = el('div','sys-side');
+    var homeBtn = el('button','sys-nav'+(state.view==='home'?' on':''), icon('home')+'<span>Início</span>');
+    homeBtn.type='button';
+    homeBtn.setAttribute('aria-label','Início');
+    homeBtn.addEventListener('click', function(){ state.view='home'; renderView(); });
+    side.appendChild(homeBtn);
+    s.modules.forEach(function(m,i){
+      var b = el('button','sys-nav'+(i===state.view?' on':''), icon(m.ic)+'<span>'+m.name+'</span>');
+      b.type='button';
+      b.setAttribute('aria-label',m.name);
+      b.addEventListener('click', function(){ state.view=i; renderView(); });
+      side.appendChild(b);
+    });
+    body.appendChild(side);
+    var main = el('div','sys-main'); main.id = 'sysMain';
+    body.appendChild(main);
+    mount.appendChild(body);
+
+    renderView();
+  }
+
+  render();
+
+  var compactDemo = window.matchMedia('(max-width: 720px)');
+  function syncDemoInteraction(){
+    mount.inert = compactDemo.matches;
+    if(compactDemo.matches) mount.setAttribute('aria-hidden','true');
+    else mount.removeAttribute('aria-hidden');
+  }
+  syncDemoInteraction();
+  compactDemo.addEventListener?.('change', syncDemoInteraction);
+})();
+</script>
+
+<!-- Mobile navigation -->
+<script>
+(function(){
+  var toggle = document.getElementById('nav-menu-toggle');
+  var menu = document.getElementById('mobile-menu');
+  if(!toggle || !menu) return;
+
+  function setOpen(open){
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+    menu.setAttribute('aria-hidden', String(!open));
+    menu.inert = !open;
+    menu.classList.toggle('open', open);
+    document.body.classList.toggle('menu-open', open);
+  }
+
+  toggle.addEventListener('click', function(){
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  menu.querySelectorAll('a').forEach(function(link){
+    link.addEventListener('click', function(){ setOpen(false); });
+  });
+  document.addEventListener('keydown', function(event){
+    if(event.key === 'Escape') setOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if(window.innerWidth > 960) setOpen(false);
+  });
 })();
 </script>
 
@@ -1661,6 +3258,7 @@
   var cv = document.getElementById('gradient-canvas');
   var pe = document.querySelector('#nav .mark path');
   if(!cv || !pe || !window.OrbEngine) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var hero = document.getElementById('hero-section');
 
   var engine = OrbEngine.create(cv, {
