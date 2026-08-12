@@ -24,7 +24,7 @@
       "@type": "Organization",
       "name": "Spiralis",
       "description": "Sistemas sob medida, automação de processos e cibersegurança para empresas.",
-      "email": "contato@spiralis.com.br"
+      "email": "contato@spiraliscompany.com.br"
     }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,7 +34,6 @@
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
   <script src="ScrollToPlugin.min.js"></script>
-  <script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: auto; scroll-padding-top: 5.5rem; }
@@ -1055,139 +1054,95 @@
       .journey-event.left .journey-event-desc { margin-left: 0; }
     }
 
-    /* ── PROJECTS (pinned WebGL carousel) ─────────── */
-    #projetos {
+    /* ── DÚVIDAS (FAQ) ────────────────────────────── */
+    /* Duas colunas no amplo: título à esquerda, lista à direita, para não
+       virar uma pilha centralizada de perguntas. O acordeão é <details>,
+       então abre e fecha sem JS e já vem acessível pelo teclado. A altura
+       não é animada de propósito (isso causa reflow a cada quadro); só o
+       conteúdo entra em fade. */
+    #duvidas {
       background: var(--cream);
       position: relative; z-index: 10;
+      padding: clamp(5rem,10vw,9rem) var(--gutter);
     }
-    .proj-heading {
+    .faq-wrap {
+      display: grid;
+      grid-template-columns: minmax(250px, 1fr) minmax(0, 1.55fr);
+      gap: clamp(2.5rem,5vw,5rem);
+      align-items: start;
+      max-width: 1180px; margin: 0 auto;
+    }
+    .faq-aside { position: sticky; top: 7rem; }
+    .faq-kicker {
+      font-family: var(--ff-mono); font-size: .62rem;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--violet); margin-bottom: 1.35rem;
+    }
+    .faq-heading {
       font-family: var(--ff-section);
-      font-size: clamp(2rem,4vw,4.5rem);
+      font-size: clamp(2rem,4vw,4rem);
       font-weight: 500; letter-spacing: -.01em;
-      color: var(--ink-deep); line-height: 1.1;
+      line-height: 1.02; color: var(--ink-deep);
     }
-    .proj-link {
-      font-family: var(--ff-mono); font-size: .65rem;
-      letter-spacing: .14em; text-transform: uppercase;
-      color: #555; border-bottom: 1px solid #555;
-      padding-bottom: .2rem;
+    .faq-sub {
+      margin-top: 1.5rem; max-width: 34ch;
+      font-family: var(--ff-body); font-size: .95rem;
+      line-height: 1.6; color: #6B5C87;
     }
-
-    /* pinned desktop carousel */
-    .proj-pinned {
-      display: none;
-      position: relative; width: 100%; height: 100dvh;
-      flex-direction: column;
-      padding: 6rem var(--gutter) 3rem;
+    .faq-cta {
+      display: inline-flex; align-items: center; min-height: 44px;
+      margin-top: 1.75rem;
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: var(--violet);
+      border-bottom: 1px solid rgba(73,24,165,.35);
+      transition: border-color .25s;
     }
-    .proj-top {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      margin-bottom: 2rem; flex-shrink: 0;
-    }
-    .proj-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 1rem; }
-    .proj-counter {
-      font-family: var(--ff-mono); font-size: .8rem;
-      letter-spacing: .06em; color: #9d92b8;
-      font-variant-numeric: tabular-nums;
-    }
-    .proj-counter #proj-cur { color: var(--ink-deep); font-weight: 700; }
-    .proj-canvas-wrap {
-      position: relative; flex: 1; min-height: 0;
-      border-radius: 14px; overflow: hidden;
-    }
-    #proj-gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; }
-    .proj-bottom {
-      display: flex; justify-content: space-between; align-items: center;
-      gap: 2rem; margin-top: 2rem; flex-shrink: 0;
-    }
-    .proj-detail { display: flex; align-items: baseline; gap: 1.1rem; min-width: 0; }
-    .proj-detail-num {
-      font-family: var(--ff-mono); font-size: .7rem;
-      color: #9d92b8; flex-shrink: 0;
-    }
-    .proj-detail-name {
-      font-family: var(--ff-head); font-size: 1.3rem;
+    .faq-cta:hover { border-bottom-color: var(--violet); }
+    .faq-list { border-top: 1px solid rgba(73,24,165,.16); }
+    .faq-item { border-bottom: 1px solid rgba(73,24,165,.16); }
+    .faq-item summary {
+      list-style: none; cursor: pointer;
+      display: flex; align-items: center; gap: 1.25rem;
+      padding: 1.55rem 0;
+      font-family: var(--ff-head);
+      font-size: clamp(1rem,1.4vw,1.18rem);
       font-weight: 700; color: var(--ink-deep);
-      display: inline; margin-right: .6rem;
+      transition: color .25s;
     }
-    .proj-detail-tag { font-size: .8rem; color: #79708f; display: inline; }
-    .proj-dots { display: flex; gap: .5rem; flex-shrink: 0; }
-    .proj-dot {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: transparent;
-      border: 0; padding: 0; cursor: pointer;
-      display: grid; place-items: center;
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary:hover { color: var(--violet); }
+    /* o sinal é um "+" desenhado em duas barras; ao abrir gira 135° e vira × */
+    .faq-sinal {
+      flex-shrink: 0; margin-left: auto;
+      width: 1.15rem; height: 1.15rem; position: relative;
+      transition: transform .3s var(--ease-soft);
     }
-    .proj-dot::after {
-      content: '';
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #c7bfe0;
-      transition: background .3s, transform .3s;
+    .faq-sinal::before, .faq-sinal::after {
+      content: ''; position: absolute; inset: 0; margin: auto;
+      background: var(--violet);
     }
-    .proj-dot.on::after { background: var(--violet); transform: scale(1.4); }
-    .proj-arrow {
-      flex-shrink: 0; background: none; border: 1px solid rgba(35,8,77,.22);
-      color: var(--ink-deep); width: 2.6rem; height: 2.6rem; border-radius: 50%;
-      font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background .3s var(--ease-soft), color .3s, border-color .3s, transform .3s var(--ease-soft);
+    .faq-sinal::before { width: 100%; height: 1.5px; }
+    .faq-sinal::after  { width: 1.5px; height: 100%; }
+    .faq-item[open] .faq-sinal { transform: rotate(135deg); }
+    .faq-resposta {
+      padding: 0 3rem 1.85rem 0;
+      font-family: var(--ff-body); font-size: .95rem;
+      line-height: 1.65; color: #55496F; max-width: 64ch;
+      animation: faqEntra .35s var(--ease-soft);
     }
-    .proj-arrow:hover { background: var(--violet); color: #fff; border-color: var(--violet); transform: translateX(3px); }
-
-    /* mobile fallback (native horizontal scroll) */
-    .proj-mobile { padding: 6rem var(--gutter) 5rem; }
-    .proj-header {
-      display: flex; justify-content: space-between; align-items: flex-end;
-      margin-bottom: 3rem;
+    @keyframes faqEntra {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: none; }
     }
-    .proj-mobile-grid {
-      display: flex; flex-wrap: nowrap;
-      gap: 1.25rem; overflow-x: auto;
-      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
-      padding-bottom: .5rem; scrollbar-width: none;
+    @media (prefers-reduced-motion: reduce) {
+      .faq-resposta { animation: none; }
+      .faq-sinal { transition: none; }
     }
-    .proj-mobile-grid::-webkit-scrollbar { display: none; }
-    .proj-card {
-      position: relative; border-radius: 10px;
-      overflow: hidden; aspect-ratio: 16/11;
-      width: clamp(280px, 78vw, 480px); flex-shrink: 0;
-      background: #ccc; scroll-snap-align: start;
-    }
-    .proj-inner { width: 100%; height: 100%; }
-    .proj-bg { width: 100%; height: 100%; }
-    .proj-bg {
-      background-size: cover; background-position: center;
-      background-repeat: no-repeat;
-    }
-    @media (max-width: 1023px), (hover: none), (prefers-reduced-motion: reduce) {
-      .proj-card:nth-child(1) .proj-bg { background-image: url('kimura-control-dashboard.png'); }
-      .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
-      .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
-      .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
-    }
-    .no-project-webgl .proj-pinned { display: none !important; }
-    .no-project-webgl .proj-mobile { display: block !important; }
-    .no-project-webgl .proj-card:nth-child(1) .proj-bg { background-image: url('kimura-control-dashboard.png'); }
-    .no-project-webgl .proj-card:nth-child(2) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=900&q=80'); }
-    .no-project-webgl .proj-card:nth-child(3) .proj-bg { background-image: linear-gradient(160deg,rgba(35,8,77,.55),rgba(124,77,219,.22)),url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=900&q=80'); }
-    .no-project-webgl .proj-card:nth-child(4) .proj-bg { background-image: linear-gradient(160deg,rgba(10,5,15,.5),rgba(73,24,165,.3)),url('https://images.unsplash.com/photo-1518770660439-4636190af475?w=900&q=80'); }
-    .proj-info {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 2rem;
-      background: linear-gradient(to top,rgba(0,0,0,.85),transparent);
-    }
-    .proj-num {
-      font-family: var(--ff-mono); font-size: .58rem;
-      letter-spacing: .1em; color: rgba(255,255,255,.4); margin-bottom: .4rem;
-    }
-    .proj-name {
-      font-family: var(--ff-head); font-size: 1.3rem;
-      font-weight: 700; color: white; margin-bottom: .2rem;
-    }
-    .proj-tag { font-size: .75rem; color: rgba(255,255,255,.45); }
-
-    @media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
-      .proj-pinned { display: flex; }
-      .proj-mobile { display: none; }
+    @media (max-width: 900px) {
+      .faq-wrap { grid-template-columns: 1fr; }
+      .faq-aside { position: static; }
+      .faq-resposta { padding-right: 1rem; }
     }
 
     /* ── TESTIMONIALS ────────────────────────────── */
@@ -1230,20 +1185,17 @@
       display: inline-block;
       will-change: filter, opacity, transform;
     }
-    /* as 3 marcas levitam POR CIMA do título (z acima do texto, que é 10) */
+    /* as marcas voam num trilho fechado em volta do título. Tamanho e
+       ancoragem no centro do palco são escritos pelo JS, porque o trilho
+       é medido em px de um palco de 1440 e reescalado junto. O z-index
+       também é do JS: no miolo do voo a marca passa ATRÁS do texto. */
     .client-item {
-      position: absolute; z-index: 20;
-      width: clamp(190px, 19vw, 320px);
-      aspect-ratio: 3 / 2;
+      position: absolute;
       display: flex; align-items: center; justify-content: center;
       opacity: 0;
       will-change: transform, opacity;
       pointer-events: none;
     }
-    /* ancoradas sobre as bordas do bloco de texto (24-76% x 39-65% do palco) */
-    .client-item[data-pos="0"] { left: 15%;  top: 27%; }
-    .client-item[data-pos="1"] { right: 13%; top: 22%; }
-    .client-item[data-pos="2"] { right: 17%; bottom: 21%; }
     .client-item span {
       font-family: var(--ff-head);
       font-size: 1.2rem; font-weight: 700;
@@ -1254,9 +1206,6 @@
     .client-item img {
       width: 100%; height: 100%;
       object-fit: contain; display: block;
-      /* os arquivos têm fundo preto chapado: screen apaga o preto
-         sobre o fundo escuro da seção, dispensando recorte manual */
-      mix-blend-mode: screen;
     }
     .clients-hint {
       position: absolute; z-index: 25;
@@ -1294,34 +1243,48 @@
     }
 
     /* ── CTA ──────────────────────────────────────── */
+    /* fecha no mesmo Mist das outras seções claras (#duvidas, keyfacts) */
     #contato {
-      background: var(--bg); min-height: 85dvh;
+      background: var(--cream); min-height: 85dvh;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
       padding: 8rem var(--gutter); text-align: center;
       position: relative; overflow: hidden;
     }
+    /* brilho violeta subindo dos dois cantos de baixo, bem diluído */
+    #contato::after {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(48% 44% at 0% 108%, rgba(73,24,165,.30), transparent 70%),
+        radial-gradient(48% 44% at 100% 108%, rgba(124,77,219,.32), transparent 70%);
+    }
+    #contato > * { position: relative; z-index: 1; }
     .cta-label-text {
       font-family: var(--ff-mono); font-size: .6rem;
       letter-spacing: .2em; text-transform: uppercase;
-      color: var(--text-dim); margin-bottom: 3rem;
+      color: #493B63; margin-bottom: 3rem;
     }
     .cta-heading {
       font-family: var(--ff-section);
       font-size: clamp(3.5rem,9vw,10rem);
       font-weight: 500; letter-spacing: -.01em;
-      color: var(--text); line-height: .95;
+      color: var(--ink-deep); line-height: .95;
       margin-bottom: 3.5rem;
     }
     .cta-heading em { font-style: italic; }
+    /* A wordmark é lida como uma palavra da frase, então é dimensionada
+       pelo DESENHO, não pela caixa do SVG (que tem folga em cima e embaixo).
+       1.26em deixa o traço com a mesma altura que "spiralis" teria se fosse
+       digitada em Comfortaa neste corpo; o recuo põe a base da palavra na
+       mesma linha de base de "Fale com". */
     .cta-wordmark {
       display: inline-block;
-      height: 0.82em; width: auto;
+      height: 1.26em; width: auto;
       aspect-ratio: 1416 / 406;
-      vertical-align: -0.08em;
+      vertical-align: -0.355em;
       margin: 0 .04em 0 .06em;
     }
-    html[data-theme="light"] .cta-wordmark { filter: invert(1) brightness(0.15); }
     .cta-acts { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; justify-content: center; }
     .btn-fill {
       background: var(--violet); color: #fff;
@@ -1335,35 +1298,90 @@
     .btn-ghost-link {
       display: inline-flex; align-items: center; min-height: 44px;
       font-family: var(--ff-mono); font-size: .68rem;
-      letter-spacing: .1em; color: var(--text-dim);
-      border-bottom: 1px solid var(--text-dim); padding-bottom: .2rem;
+      letter-spacing: .1em; color: #493B63;
+      border-bottom: 1px solid rgba(73,59,99,.45); padding-bottom: .2rem;
     }
 
     /* ── FOOTER ───────────────────────────────────── */
+    /* Fecha no mesmo claro da CTA, sem fio separando: as duas leem como
+       um bloco só. O que fazia isto parecer cabeçalho não era o arranjo,
+       era o conteúdo: uma marca e quatro links são o conteúdo de uma
+       barra de navegação. Rodapé pede massa e grupos rotulados, então
+       aqui vão colunas com título, um bloco de marca com descrição e uma
+       barra legal isolada embaixo. */
     footer {
-      background: var(--bg);
-      border-top: 1px solid #1b1233;
-      padding: 3.5rem var(--gutter);
-      display: flex; justify-content: space-between;
-      align-items: center; flex-wrap: wrap; gap: 2rem;
+      background: var(--cream);
+      position: relative; overflow: hidden;
+      padding: 7rem var(--gutter) 2.5rem;
     }
+    /* Continuação do brilho da CTA. Cada caixa pinta o próprio degradê, e
+       eles só emendam sem degrau se tiverem a mesma opacidade na fronteira:
+       a CTA chega na borda de baixo com alfa .222, então o raio vertical
+       daqui (400%) e a parada (96%) são escolhidos para o topo do rodapé
+       começar nesse mesmo valor e subir até o pico nos cantos. */
+    footer::before {
+      content: ''; position: absolute; inset: 0; z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(35% 400% at 0% 100%, rgba(73,24,165,.30), transparent 96%),
+        radial-gradient(35% 400% at 100% 100%, rgba(124,77,219,.32), transparent 96%);
+    }
+    footer > * { position: relative; z-index: 1; }
+    /* A coluna da marca é mais larga que as de links: é o desequilíbrio
+       entre elas que faz o bloco ler como rodapé e não como grade. */
+    .footer-main {
+      display: grid;
+      grid-template-columns: minmax(240px, 1.6fr) repeat(3, minmax(150px, 1fr));
+      gap: 3rem 2.5rem;
+      align-items: start;
+    }
+    .footer-brand { max-width: 32ch; }
     .footer-logo {
       font-family: var(--ff-display); font-weight: 700;
-      font-size: 1.5rem; letter-spacing: -.01em; color: var(--text);
+      font-size: 2rem; letter-spacing: -.01em; color: var(--violet);
     }
     .footer-logo .mark { width: 1.3em; height: 1.3em; }
-    .footer-nav { display: flex; gap: 2rem; list-style: none; }
-    .footer-nav a {
-      display: inline-flex; align-items: center; min-height: 44px;
-      font-family: var(--ff-mono); font-size: .75rem;
-      letter-spacing: .1em; text-transform: uppercase;
-      color: var(--text-dim);
-      transition: color .25s;
+    .footer-tagline {
+      margin-top: 1.35rem;
+      font-family: var(--ff-body); font-size: .92rem;
+      line-height: 1.55; color: #6B5C87;
     }
-    .footer-nav a:hover { color: var(--text); }
+    .footer-col-title {
+      font-family: var(--ff-mono); font-size: .6rem; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      color: var(--violet); margin-bottom: 1rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col a {
+      display: inline-flex; align-items: center; min-height: 34px;
+      font-family: var(--ff-body); font-size: .88rem;
+      color: #4A3D68; transition: color .25s;
+    }
+    .footer-col a:hover { color: var(--violet); }
+    .footer-bottom {
+      margin-top: 5rem; padding-top: 1.5rem;
+      border-top: 1px solid rgba(73,24,165,.16);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
     .footer-copy {
       font-family: var(--ff-mono); font-size: .72rem;
-      letter-spacing: .05em; color: var(--text-dim);
+      letter-spacing: .05em; color: #6B5C87;
+    }
+    .footer-topo {
+      font-family: var(--ff-mono); font-size: .68rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: #6B5C87; transition: color .25s;
+      display: inline-flex; align-items: center; gap: .5rem; min-height: 34px;
+    }
+    .footer-topo:hover { color: var(--violet); }
+
+    @media (max-width: 900px) {
+      .footer-main { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; max-width: 46ch; }
+    }
+    @media (max-width: 520px) {
+      .footer-main { grid-template-columns: 1fr; gap: 2.25rem; }
     }
 
     /* ── UTILS ────────────────────────────────────── */
@@ -1415,13 +1433,12 @@
     }
     html[data-theme="light"] body { background: var(--bg); color: var(--text); }
     html[data-theme="light"] .about-bottom-row { border-top-color: #D4CBE8; }
-    html[data-theme="light"] footer { border-top-color: #D4CBE8; }
     html[data-theme="light"] .clients,
     html[data-theme="light"] .clients-stage { background: var(--bg); }
     html[data-theme="light"] .client-item span { color: var(--text); text-shadow: none; }
     html[data-theme="light"] #keyfacts-section { background: linear-gradient(0deg,#EDE8F8 0%,#D8CCFA 100%); }
-    html[data-theme="light"] #projetos { background: var(--cream); }
-    html[data-theme="light"] .proj-heading { color: var(--text); }
+    html[data-theme="light"] #duvidas { background: var(--cream); }
+    html[data-theme="light"] .faq-heading { color: var(--text); }
     html[data-theme="light"] .kf-title h2 { color: var(--text); }
     html[data-theme="light"] .cmp-b p { color: var(--text); }
     html[data-theme="light"] .clients-heading h2 { color: var(--text); }
@@ -1452,10 +1469,6 @@
     html[data-theme="light"] .svc-img-bg.s3 { background: linear-gradient(145deg,#D8CCFA,#9870E0,#5A2DB0); }
     html[data-theme="light"] .svc-img-bg.s4 { background: linear-gradient(145deg,#C8BAF5,#A07AE8,#7C4DDB); }
     html[data-theme="light"] #servicos { --svc-muted: var(--text-dim); }
-    html[data-theme="light"] .footer-logo { color: var(--text); }
-    html[data-theme="light"] .footer-copy { color: var(--text-dim); }
-    html[data-theme="light"] .footer-nav a { color: var(--text-dim); }
-    html[data-theme="light"] .footer-nav a:hover { color: var(--text); }
     html[data-theme="light"] .hero-scroll { background: linear-gradient(to bottom, transparent, var(--text-dim)); }
 
     /* ── SHOWCASE (container scroll) ─────────────── */
@@ -1698,15 +1711,6 @@
       .svc-title { font-size: 1.65rem; }
       .svc-desc { font-size: .95rem; line-height: 1.6; }
 
-      .proj-mobile { padding: 5.5rem var(--gutter) 4rem; }
-      .proj-header {
-        align-items: flex-start;
-        gap: 1.5rem;
-        margin-bottom: 2.5rem;
-      }
-      .proj-card { width: min(82vw, calc(100vw - 2 * var(--gutter))); }
-
-
       #contato {
         min-height: 72dvh;
         padding: 6rem var(--gutter);
@@ -1718,22 +1722,12 @@
       }
       .cta-acts { flex-direction: column; gap: .5rem; }
 
-      footer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 2.5rem var(--gutter);
-      }
-      .footer-nav {
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 0 1.25rem;
-      }
+      footer { padding: 4rem var(--gutter) 2rem; }
+      .footer-bottom { margin-top: 3rem; }
     }
 
     @media (max-width: 360px) {
       .nav-logo .wordmark { display: none; }
-      .footer-nav { gap: 0 1rem; }
     }
 
     @media (max-width: 720px) {
@@ -1802,7 +1796,7 @@
     <a href="#sobre">Sobre</a>
     <a href="#servicos">Serviços</a>
     <a href="#processo">Processo</a>
-    <a href="#projetos">Projetos</a>
+    <a href="#duvidas">Dúvidas</a>
   </div>
   <div class="nav-right">
     <button id="nav-menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Abrir menu">
@@ -1816,7 +1810,7 @@
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Serviços</a>
   <a href="#processo">Processo</a>
-  <a href="#projetos">Projetos</a>
+  <a href="#duvidas">Dúvidas</a>
 </div>
 
 <main id="conteudo">
@@ -2214,78 +2208,46 @@
   </div>
 </section>
 
-<!-- ══════════════ PROJECTS (pinned carousel) ══════════════ -->
-<section id="projetos">
-  <div class="proj-pinned" id="proj-pinned">
-    <div class="proj-top">
-      <h2 class="proj-heading">Projetos<br>entregues.</h2>
-      <div class="proj-top-right">
-        <a href="#contato" class="proj-link">Quero um projeto →</a>
-        <div class="proj-counter"><span id="proj-cur">01</span><span class="proj-slash">/</span><span id="proj-total">04</span></div>
-      </div>
+<!-- ══════════════ DÚVIDAS (FAQ) ══════════════ -->
+<section id="duvidas">
+  <div class="faq-wrap">
+    <div class="faq-aside">
+      <p class="faq-kicker">Dúvidas</p>
+      <h2 class="faq-heading">O que perguntam<br>antes de fechar.</h2>
+      <p class="faq-sub">Se a sua pergunta não estiver aqui, ela provavelmente cabe numa conversa de quinze minutos.</p>
+      <a href="#contato" class="faq-cta">Falar com a equipe →</a>
     </div>
 
-    <div class="proj-canvas-wrap" id="proj-canvas-wrap">
-      <canvas id="proj-gl" aria-hidden="true"></canvas>
-    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Quanto custa um sistema sob medida?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">Não temos tabela de preço, porque não trabalhamos com template. O valor sai do diagnóstico: mapeamos a operação, fechamos o escopo e apresentamos uma proposta fechada antes da primeira linha de código. Você aprova sabendo exatamente o que está comprando.</div>
+      </details>
 
-    <div class="proj-bottom">
-      <div class="proj-detail" aria-live="polite">
-        <div class="proj-detail-num" id="proj-detail-num">01</div>
-        <div class="proj-detail-body">
-          <h3 class="proj-detail-name" id="proj-detail-name">Kimura Control</h3>
-          <p class="proj-detail-tag" id="proj-detail-tag">Plataforma de Gestão para Academias de Artes Marciais · Web App</p>
-        </div>
-      </div>
-      <div class="proj-dots" id="proj-dots">
-        <button class="proj-dot on" type="button" aria-label="Ver projeto 1"></button>
-        <button class="proj-dot" type="button" aria-label="Ver projeto 2"></button>
-        <button class="proj-dot" type="button" aria-label="Ver projeto 3"></button>
-        <button class="proj-dot" type="button" aria-label="Ver projeto 4"></button>
-      </div>
-      <button class="proj-arrow" id="proj-next" aria-label="Próximo projeto">→</button>
-    </div>
-  </div>
+      <details class="faq-item">
+        <summary>Quanto tempo até estar rodando?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">Depende do escopo, e o escopo sai do diagnóstico. O que é fixo é o método: seis etapas, do diagnóstico ao deploy, com prazo acordado antes do início. Você não descobre a data no meio do projeto.</div>
+      </details>
 
-  <!-- Mobile fallback: native horizontal scroll, no WebGL -->
-  <div class="proj-mobile" id="proj-mobile">
-    <div class="proj-header">
-      <h2 class="proj-heading fade-in">Projetos<br>entregues.</h2>
-      <a href="#contato" class="proj-link fade-in">Quero um projeto →</a>
-    </div>
-    <div class="proj-mobile-grid" tabindex="0" aria-label="Projetos da Spiralis">
-      <div class="proj-card fade-in">
-        <div class="proj-inner"><div class="proj-bg"></div></div>
-        <div class="proj-info">
-          <div class="proj-num">01</div>
-          <div class="proj-name">Kimura Control</div>
-          <div class="proj-tag">Plataforma de Gestão para Academias de Artes Marciais · Web App</div>
-        </div>
-      </div>
-      <div class="proj-card fade-in">
-        <div class="proj-inner"><div class="proj-bg"></div></div>
-        <div class="proj-info">
-          <div class="proj-num">02</div>
-          <div class="proj-name">Automação com IA</div>
-          <div class="proj-tag">Automação de Fluxo · IA</div>
-        </div>
-      </div>
-      <div class="proj-card fade-in">
-        <div class="proj-inner"><div class="proj-bg"></div></div>
-        <div class="proj-info">
-          <div class="proj-num">03</div>
-          <div class="proj-name">Auditoria & Hardening</div>
-          <div class="proj-tag">Pentest · Hardening</div>
-        </div>
-      </div>
-      <div class="proj-card fade-in">
-        <div class="proj-inner"><div class="proj-bg"></div></div>
-        <div class="proj-info">
-          <div class="proj-num">04</div>
-          <div class="proj-name">Integração ERP</div>
-          <div class="proj-tag">Integração ERP · API</div>
-        </div>
-      </div>
+      <details class="faq-item">
+        <summary>De quem é o código-fonte?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">Seu. Repositório, documentação e credenciais são entregues ao final do projeto. Não prendemos ninguém em licença, plataforma ou dependência de fornecedor.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>E se a Spiralis sumir?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">É a pergunta certa para fazer a qualquer fornecedor, e a resposta está na anterior. Com o código, a documentação e os acessos na sua mão, qualquer equipe consegue dar continuidade. Nosso objetivo é ser escolha, não dependência.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Como vocês tratam os meus dados?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">Segurança não é a última etapa do projeto. Hardening de infraestrutura, revisão de código e teste de intrusão fazem parte da entrega, não de um pacote vendido à parte. Trabalhamos com acesso mínimo necessário e em conformidade com a LGPD.</div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Vocês atendem empresas do meu porte?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">Trabalhamos com empresas de porte médio e alto que já têm operação rodando e estão perdendo dinheiro com processo manual, retrabalho ou sistema vulnerável. Se é o seu caso, o diagnóstico é o ponto de partida.</div>
+      </details>
     </div>
   </div>
 </section>
@@ -2321,30 +2283,66 @@
 <section id="contato">
   <div class="cta-label-text">Pronto para começar?</div>
   <h2 class="cta-heading">
-    Fale com<br>a <img src="spiralis-wordmark.svg" alt="Spiralis" class="cta-wordmark">
+    Fale com<br>a <img src="spiralis-wordmark-violet.svg" alt="Spiralis" class="cta-wordmark">
   </h2>
   <div class="cta-acts">
-    <a href="mailto:contato@spiralis.com.br" class="btn-fill">Iniciar conversa</a>
-    <a href="mailto:contato@spiralis.com.br" class="btn-ghost-link">contato@spiralis.com.br</a>
+    <!-- WhatsApp (48) 99180-0311 em formato internacional: 55 + DDD + número,
+         só dígitos, sem +, espaço ou traço. -->
+    <a href="https://wa.me/5548991800311?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Spiralis%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto."
+       class="btn-fill" target="_blank" rel="noopener noreferrer"
+       aria-label="Iniciar conversa no WhatsApp (abre em nova aba)">Iniciar conversa</a>
+    <a href="mailto:contato@spiraliscompany.com.br" class="btn-ghost-link">contato@spiraliscompany.com.br</a>
   </div>
 </section>
 </main>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo brand-lockup">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <div class="footer-logo brand-lockup">
     <svg class="mark" viewBox="0 0 1000 1000" fill="none" aria-hidden="true">
       <path fill="currentColor" fill-rule="evenodd" d="M472.18 153.42 L470.59 155.01 L446.74 156.60 L445.15 158.19 L438.79 158.19 L437.20 159.78 L430.84 159.78 L429.25 161.37 L411.76 164.55 L410.17 166.14 L407.00 166.14 L400.64 169.32 L395.87 169.32 L391.10 172.50 L383.15 174.09 L370.43 180.45 L367.25 180.45 L329.09 201.11 L303.66 218.60 L284.58 236.09 L282.99 236.09 L263.12 255.96 L263.12 257.55 L251.99 268.68 L251.99 270.27 L236.09 289.35 L231.32 298.89 L220.19 314.79 L205.88 343.40 L205.88 346.58 L202.70 351.35 L202.70 354.53 L199.52 359.30 L199.52 362.48 L193.16 378.38 L193.16 383.15 L191.57 384.74 L191.57 389.51 L188.39 397.46 L188.39 403.82 L186.80 405.41 L186.80 411.76 L185.21 413.35 L185.21 422.89 L183.62 424.48 L183.62 438.79 L182.03 440.38 L183.62 478.54 L185.21 480.13 L185.21 488.08 L186.80 489.67 L186.80 494.44 L188.39 496.03 L188.39 500.79 L189.98 502.38 L189.98 507.15 L191.57 508.74 L194.75 521.46 L205.88 543.72 L205.88 546.90 L210.65 553.26 L218.60 569.16 L247.22 607.31 L270.27 630.37 L271.86 630.37 L287.76 644.67 L324.32 668.52 L333.86 673.29 L337.04 673.29 L340.22 676.47 L343.40 676.47 L348.17 679.65 L351.35 679.65 L356.12 682.83 L359.30 682.83 L375.20 689.19 L379.97 689.19 L387.92 692.37 L394.28 692.37 L395.87 693.96 L403.82 693.96 L405.41 695.55 L418.12 695.55 L419.71 697.14 L451.51 697.14 L453.10 695.55 L475.36 693.96 L476.95 692.37 L488.08 690.78 L489.67 689.19 L507.15 684.42 L529.41 673.29 L543.72 663.75 L568.36 637.52 L576.31 618.44 L577.90 602.54 L576.31 600.95 L574.72 586.65 L571.54 580.29 L568.36 575.52 L548.49 557.23 L535.77 550.87 L532.59 550.87 L521.46 546.10 L510.33 544.52 L508.74 542.93 L486.49 541.34 L484.90 539.75 L473.77 539.75 L472.18 538.16 L462.64 538.16 L461.05 536.57 L443.56 534.98 L441.97 533.39 L435.61 533.39 L427.66 530.21 L421.30 530.21 L414.94 527.03 L410.17 527.03 L408.59 525.44 L399.05 523.85 L389.51 519.08 L381.56 517.49 L373.61 512.72 L370.43 512.72 L360.89 507.95 L337.04 492.05 L320.35 475.36 L309.22 459.46 L301.27 443.56 L298.09 427.66 L296.50 426.07 L296.50 418.12 L294.91 416.53 L294.91 392.69 L296.50 391.10 L296.50 381.56 L298.09 379.97 L298.09 373.61 L302.86 362.48 L302.86 357.71 L315.58 330.68 L334.66 303.66 L359.30 279.01 L386.33 259.94 L407.00 248.81 L410.17 248.81 L421.30 242.45 L429.25 240.86 L434.02 237.68 L437.20 237.68 L443.56 234.50 L448.33 234.50 L454.69 231.32 L459.46 231.32 L467.41 228.14 L473.77 228.14 L475.36 226.55 L494.44 224.96 L496.03 223.37 L508.74 223.37 L510.33 221.78 L559.62 221.78 L561.21 223.37 L572.34 223.37 L573.93 224.96 L583.47 224.96 L585.06 226.55 L591.41 226.55 L593.00 228.14 L604.13 229.73 L605.72 231.32 L615.26 232.91 L624.80 237.68 L632.75 239.27 L667.73 256.76 L686.80 269.48 L693.16 275.83 L702.70 282.19 L743.24 324.32 L771.86 367.25 L787.76 400.64 L787.76 403.82 L790.94 408.59 L790.94 411.76 L798.89 432.43 L798.89 437.20 L802.07 443.56 L802.07 449.92 L803.66 451.51 L805.25 465.82 L806.84 467.41 L806.84 475.36 L808.43 475.36 L808.43 462.64 L810.02 461.05 L810.02 449.92 L808.43 448.33 L808.43 424.48 L806.84 422.89 L805.25 403.82 L803.66 402.23 L803.66 395.87 L802.07 394.28 L798.89 376.79 L795.71 370.43 L795.71 365.66 L792.53 360.89 L786.17 340.22 L771.86 311.61 L751.19 279.81 L740.06 267.09 L740.06 265.50 L730.52 255.96 L730.52 254.37 L709.06 232.91 L707.47 232.91 L697.93 223.37 L667.73 201.11 L662.96 199.52 L651.83 191.57 L626.39 178.86 L623.21 178.86 L620.03 175.68 L615.26 175.68 L610.49 172.50 L607.31 172.50 L586.65 164.55 L581.88 164.55 L580.29 162.96 L575.52 162.96 L567.57 159.78 L561.21 159.78 L559.62 158.19 L553.26 158.19 L551.67 156.60 L543.72 156.60 L542.13 155.01 L527.82 155.01 L526.23 153.42 L473.77 153.42 Z M542.13 285.37 L540.54 286.96 L516.69 288.55 L515.10 290.14 L497.62 293.32 L496.03 294.91 L483.31 298.09 L478.54 301.27 L475.36 301.27 L448.33 315.58 L435.61 325.12 L417.33 344.99 L415.74 349.76 L410.97 356.12 L410.97 359.30 L407.79 365.66 L407.79 375.20 L406.20 376.79 L406.20 379.97 L407.79 381.56 L407.79 389.51 L414.15 403.82 L422.89 414.15 L434.02 422.10 L446.74 428.46 L449.92 428.46 L454.69 431.64 L459.46 431.64 L465.82 434.82 L481.72 436.41 L483.31 438.00 L492.85 438.00 L494.44 439.59 L508.74 439.59 L510.33 441.18 L521.46 441.18 L523.05 442.77 L543.72 444.36 L545.31 445.95 L551.67 445.95 L553.26 447.54 L559.62 447.54 L561.21 449.13 L567.57 449.13 L569.16 450.72 L580.29 452.31 L586.65 455.48 L591.41 455.48 L593.00 457.07 L605.72 460.25 L621.62 468.20 L624.80 468.20 L627.98 471.38 L635.93 474.56 L639.11 477.74 L648.65 482.51 L674.88 507.15 L682.83 518.28 L686.01 526.23 L689.19 529.41 L689.19 532.59 L695.55 545.31 L697.14 558.03 L698.73 559.62 L698.73 596.18 L697.14 597.77 L697.14 604.13 L695.55 605.72 L692.37 621.62 L689.19 626.39 L687.60 634.34 L674.88 658.19 L657.39 682.03 L637.52 701.91 L605.72 725.76 L578.70 740.06 L575.52 740.06 L567.57 744.83 L564.39 744.83 L538.95 754.37 L526.23 755.96 L518.28 759.14 L500.79 760.73 L499.21 762.32 L484.90 762.32 L483.31 763.91 L443.56 763.91 L441.97 762.32 L416.53 760.73 L414.94 759.14 L400.64 757.55 L399.05 755.96 L387.92 754.37 L381.56 751.19 L376.79 751.19 L359.30 743.24 L356.12 743.24 L348.17 738.47 L344.99 738.47 L335.45 733.70 L332.27 730.52 L321.14 725.76 L282.99 698.73 L247.22 662.96 L247.22 661.37 L234.50 647.06 L213.83 615.26 L197.93 583.47 L196.34 575.52 L193.16 570.75 L193.16 567.57 L189.98 561.21 L189.98 556.44 L186.80 551.67 L186.80 546.90 L185.21 545.31 L185.21 540.54 L182.03 532.59 L182.03 526.23 L180.45 524.64 L178.86 507.15 L177.27 507.15 L177.27 511.92 L175.68 513.51 L175.68 542.13 L177.27 543.72 L177.27 561.21 L178.86 562.80 L178.86 572.34 L180.45 573.93 L182.03 589.83 L183.62 591.41 L186.80 607.31 L191.57 618.44 L191.57 623.21 L194.75 627.98 L197.93 639.11 L213.83 670.91 L231.32 697.93 L248.81 718.60 L248.81 720.19 L292.53 762.32 L340.22 794.12 L356.12 802.07 L359.30 802.07 L370.43 808.43 L373.61 808.43 L378.38 811.61 L386.33 813.20 L395.87 817.97 L400.64 817.97 L407.00 821.14 L411.76 821.14 L413.35 822.73 L418.12 822.73 L426.07 825.91 L432.43 825.91 L434.02 827.50 L441.97 827.50 L443.56 829.09 L451.51 829.09 L453.10 830.68 L469.00 830.68 L470.59 832.27 L513.51 832.27 L515.10 830.68 L529.41 830.68 L531.00 829.09 L540.54 829.09 L542.13 827.50 L556.44 825.91 L564.39 822.73 L570.75 822.73 L572.34 821.14 L604.13 811.61 L640.70 794.12 L643.88 790.94 L648.65 789.35 L651.83 786.17 L656.60 784.58 L670.91 775.04 L689.98 759.14 L691.57 759.14 L705.88 744.83 L707.47 744.83 L733.70 717.01 L733.70 715.42 L746.42 701.11 L767.09 669.32 L789.35 621.62 L790.94 612.08 L795.71 600.95 L798.89 583.47 L800.48 581.88 L800.48 573.93 L802.07 572.34 L802.07 564.39 L803.66 562.80 L803.66 510.33 L802.07 508.74 L802.07 499.21 L798.89 491.26 L798.89 484.90 L797.30 483.31 L797.30 478.54 L795.71 476.95 L790.94 459.46 L787.76 454.69 L784.58 443.56 L765.50 408.59 L736.88 370.43 L715.42 348.97 L713.83 348.97 L691.57 329.89 L677.27 320.35 L672.50 318.76 L669.32 315.58 L647.06 304.45 L643.88 304.45 L639.11 301.27 L631.16 299.68 L621.62 294.91 L616.85 294.91 L615.26 293.32 L610.49 293.32 L602.54 290.14 L596.18 290.14 L594.59 288.55 L570.75 286.96 L569.16 285.37 L543.72 285.37 Z"/>
     </svg>
-    <img class="wordmark" src="spiralis-wordmark.svg" alt="Spiralis">
+    <img class="wordmark" src="spiralis-wordmark-violet.svg" alt="Spiralis">
+      </div>
+      <p class="footer-tagline">Do diagnóstico ao deploy: sistemas sob medida, automação e segurança incorporada em cada etapa.</p>
+    </div>
+
+    <div class="footer-col">
+      <h2 class="footer-col-title">Navegação</h2>
+      <ul>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#processo">Processo</a></li>
+        <li><a href="#duvidas">Dúvidas</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h2 class="footer-col-title">Serviços</h2>
+      <ul>
+        <li><a href="#servicos">Desenvolvimento de Sistemas</a></li>
+        <li><a href="#servicos">Automações e Chatbots</a></li>
+        <li><a href="#servicos">Integração de Sistemas</a></li>
+        <li><a href="#servicos">Cibersegurança</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h2 class="footer-col-title">Contato</h2>
+      <ul>
+        <li><a href="mailto:contato@spiraliscompany.com.br">contato@spiraliscompany.com.br</a></li>
+        <li><a href="https://wa.me/5548991800311?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Spiralis%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto."
+               target="_blank" rel="noopener noreferrer">WhatsApp (48) 99180-0311</a></li>
+      </ul>
+    </div>
   </div>
-  <ul class="footer-nav">
-    <li><a href="#sobre">Sobre</a></li>
-    <li><a href="#servicos">Serviços</a></li>
-    <li><a href="#projetos">Projetos</a></li>
-    <li><a href="#contato">Contato</a></li>
-  </ul>
-  <div class="footer-copy">© 2026 Spiralis. Todos os direitos reservados.</div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 Spiralis. Todos os direitos reservados.</div>
+    <a href="#hero-section" class="footer-topo">Voltar ao topo <span aria-hidden="true">↑</span></a>
+  </div>
 </footer>
 
 <script>
@@ -2640,313 +2638,6 @@
     });
   }
 
-  /* ── PROJECT CARD TILT ──────────────────── */
-  document.querySelectorAll('.proj-card').forEach(card => {
-    const inner = card.querySelector('.proj-inner');
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left - r.width/2)  / (r.width/2);
-      const y = (e.clientY - r.top  - r.height/2) / (r.height/2);
-      gsap.to(inner, {rotationY:x*10, rotationX:-y*10,
-        duration:.4, ease:'power2.out', transformPerspective:900});
-    });
-    card.addEventListener('mouseleave', () => {
-      gsap.to(inner, {rotationY:0, rotationX:0,
-        duration:.9, ease:'elastic.out(1,.5)'});
-    });
-  });
-
-  /* ── PROJECTS PINNED WEBGL CAROUSEL ───────
-     Réplica curvada/"jelly" (ricardochance.com/work),
-     porém acionada pelo scroll da página (mais lenta
-     e progressiva que o protótipo original) em vez de
-     wheel isolado em tela cheia.                       */
-  (function initProjCarousel(){
-    const pinnedEl = document.getElementById('proj-pinned');
-    const canvas   = document.getElementById('proj-gl');
-    if (!pinnedEl || !canvas) return;
-    const supportsPinned = window.matchMedia('(min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference)').matches;
-    if (!supportsPinned) return;
-    if (location.protocol === 'file:') {
-      document.documentElement.classList.add('no-project-webgl');
-      return;
-    }
-    if (typeof THREE === 'undefined') {
-      document.documentElement.classList.add('no-project-webgl');
-      return;
-    }
-
-    const PROJECTS = [
-      { num:'01', name:'Kimura Control', tag:'Plataforma de Gestão para Academias de Artes Marciais · Web App',
-        img:'kimura-control-dashboard.png' },
-      { num:'02', name:'Automação com IA', tag:'Automação de Fluxo · IA',
-        img:'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&q=80' },
-      { num:'03', name:'Auditoria & Hardening', tag:'Pentest · Hardening',
-        img:'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&q=80' },
-      { num:'04', name:'Integração ERP', tag:'Integração ERP · API',
-        img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80' }
-    ];
-    const N = PROJECTS.length;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    } catch (error) {
-      document.documentElement.classList.add('no-project-webgl');
-      return;
-    }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 10;
-
-    function viewSize() {
-      const h = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
-      return { w: h * camera.aspect, h };
-    }
-
-    let CARD_W, CARD_H, GAP, STEP, view;
-    function computeLayout() {
-      view = viewSize();
-      CARD_W = view.w * 0.40;
-      CARD_H = view.h * 0.92;
-      GAP    = view.w * 0.02;
-      STEP   = CARD_W + GAP;
-    }
-
-    const textures = PROJECTS.map(p => {
-      const loader = new THREE.TextureLoader();
-      loader.crossOrigin = /^https?:/i.test(p.img) ? 'anonymous' : undefined;
-      const tex = loader.load(p.img);
-      tex.colorSpace = THREE.SRGBColorSpace || tex.colorSpace;
-      return tex;
-    });
-
-    const uniforms = { uVel: { value: 0 }, uTime: { value: 0 } };
-    function makeMaterial(tex, cardIdx) {
-      return new THREE.ShaderMaterial({
-        transparent: true,
-        uniforms: {
-          uMap:      { value: tex },
-          uVel:      uniforms.uVel,
-          uTime:     uniforms.uTime,
-          uSelected: { value: 0 },
-          uView:     { value: 1 },
-          uTint:     { value: new THREE.Color(0x23084D) },
-          uTintStrength: { value: cardIdx === 0 ? 0.06 : 0.32 }
-        },
-        vertexShader: `
-          uniform float uVel;
-          uniform float uView;
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            vec3 p = position;
-            vec4 world = modelMatrix * vec4(p, 1.0);
-            float nx = world.x / uView;
-            world.z -= nx * nx * 1.6;
-            world.y -= nx * nx * 0.25;
-            world.y += uVel * (uv.x - 0.5) * 1.1;
-            world.z += sin(uv.x * 3.14159) * abs(uVel) * 0.4;
-            gl_Position = projectionMatrix * viewMatrix * world;
-          }
-        `,
-        fragmentShader: `
-          uniform sampler2D uMap;
-          uniform float uVel;
-          uniform float uTime;
-          uniform float uSelected;
-          uniform vec3 uTint;
-          uniform float uTintStrength;
-          varying vec2 vUv;
-          void main() {
-            /* textura base */
-            float k = uVel * 0.025;
-            vec2 uv = vUv;
-            uv.x += sin(vUv.y * 3.14159) * k;
-            vec4 c = texture2D(uMap, uv);
-            c.rgb = mix(c.rgb, uTint, uTintStrength);
-
-            /* ── rounded rect SDF ── */
-            vec2 uv2 = vUv * 2.0 - 1.0;
-            float cr  = 0.13;
-            vec2  q   = abs(uv2) - (1.0 - cr);
-            float sdf = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - cr;
-            float alpha = smoothstep(0.012, -0.008, sdf);
-
-            /* ── star border: dois pontos opostos, só no card em destaque ── */
-            float bw = 0.015;
-            float onBorder = (1.0 - smoothstep(0.0, bw, -sdf)) * step(sdf, 0.002);
-
-            /* ping-pong 0→1→0 */
-            float ping = abs(mod(uTime * 0.5, 2.0) - 1.0);
-
-            /* ponto topo (esq→dir) e baixo (dir→esq) — sempre opostos */
-            vec2 starTop = vec2(ping,       1.0);
-            vec2 starBot = vec2(1.0 - ping, 0.0);
-
-            float dT = distance(vUv, starTop);
-            float dB = distance(vUv, starBot);
-
-            float glowT = exp(-dT * dT * 1000.0);
-            float glowB = exp(-dB * dB * 1000.0);
-            float haloT = exp(-dT * dT * 180.0) * 0.20;
-            float haloB = exp(-dB * dB * 180.0) * 0.20;
-
-            vec3 violet  = vec3(0.52, 0.10, 0.95);
-            vec3 colT = mix(violet, vec3(1.0, 0.80, 1.0), smoothstep(0.05, 0.0, dT));
-            vec3 colB = mix(violet, vec3(1.0, 0.80, 1.0), smoothstep(0.05, 0.0, dB));
-
-            /* borda base muito sutil (sempre) */
-            c.rgb = mix(c.rgb, vec3(0.15, 0.04, 0.32), onBorder * 0.28);
-
-            /* brilho nos dois pontos — só no card selecionado */
-            float sel = uSelected;
-            c.rgb += (colT * (glowT + haloT) + colB * (glowB + haloB)) * sel * onBorder * 4.0;
-            /* halo leve que sangra pra dentro */
-            c.rgb += (colT * haloT + colB * haloB) * sel * 0.5;
-
-            gl_FragColor = vec4(c.rgb, alpha);
-          }
-        `
-      });
-    }
-
-    const cards = [];
-    function buildCards() {
-      for (const c of cards) { scene.remove(c.mesh); c.mesh.geometry.dispose(); }
-      cards.length = 0;
-      for (let i = 0; i < N; i++) {
-        const geo = new THREE.PlaneGeometry(CARD_W, CARD_H, 40, 16);
-        const mat = makeMaterial(textures[i], i);
-        mat.uniforms.uView.value = view.w;
-        mat.uniforms.uSelected.value = (i === selected) ? 1.0 : 0.0;
-        const mesh = new THREE.Mesh(geo, mat);
-        mesh.userData.index = i;
-        scene.add(mesh);
-        cards.push({ mesh, index: i });
-      }
-    }
-
-    let target = 0, current = 0, selected = 0, prev = 0;
-    const LERP = 0.085;
-    function totalWidth() { return N * STEP; }
-    function layout() {
-      const tw = totalWidth();
-      for (const c of cards) {
-        let x = c.index * STEP - current;
-        x = ((x % tw) + tw) % tw;
-        if (x > tw / 2) x -= tw;
-        c.mesh.position.x = x;
-        const dist = Math.min(1, Math.abs(x) / (STEP * 1.15));
-        const s = 1 - dist * 0.14;
-        c.mesh.scale.set(s, s, 1);
-      }
-    }
-
-    const curEl = document.getElementById('proj-cur');
-    const totalEl = document.getElementById('proj-total');
-    const dots = [...document.querySelectorAll('#proj-dots .proj-dot')];
-    totalEl.textContent = String(N).padStart(2, '0');
-
-    function select(i) {
-      selected = ((i % N) + N) % N;
-      curEl.textContent = String(selected + 1).padStart(2, '0');
-      dots.forEach((d, k) => d.classList.toggle('on', k === selected));
-      const p = PROJECTS[selected];
-      document.getElementById('proj-detail-num').textContent = p.num;
-      document.getElementById('proj-detail-name').textContent = p.name;
-      document.getElementById('proj-detail-tag').textContent = p.tag;
-      /* acende o efeito só no card em destaque */
-      for (const c of cards) {
-        c.mesh.material.uniforms.uSelected.value = (c.index === selected) ? 1.0 : 0.0;
-      }
-    }
-    select(0);
-
-    /* clique: navega tanto o carrossel quanto a posição
-       real de rolagem da página (fonte da verdade)      */
-    canvas.addEventListener('click', e => {
-      const ray = new THREE.Raycaster();
-      const m = new THREE.Vector2(
-        (e.offsetX / canvas.clientWidth) * 2 - 1,
-        -(e.offsetY / canvas.clientHeight) * 2 + 1
-      );
-      ray.setFromCamera(m, camera);
-      const hit = ray.intersectObjects(cards.map(c => c.mesh))[0];
-      if (hit) scrollToIndex(hit.object.userData.index);
-    });
-
-    let projST = null;
-    function scrollToIndex(i) {
-      if (!projST) return;
-      const idx = ((i % N) + N) % N;
-      const prog = idx / (N - 1);
-      const y = projST.start + prog * (projST.end - projST.start);
-      gsap.to(window, { duration: 1, scrollTo: y, ease: 'power2.inOut' });
-    }
-    document.getElementById('proj-next').addEventListener('click', () => scrollToIndex(selected + 1));
-    dots.forEach((d, i) => d.addEventListener('click', () => scrollToIndex(i)));
-
-    function resize() {
-      const w = pinnedEl.querySelector('.proj-canvas-wrap').clientWidth;
-      const h = pinnedEl.querySelector('.proj-canvas-wrap').clientHeight;
-      if (!w || !h) return;
-      renderer.setSize(w, h);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      computeLayout();
-      buildCards();
-      target = selected * STEP;
-      current = target;
-    }
-    window.addEventListener('resize', resize);
-
-    let projFrame = 0;
-    function tick() {
-      uniforms.uTime.value = performance.now() * 0.001;
-      current += (target - current) * LERP;
-      const vel = current - prev;
-      prev = current;
-      if (!reduceMotion) {
-        uniforms.uVel.value += ((THREE.MathUtils.clamp(vel * 0.5, -0.8, 0.8)) - uniforms.uVel.value) * 0.12;
-      }
-      layout();
-      renderer.render(scene, camera);
-      projFrame = requestAnimationFrame(tick);
-    }
-
-    resize();
-    const projRenderObserver = new IntersectionObserver(entries => {
-      const shouldRender = entries[0].isIntersecting;
-      if (shouldRender && !projFrame) {
-        projFrame = requestAnimationFrame(tick);
-      } else if (!shouldRender && projFrame) {
-        cancelAnimationFrame(projFrame);
-        projFrame = 0;
-      }
-    }, {rootMargin: '600px 0px'});
-    projRenderObserver.observe(pinnedEl);
-
-    /* progressão acionada pelo scroll da página — bem mais
-       lenta que o protótipo isolado (mais altura de rolagem
-       por card, equivalente a ~1.75x a seção de Serviços) */
-    projST = ScrollTrigger.create({
-      trigger: '#projetos',
-      start: 'top top',
-      end: '+=' + (window.innerHeight * 2.8),
-      pin: '#proj-pinned',
-      scrub: true,
-      onUpdate(self){
-        target = self.progress * (N - 1) * STEP;
-        const idx = Math.min(Math.round(self.progress * (N - 1)), N - 1);
-        if (idx !== selected) select(idx);
-      }
-    });
-  })();
-
   /* ── MAGNETIC BUTTONS ───────────────────── */
   document.querySelectorAll('.btn-fill,.nav-pill').forEach(btn => {
     btn.addEventListener('mousemove', e => {
@@ -2969,7 +2660,7 @@
      Para trocar a lista, basta editar CLIENTES abaixo.       */
   /* logo: caminho do arquivo. Sem logo, cai no wordmark em texto. */
   const CLIENTES = [
-    {nome: 'Graziano Adm',   logo: 'clientes/graziano-adm.jpg'},
+    {nome: 'Graziano Adm',   logo: 'clientes/graziano-adm.png'},
     {nome: 'FiscalWatch',    logo: 'clientes/fiscalwatch.png'},
     {nome: 'Kimura Control', logo: 'clientes/kimura-control.png'}
   ];
@@ -3000,12 +2691,47 @@
       const heading = document.getElementById('clients-heading');
       const words = [...clientsStage.querySelectorAll('.clients-word')];
 
-      // uma marca por cliente, ancorada em volta do título (posição no CSS)
+      /* Trilho do voo: 12 pontos por canal, amostrados com Catmull-Rom.
+         X e Y estão em px de um palco de 1440 e são reescalados por VP.
+         O trilho é aberto e dá a volta em torno do título: a marca entra
+         embaixo à direita, sobe pela esquerda, cruza o topo, desce pela
+         direita e sai embaixo à esquerda.                              */
+      const TRK_X = [960, 400, -250, -500, -380,    5,  390,  560,  270, -580, -580, -960];
+      const TRK_Y = [540, 500,  270,   30, -190, -270, -190,   10,  255,  520,  580,  780];
+      const TRK_S = [.28, .75,  .83,  .84,   .8,  .75,   .8,  .84,  .88,  .62,  .35,  .28];
+      const TRK_O = [  0,  .8,  .86,   .9,   .8,  .72,   .8,   .9,  .88,  .58,  .22,    0];
+
+      /* Catmull-Rom uniforme: a curva passa por todos os pontos e a
+         tangente em cada um vem dos vizinhos, então não há canto. */
+      const spline = (k, t) => {
+        const n = k.length, d = t * (n - 1), c = Math.min(Math.floor(d), n - 2);
+        const p0 = k[Math.max(0, c - 1)], p1 = k[c],
+              p2 = k[Math.min(n - 1, c + 1)], p3 = k[Math.min(n - 1, c + 2)];
+        const u = d - c, u2 = u * u;
+        return .5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u2
+                     + u2 * u * (-p0 + 3 * p1 - 3 * p2 + p3));
+      };
+
+      /* cada marca percorre o mesmo trilho, defasada. O atraso espalha as
+         marcas igualmente ao longo da curva e a velocidade é o que faz a
+         última encerrar o voo exatamente no fim da seção. */
+      const N = CLIENTES.length;
+      const ATRASO = 1 / N;
+      const FIM = .88;                    // p vai de .03 (topo) a .88 (base)
+      const VELOC = (1 + ATRASO * (N - 1)) / FIM;
+
+      // mesma escada de viewport da referência: abaixo de 1440 tudo encolhe junto
+      const vpEscala = () => {
+        const w = innerWidth;
+        return w < 640 ? .33 : w < 768 ? .46 : w < 1024 ? .58 : Math.min(1, w / 1440);
+      };
+      const LARG = 280, ALT = 187;
+      let VP = vpEscala();
+
       const itens = CLIENTES.map((marca, i) => {
         const el = document.createElement('div');
         el.className = 'client-item';
         el.setAttribute('aria-hidden', 'true');
-        el.dataset.pos = String(i);
         if (marca.logo) {
           const img = document.createElement('img');
           img.src = marca.logo;
@@ -3030,25 +2756,31 @@
         return {el, i};
       });
 
-      /* levitação contínua: cada marca flutua no seu próprio ritmo,
-         independente do scroll, para não ficarem paradas */
-      itens.forEach(({el, i}) => {
-        gsap.to(el, {
-          y: 16 + i * 4,
-          duration: 2.8 + i * .5,
-          ease: 'sine.inOut',
-          repeat: -1, yoyo: true,
-          delay: i * .35
+      /* o item é ancorado no centro do palco e sai de lá pelo transform,
+         então o trilho pode ser escrito em coordenadas centradas */
+      const dimensionar = () => {
+        VP = vpEscala();
+        const w = Math.round(LARG * VP), h = Math.round(ALT * VP);
+        itens.forEach(({el}) => {
+          el.style.width = w + 'px';
+          el.style.height = h + 'px';
+          el.style.left = 'calc(50% - ' + (w / 2) + 'px)';
+          el.style.top = 'calc(50% - ' + (h / 2) + 'px)';
         });
-      });
+      };
+      dimensionar();
 
       const aplicar = p => {
-        // marcas: entram no início do trilho e ganham leve profundidade.
-        // a escala vai pelo gsap (não por style.scale) porque a levitação
-        // já escreve transform — as duas se multiplicariam.
         itens.forEach(({el, i}) => {
-          const u = Math.max(0, Math.min(1, (p - i * .06) / .22));
-          gsap.set(el, {opacity: u, scale: .72 + .28 * u});
+          const u = Math.max(0, Math.min(1, VELOC * p - ATRASO * i));
+          gsap.set(el, {
+            x: spline(TRK_X, u) * VP,
+            y: spline(TRK_Y, u) * VP,
+            scale: Math.max(.1, spline(TRK_S, u)),
+            opacity: Math.max(0, Math.min(1, spline(TRK_O, u))),
+            // no miolo do voo a marca mergulha ATRÁS do título (que é z 10)
+            zIndex: u > .32 && u < .59 ? 5 : 15
+          });
         });
 
         // palavras: blur → nítido, uma a uma
@@ -3070,17 +2802,44 @@
         heading.style.transform = 'translateY(' + (-50 * s).toFixed(2) + 'px)';
       };
 
+      /* O scroll não move as marcas direto: move o ALVO de uma mola, e o
+         que é desenhado é a posição da mola. É daí que vem a inércia — a
+         marca ainda completa um pedaço do voo depois que o scroll para, e
+         não gruda no dedo. Ganhos da referência: levemente super-
+         amortecida, então atrasa sem quicar. */
+      const RIGIDEZ = 90, AMORT = 22;
+      const inicial = p => .03 + .85 * p;
+      let alvo = inicial(0), pos = alvo, vel = 0, dormindo = true;
+
+      const passo = (t, dt) => {
+        const h = Math.min(dt, 33) / 1000;
+        vel += (-RIGIDEZ * (pos - alvo) - AMORT * vel) * h;
+        pos += vel * h;
+        if (Math.abs(pos - alvo) < .001 && Math.abs(vel) < .001) {
+          pos = alvo; vel = 0; dormindo = true;
+          gsap.ticker.remove(passo);
+        }
+        aplicar(pos);
+      };
+      // a mola só ocupa o ticker enquanto está longe do alvo
+      const acordar = () => {
+        if (dormindo) { dormindo = false; gsap.ticker.add(passo); }
+      };
+
       const st = ScrollTrigger.create({
         trigger: '.clients',
         start: 'top top',
         end: 'bottom bottom',
-        scrub: .6,
-        onUpdate: self => aplicar(self.progress),
-        onRefresh: self => aplicar(self.progress)
+        onUpdate: self => { alvo = inicial(self.progress); acordar(); },
+        onRefresh: self => {
+          alvo = pos = inicial(self.progress); vel = 0;
+          dimensionar(); aplicar(pos);
+        }
       });
-      aplicar(0);
+      aplicar(pos);
 
       return () => {
+        gsap.ticker.remove(passo);
         st.kill();
         itens.forEach(it => { gsap.killTweensOf(it.el); it.el.remove(); });
         words.forEach(w => w.removeAttribute('style'));
@@ -3113,7 +2872,7 @@
 
   /* ── NAV BLEND ──────────────────────────── */
   const nav = document.getElementById('nav');
-  const lightSections = ['#showcase','#keyfacts-section','#projetos'];
+  const lightSections = ['#showcase','#keyfacts-section','#duvidas','#contato','footer'];
   function syncNavContrast(){
     let onLight = false;
     lightSections.forEach(s=>{
