@@ -177,17 +177,8 @@
       display: flex; gap: .75rem; align-items: center;
       justify-self: end;
     }
-    .nav-pill {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-height: 44px;
-      font-family: var(--ff-mono); font-size: .65rem;
-      letter-spacing: .12em; text-transform: uppercase;
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: 999px; padding: .55rem 1.1rem;
-      color: white; background: none;
-      transition: background .25s, color .25s;
-    }
-    .nav-pill:hover { background: white; color: black; }
+    /* .nav-pill herda o botão padrão; o ajuste de escala fica junto
+       do bloco base, para não depender da ordem das regras. */
     #nav-menu-toggle {
       display: none;
       width: 44px; height: 44px;
@@ -233,17 +224,19 @@
       border-bottom-color: rgba(35,8,77,.12);
     }
     nav.is-over-light .nav-logo,
-    nav.is-over-light .nav-links a,
-    nav.is-over-light .nav-pill { color: var(--ink-deep); }
-    nav.is-over-light .nav-pill,
+    nav.is-over-light .nav-links a { color: var(--ink-deep); }
     nav.is-over-light #nav-menu-toggle { border-color: rgba(35,8,77,.28); }
     nav.is-over-light .wordmark { filter: invert(1) brightness(.16); }
     nav.is-over-light .nav-links a:hover,
     nav.is-over-light .nav-links a:focus-visible { color: var(--violet); }
-    nav.is-over-light .nav-pill:hover,
-    nav.is-over-light .nav-pill:focus-visible {
-      background: var(--ink-deep);
-      color: white;
+    /* Sobre seção clara a pílula inverte pelos tokens. Definir color ou
+       background aqui venceria o hover do botão padrão por especificidade
+       e mataria o wipe, então o ajuste é só de token. */
+    nav.is-over-light .nav-pill {
+      --pill-line:      rgba(35,8,77,.28);
+      --pill-text:      var(--ink-deep);
+      --pill-fill:      var(--ink-deep);
+      --pill-fill-text: #fff;
     }
     body.menu-open { overflow: hidden; }
 
@@ -301,30 +294,62 @@
       opacity: 0;
       animation: hReveal .8s var(--ease-soft) 1.15s both;
     }
-    .hero-cta-link {
-      --hero-cta-fill: #fff;
-      --hero-cta-fill-text: #000;
-      display: inline-flex; align-items: center; gap: .55rem;
+    /* ── BOTÃO PADRÃO ──────────────────────────────────────────────
+       Pílula com preenchimento em wipe da esquerda para a direita.
+       A mecânica mora só aqui; cada contexto ajusta as cores pelos
+       tokens --pill-*. Para uma variante nova, redefina os tokens
+       em vez de reescrever a regra.                                */
+    .hero-cta-link,
+    .nav-pill,
+    .svc-link,
+    .btn-fill,
+    .roi-close a {
+      --pill-line:      rgba(255,255,255,.4);
+      --pill-text:      #fff;
+      --pill-fill:      #fff;
+      --pill-fill-text: #000;
+
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: .55rem; min-height: 44px;
       font-family: var(--ff-mono); font-size: .68rem;
       letter-spacing: .14em; text-transform: uppercase;
-      color: white;
+      color: var(--pill-text);
       background-color: transparent;
-      background-image: linear-gradient(var(--hero-cta-fill), var(--hero-cta-fill));
+      background-image: linear-gradient(var(--pill-fill), var(--pill-fill));
       background-repeat: no-repeat;
       background-position: left center;
       background-size: 0 100%;
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: 999px; padding: .7rem 1.35rem;
+      border: 1px solid var(--pill-line);
+      border-radius: 999px;
+      padding: .7rem 1.35rem;
+      white-space: nowrap;
       transition:
         background-size .45s var(--ease-expo),
         color .3s ease,
         border-color .3s ease;
     }
-    .hero-cta-link:hover,
-    .hero-cta-link:focus-visible {
+    .hero-cta-link:hover, .hero-cta-link:focus-visible,
+    .nav-pill:hover,      .nav-pill:focus-visible,
+    .svc-link:hover,      .svc-link:focus-visible,
+    .btn-fill:hover,      .btn-fill:focus-visible,
+    .roi-close a:hover,   .roi-close a:focus-visible {
       background-size: 100% 100%;
-      color: var(--hero-cta-fill-text);
-      border-color: var(--hero-cta-fill);
+      color: var(--pill-fill-text);
+      border-color: var(--pill-fill);
+    }
+    /* Variante preenchida: mesma mecânica, peso de ação principal */
+    .svc-link,
+    .btn-fill {
+      --pill-line:      var(--violet);
+      --pill-text:      #fff;
+      --pill-fill:      var(--violet-900);
+      --pill-fill-text: #fff;
+      background-color: var(--violet);
+    }
+    /* Escala reduzida para caber na nav */
+    .nav-pill {
+      font-size: .65rem; letter-spacing: .12em;
+      padding: .55rem 1.1rem;
     }
     .hero-cta-link .arr { display: inline-block; }
     .hero-info { text-align: right; max-width: 380px; }
@@ -403,105 +428,192 @@
       text-transform: uppercase;
       color: #625676;
     }
-    /* ── COMPARATIVO (mercado × Spiralis) ───── */
-    .cmp { max-width: 1000px; margin: 0 auto; }
-    .cmp-head {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 1rem; margin-bottom: .85rem;
+    /* ── CALCULADORA DE RETORNO ───────────────── */
+    .roi {
+      max-width: 1160px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      gap: 1.25rem; align-items: start;
     }
-    .cmp-head span {
-      font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .18em; text-transform: uppercase;
-      padding-left: 1.5rem;
-    }
-    .cmp-head-a { color: #8A7CA8; }
-    .cmp-head-b { color: var(--violet); font-weight: 700; }
-
-    .cmp-row {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 1rem; margin-bottom: 1rem;
-    }
-    .cmp-topic {
-      grid-column: 1 / -1;
-      display: flex; align-items: center; gap: .85rem;
-      font-family: var(--ff-mono); font-size: .58rem;
-      letter-spacing: .18em; text-transform: uppercase;
-      color: #6B5C86; margin-top: .5rem;
-    }
-    .cmp-topic::after {
-      content: ''; flex: 1; height: 1px;
-      background: rgba(73,24,165,.14);
-    }
-
-    .cmp-cell {
-      border-radius: 10px; padding: 1.55rem 1.5rem;
-      display: flex; gap: .9rem; align-items: flex-start;
-    }
-    .cmp-cell p { font-size: .92rem; line-height: 1.55; }
-    .cmp-icon {
-      flex-shrink: 0; width: 1.2rem; height: 1.2rem; border-radius: 50%;
-      display: grid; place-items: center;
-      font-size: .6rem; font-weight: 700; line-height: 1;
-      margin-top: .15rem;
-    }
-    .cmp-cell-tag {
-      display: none;
-      font-family: var(--ff-mono); font-size: .55rem;
-      letter-spacing: .18em; text-transform: uppercase;
-      margin-bottom: .5rem;
-    }
-
-    .cmp-a {
-      background: rgba(73,24,165,.045);
-      border: 1px dashed rgba(73,24,165,.22);
-    }
-    .cmp-a p, .cmp-a .cmp-cell-tag { color: #6B5C86; }
-    .cmp-a .cmp-icon { background: rgba(73,24,165,.12); color: #6B5C86; }
-
-    .cmp-b {
+    .roi-card {
       background: #fff;
       border: 1px solid rgba(73,24,165,.10);
-      box-shadow: 0 4px 20px rgba(73,24,165,.09);
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(73,24,165,.09);
+      padding: 2.1rem 1.9rem;
+    }
+    .roi-card-kicker {
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--violet); font-weight: 700; margin-bottom: 1.8rem;
+    }
+    .roi-field { margin-bottom: 1.75rem; }
+    .roi-field:last-child { margin-bottom: 0; }
+    .roi-field-head { margin-bottom: .8rem; }
+    .roi-label {
+      font-family: var(--ff-body); font-size: .88rem;
+      font-weight: 600; color: var(--ink-deep);
+    }
+    .roi-hint {
+      font-family: var(--ff-body); font-size: .72rem;
+      line-height: 1.5; color: #8A7CA8; margin-top: .6rem;
+    }
+
+    .roi-slider { position: relative; height: 3rem; }
+    .roi-track {
+      position: absolute; inset: 0; border-radius: 999px;
+      background: rgba(73,24,165,.06);
+      border: 1px solid rgba(73,24,165,.08);
+    }
+    .roi-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      min-width: 3rem; border-radius: 999px; pointer-events: none;
+      background: linear-gradient(90deg, var(--violet), var(--violet-400));
+      box-shadow: 0 3px 14px rgba(73,24,165,.30);
+    }
+    .roi-range {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      -webkit-appearance: none; appearance: none;
+      background: transparent; cursor: pointer; margin: 0;
+    }
+    .roi-range:focus-visible {
+      outline: 2px solid var(--violet-400);
+      outline-offset: 3px; border-radius: 999px;
+    }
+    .roi-range::-webkit-slider-runnable-track { height: 3rem; background: transparent; }
+    .roi-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 2.4rem; height: 3rem; background: transparent; border: none;
+    }
+    .roi-range::-moz-range-track { height: 3rem; background: transparent; border: none; }
+    .roi-range::-moz-range-thumb {
+      width: 2.4rem; height: 3rem; background: transparent;
+      border: none; border-radius: 0;
+    }
+    .roi-chip {
+      position: absolute; right: .5rem; top: 50%; transform: translateY(-50%);
+      pointer-events: none;
+      font-family: var(--ff-head); font-weight: 700; font-size: .82rem;
+      color: var(--ink-deep); background: #fff;
+      border: 1px solid rgba(73,24,165,.12);
+      padding: .42rem .9rem; border-radius: 999px;
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(73,24,165,.12);
+    }
+
+    .roi-seg { display: grid; grid-template-columns: repeat(5,1fr); gap: .4rem; }
+    .roi-seg button {
+      font-family: var(--ff-body); font-size: .78rem; font-weight: 500;
+      padding: .85rem .2rem; border-radius: 999px;
+      border: 1px solid rgba(73,24,165,.14);
+      background: rgba(73,24,165,.04); color: #6B5C86;
+      cursor: pointer; white-space: nowrap;
+      transition: background .22s var(--ease-soft), color .22s var(--ease-soft),
+                  border-color .22s var(--ease-soft), box-shadow .22s var(--ease-soft);
+    }
+    .roi-seg button:hover { border-color: rgba(73,24,165,.34); color: var(--violet); }
+    .roi-seg button[aria-pressed="true"] {
+      background: linear-gradient(135deg, var(--violet), var(--violet-400));
+      color: #fff; border-color: transparent; font-weight: 700;
+      box-shadow: 0 4px 16px rgba(73,24,165,.32);
+    }
+
+    .roi-out {
+      background: linear-gradient(165deg,#1C0940 0%, var(--violet-900) 52%, #10032A 100%);
+      border: 1px solid rgba(124,77,219,.22);
+      border-radius: 14px; padding: 2.1rem 1.9rem 1.9rem;
+      box-shadow: 0 10px 40px rgba(35,8,77,.28);
+    }
+    .roi-gauge { width: 100%; display: block; margin-bottom: -.25rem; }
+    .roi-big {
+      font-family: var(--ff-head); font-weight: 700;
+      font-size: clamp(2.2rem,4.6vw,3.4rem); line-height: 1;
+      letter-spacing: -.02em; color: #fff; text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Estado em que o projeto não se paga na escala informada */
+    .roi-big.is-negativo {
+      font-size: clamp(1.3rem,2.8vw,1.8rem);
+      letter-spacing: 0; color: #C9B8EC;
+    }
+    .roi-big-label {
+      margin-top: .8rem; text-align: center;
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .2em; text-transform: uppercase; color: #9B6BFF;
+    }
+    .roi-big-sub {
+      margin-top: .55rem; text-align: center;
+      font-family: var(--ff-body); font-size: .8rem; color: #B4A2D6;
+    }
+    .roi-rows { margin-top: 1.9rem; }
+    .roi-row {
+      display: flex; align-items: baseline; gap: .8rem;
+      padding: .82rem 0; border-top: 1px solid rgba(124,77,219,.14);
+    }
+    .roi-row:last-child { border-bottom: 1px solid rgba(124,77,219,.14); }
+    .roi-row-k {
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .15em; text-transform: uppercase; color: #9583B8;
+    }
+    .roi-row-line { flex: 1; height: 1px; background: rgba(124,77,219,.18); }
+    .roi-row-v {
+      font-family: var(--ff-head); font-weight: 700; font-size: .82rem;
+      color: #fff; white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+
+    .roi-tiles {
+      grid-column: 1 / -1;
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem;
+    }
+    .roi-tile {
+      background: #fff; border: 1px solid rgba(73,24,165,.10);
+      border-radius: 14px; padding: 1.6rem 1.5rem;
+      box-shadow: 0 4px 20px rgba(73,24,165,.08);
       position: relative; overflow: hidden;
     }
-    .cmp-b::before {
+    .roi-tile::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
       background: linear-gradient(to bottom, var(--violet-400), var(--violet));
     }
-    .cmp-b p { color: var(--ink-deep); font-weight: 500; }
-    .cmp-b .cmp-cell-tag { color: var(--violet); }
-    .cmp-b .cmp-icon { background: var(--violet); color: #fff; }
+    .roi-tile-v {
+      display: block; font-family: var(--ff-head); font-weight: 700;
+      font-size: clamp(1.4rem,2.4vw,1.9rem); color: var(--violet);
+      line-height: 1.1; font-variant-numeric: tabular-nums;
+    }
+    .roi-tile-k {
+      display: block; margin-top: .6rem;
+      font-family: var(--ff-mono); font-size: .58rem;
+      letter-spacing: .15em; text-transform: uppercase; color: #6B5C86;
+      line-height: 1.5;
+    }
 
-    .cmp-close {
-      margin-top: 2.25rem; background: var(--violet-900);
-      border-radius: 10px; padding: 2rem 2.25rem;
+    .roi-close {
+      grid-column: 1 / -1; margin-top: .5rem;
+      background: var(--violet-900); border-radius: 14px;
+      padding: 2rem 2.25rem;
       display: flex; align-items: center; justify-content: space-between;
       gap: 1.5rem; flex-wrap: wrap;
     }
-    .cmp-close p {
+    .roi-close p {
       font-family: var(--ff-head); font-weight: 700;
-      font-size: clamp(1.05rem,2vw,1.35rem);
-      color: #fff; line-height: 1.35; max-width: 34ch;
+      font-size: clamp(1rem,1.9vw,1.3rem);
+      color: #fff; line-height: 1.4; max-width: 46ch;
     }
-    .cmp-close a {
-      font-family: var(--ff-mono); font-size: .68rem;
-      letter-spacing: .14em; text-transform: uppercase; color: #fff;
-      border-bottom: 1px solid rgba(255,255,255,.35);
-      padding-bottom: .25rem; white-space: nowrap;
-      transition: border-color .25s;
-    }
-    .cmp-close a:hover { border-color: #fff; }
+    /* Herda o botão padrão; painel escuro, então mantém os tokens claros */
 
-    @media (max-width: 820px) {
-      .cmp-head { display: none; }
-      .cmp-row { grid-template-columns: 1fr; gap: .75rem; margin-bottom: 1.5rem; }
-      .cmp-cell-tag { display: block; }
-      .cmp-cell { padding: 1.35rem 1.25rem; }
-      .cmp-close {
+    @media (max-width: 980px) {
+      .roi { grid-template-columns: 1fr; }
+      .roi-tiles { grid-template-columns: 1fr; }
+      .roi-close {
         flex-direction: column; align-items: flex-start;
         padding: 1.75rem; gap: 1.25rem;
       }
-      .cmp-close p { max-width: none; }
+      .roi-close p { max-width: none; }
+    }
+    @media (max-width: 560px) {
+      .roi-card, .roi-out { padding: 1.6rem 1.25rem; }
+      .roi-seg { grid-template-columns: repeat(3,1fr); }
+      .roi-chip { font-size: .74rem; padding: .35rem .7rem; }
     }
 
     /* ── SERVICES (pinned internal tracks) ───────── */
@@ -596,24 +708,12 @@
       line-height: 1.7;
       color: var(--svc-muted);
     }
+    /* Herda o botão padrão na variante preenchida */
     .svc-link {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
-      gap: .55rem;
       margin-top: 1.6rem;
+      font-size: .64rem; letter-spacing: .1em;
       padding: .82rem 1.25rem;
-      border-radius: 999px;
-      background: var(--violet);
-      color: #fff;
-      font-family: var(--ff-mono);
-      font-size: .64rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      transition: background-color .3s, color .3s;
     }
-    .svc-link:hover,
-    .svc-link:focus-visible { background: var(--violet-400); }
     .svc-media {
       grid-column: 2;
       /* mesma base que .svc-copy */
@@ -1286,15 +1386,8 @@
       margin: 0 .04em 0 .06em;
     }
     .cta-acts { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; justify-content: center; }
-    .btn-fill {
-      background: var(--violet); color: #fff;
-      font-family: var(--ff-mono); font-size: .68rem;
-      letter-spacing: .14em; text-transform: uppercase;
-      padding: 1rem 2.5rem; border-radius: 4px;
-      transition: transform .3s var(--ease-soft), background .25s;
-      display: inline-block;
-    }
-    .btn-fill:hover { background: var(--violet-400); transform: translateY(-2px); }
+    /* Herda o botão padrão na variante preenchida */
+    .btn-fill { padding: 1rem 2.5rem; }
     .btn-ghost-link {
       display: inline-flex; align-items: center; min-height: 44px;
       font-family: var(--ff-mono); font-size: .68rem;
@@ -1440,27 +1533,28 @@
     html[data-theme="light"] #duvidas { background: var(--cream); }
     html[data-theme="light"] .faq-heading { color: var(--text); }
     html[data-theme="light"] .kf-title h2 { color: var(--text); }
-    html[data-theme="light"] .cmp-b p { color: var(--text); }
+    html[data-theme="light"] .roi-label { color: var(--text); }
     html[data-theme="light"] .clients-heading h2 { color: var(--text); }
     html[data-theme="light"] nav {
       border-bottom: 1px solid rgba(73,24,165,.12);
     }
     html[data-theme="light"] .nav-logo { color: var(--text); }
     html[data-theme="light"] .nav-pill {
-      border-color: rgba(26,11,51,.3);
-      color: var(--text);
+      --pill-line:      rgba(26,11,51,.3);
+      --pill-text:      var(--text);
+      --pill-fill:      var(--text);
+      --pill-fill-text: #fff;
     }
-    html[data-theme="light"] .nav-pill:hover { background: var(--text); color: white; }
     html[data-theme="light"] #theme-toggle {
       border-color: rgba(26,11,51,.3);
       color: var(--text);
     }
     html[data-theme="light"] #theme-toggle:hover { background: rgba(26,11,51,.08); }
     html[data-theme="light"] .hero-cta-link {
-      --hero-cta-fill: var(--text);
-      --hero-cta-fill-text: #fff;
-      color: var(--text);
-      border-color: rgba(26,11,51,.3);
+      --pill-line:      rgba(26,11,51,.3);
+      --pill-text:      var(--text);
+      --pill-fill:      var(--text);
+      --pill-fill-text: #fff;
     }
     html[data-theme="light"] .hero-desc { color: var(--text); }
     html[data-theme="light"] .hero-est { color: var(--text-dim); }
@@ -1871,91 +1965,141 @@
 <section id="keyfacts-section">
   <div class="tr__container">
     <div class="kf-title">
-      <h2 class="fade-in">O padrão do mercado.<br>E o nosso.</h2>
-      <p class="kf-label">Como trabalhamos</p>
+      <h2 class="fade-in">Quanto custa continuar<br>como está.</h2>
+      <p class="kf-label">Calculadora de retorno</p>
     </div>
 
-    <div class="cmp">
-      <div class="cmp-head" aria-hidden="true">
-        <span class="cmp-head-a">O mercado</span>
-        <span class="cmp-head-b">A Spiralis</span>
-      </div>
+    <div class="roi fade-in">
 
-      <div class="cmp-row fade-in">
-        <div class="cmp-topic">Ponto de partida</div>
-        <div class="cmp-cell cmp-a">
-          <span class="cmp-icon" aria-hidden="true">✕</span>
-          <div>
-            <span class="cmp-cell-tag">O mercado</span>
-            <p>Um template pronto, adaptado até caber mais ou menos na sua operação.</p>
-          </div>
-        </div>
-        <div class="cmp-cell cmp-b">
-          <span class="cmp-icon" aria-hidden="true">✓</span>
-          <div>
-            <span class="cmp-cell-tag">A Spiralis</span>
-            <p>O seu processo real, mapeado antes de qualquer proposta de solução.</p>
-          </div>
-        </div>
-      </div>
+      <!-- ── Entradas ── -->
+      <div class="roi-card">
+        <p class="roi-card-kicker">Sua operação hoje</p>
 
-      <div class="cmp-row fade-in">
-        <div class="cmp-topic">Escopo</div>
-        <div class="cmp-cell cmp-a">
-          <span class="cmp-icon" aria-hidden="true">✕</span>
-          <div>
-            <span class="cmp-cell-tag">O mercado</span>
-            <p>Fechado no orçamento, antes de alguém entender de fato o problema.</p>
+        <div class="roi-field">
+          <div class="roi-field-head">
+            <span class="roi-label">Horas por semana em trabalho manual</span>
           </div>
-        </div>
-        <div class="cmp-cell cmp-b">
-          <span class="cmp-icon" aria-hidden="true">✓</span>
-          <div>
-            <span class="cmp-cell-tag">A Spiralis</span>
-            <p>Definido depois do diagnóstico, com prioridades e critérios de sucesso acordados.</p>
+          <div class="roi-slider">
+            <div class="roi-track"></div>
+            <div class="roi-fill" id="fill-horas"></div>
+            <input class="roi-range" id="in-horas" type="range"
+                   min="2" max="30" step="1" value="12"
+                   aria-label="Horas por semana em trabalho manual, por pessoa">
+            <span class="roi-chip" id="chip-horas">12h</span>
           </div>
+          <p class="roi-hint">Por pessoa. Planilha preenchida na mão, dado copiado de um sistema para outro, relatório remontado toda semana.</p>
         </div>
-      </div>
 
-      <div class="cmp-row fade-in">
-        <div class="cmp-topic">Segurança</div>
-        <div class="cmp-cell cmp-a">
-          <span class="cmp-icon" aria-hidden="true">✕</span>
-          <div>
-            <span class="cmp-cell-tag">O mercado</span>
-            <p>Auditoria no fim do projeto, quando mexer na arquitetura já custa caro.</p>
+        <div class="roi-field">
+          <div class="roi-field-head">
+            <span class="roi-label">Pessoas na operação</span>
           </div>
+          <div class="roi-seg" id="seg-pessoas" role="group" aria-label="Pessoas na operação"></div>
         </div>
-        <div class="cmp-cell cmp-b">
-          <span class="cmp-icon" aria-hidden="true">✓</span>
-          <div>
-            <span class="cmp-cell-tag">A Spiralis</span>
-            <p>Decidida junto com a arquitetura, antes da primeira linha de código.</p>
-          </div>
-        </div>
-      </div>
 
-      <div class="cmp-row fade-in">
-        <div class="cmp-topic">Responsabilidade</div>
-        <div class="cmp-cell cmp-a">
-          <span class="cmp-icon" aria-hidden="true">✕</span>
-          <div>
-            <span class="cmp-cell-tag">O mercado</span>
-            <p>Diagnóstico com uma consultoria, execução com outra. Quando falha, cada uma aponta para a outra.</p>
+        <div class="roi-field">
+          <div class="roi-field-head">
+            <span class="roi-label">Custo médio por pessoa (mês)</span>
           </div>
+          <div class="roi-slider">
+            <div class="roi-track"></div>
+            <div class="roi-fill" id="fill-custo"></div>
+            <input class="roi-range" id="in-custo" type="range"
+                   min="2000" max="25000" step="500" value="6000"
+                   aria-label="Custo médio por pessoa por mês">
+            <span class="roi-chip" id="chip-custo">R$ 6.000</span>
+          </div>
+          <p class="roi-hint">Salário mais encargos. O custo real da hora, não o valor do contracheque.</p>
         </div>
-        <div class="cmp-cell cmp-b">
-          <span class="cmp-icon" aria-hidden="true">✓</span>
-          <div>
-            <span class="cmp-cell-tag">A Spiralis</span>
-            <p>Uma equipe só, do diagnóstico ao deploy. Um interlocutor, um responsável.</p>
+
+        <div class="roi-field">
+          <div class="roi-field-head">
+            <span class="roi-label">Retrabalho por erro manual</span>
           </div>
+          <div class="roi-slider">
+            <div class="roi-track"></div>
+            <div class="roi-fill" id="fill-retrab"></div>
+            <input class="roi-range" id="in-retrab" type="range"
+                   min="0" max="40" step="1" value="15"
+                   aria-label="Percentual de retrabalho por erro manual">
+            <span class="roi-chip" id="chip-retrab">15%</span>
+          </div>
+          <p class="roi-hint">Quanto do trabalho volta para ser refeito: dado digitado errado, versão desatualizada, conferência em duplicata.</p>
         </div>
       </div>
 
-      <div class="cmp-close fade-in">
-        <p>Gestão, engenharia e cibersegurança sob o mesmo teto. Nenhuma etapa terceirizada pelo caminho.</p>
-        <a href="#processo">Ver como funciona na prática →</a>
+      <!-- ── Resultado ── -->
+      <div class="roi-out">
+        <svg class="roi-gauge" viewBox="0 0 420 232" role="img"
+             aria-label="Indicador visual do retorno estimado">
+          <defs>
+            <linearGradient id="roiGaugeGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4918A5"/>
+              <stop offset="100%" stop-color="#9B6BFF"/>
+            </linearGradient>
+            <filter id="roiDotGlow" x="-150%" y="-150%" width="400%" height="400%">
+              <feGaussianBlur stdDeviation="9" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          <g id="roi-ticks"></g>
+          <path d="M 60 210 A 150 150 0 0 1 360 210" fill="none"
+                stroke="rgba(124,77,219,.15)" stroke-width="22" stroke-linecap="round"/>
+          <path id="roi-arc" d="M 60 210 A 150 150 0 0 1 360 210" fill="none"
+                stroke="url(#roiGaugeGrad)" stroke-width="22" stroke-linecap="round"/>
+          <circle id="roi-dot" cx="60" cy="210" r="14" fill="#fff" filter="url(#roiDotGlow)"/>
+        </svg>
+
+        <p class="roi-big" id="out-ano1">R$ 0</p>
+        <p class="roi-big-label">Economia líquida no ano 1</p>
+        <p class="roi-big-sub" id="out-mes">—</p>
+
+        <div class="roi-rows">
+          <div class="roi-row">
+            <span class="roi-row-k">Horas devolvidas / mês</span>
+            <span class="roi-row-line"></span>
+            <span class="roi-row-v" id="out-horas">—</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-k">Projeção 3 anos</span>
+            <span class="roi-row-line"></span>
+            <span class="roi-row-v" id="out-3anos">—</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-k">Investimento estimado</span>
+            <span class="roi-row-line"></span>
+            <span class="roi-row-v" id="out-invest">—</span>
+          </div>
+          <div class="roi-row">
+            <span class="roi-row-k">Peso na folha da operação</span>
+            <span class="roi-row-line"></span>
+            <span class="roi-row-v" id="out-folha">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Destaques ── -->
+      <div class="roi-tiles">
+        <div class="roi-tile">
+          <span class="roi-tile-v" id="out-payback">—</span>
+          <span class="roi-tile-k">Payback do projeto</span>
+        </div>
+        <div class="roi-tile">
+          <span class="roi-tile-v" id="out-realoc">—</span>
+          <span class="roi-tile-k">Pessoas devolvidas ao trabalho que importa</span>
+        </div>
+        <div class="roi-tile">
+          <span class="roi-tile-v" id="out-horasano">—</span>
+          <span class="roi-tile-k">Horas recuperadas por ano</span>
+        </div>
+      </div>
+
+      <div class="roi-close">
+        <p>Cálculo estimado. O número real sai do diagnóstico, já com a arquitetura de segurança decidida.</p>
+        <a href="#contato">Quero o diagnóstico →</a>
       </div>
     </div>
   </div>
@@ -3369,6 +3513,160 @@
   window.addEventListener('resize', function(){
     if(window.innerWidth > 960) setOpen(false);
   });
+})();
+</script>
+
+<!-- ══════════════ CALCULADORA DE RETORNO ══════════════ -->
+<script>
+(function(){
+  var seg = document.getElementById('seg-pessoas');
+  if(!seg) return;
+
+  // Faixas de porte. "fator" escala o investimento de deploy conforme a
+  // complexidade da operação (mais gente = mais integrações e mais fluxos).
+  var FAIXAS = [
+    { label: '1–5',    pessoas: 3,   fator: 1  },
+    { label: '6–15',   pessoas: 10,  fator: 2.5 },
+    { label: '16–40',  pessoas: 25,  fator: 5  },
+    { label: '41–100', pessoas: 65,  fator: 9  },
+    { label: '100+',        pessoas: 150, fator: 14 }
+  ];
+
+  var SEMANAS_MES     = 4.33;
+  var HORAS_UTEIS_MES = 160;
+  var TAXA_AUTOMACAO  = 0.55;    // parcela do trabalho manual que a automação absorve
+  var DEPLOY_BASE     = 10000;   // ticket mínimo de deploy
+  var RECORRENTE_PCT  = 0.08;    // manutenção + monitoramento mensal sobre o deploy
+  var ESCALA_GAUGE    = 1200000; // referência de fim de escala do medidor
+
+  var faixa = 2;
+
+  var fmtBRL = new Intl.NumberFormat('pt-BR', {
+    style: 'currency', currency: 'BRL', maximumFractionDigits: 0
+  });
+  var fmtNum = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
+  function brl(n){ return fmtBRL.format(Math.max(0, Math.round(n))); }
+  function num(n){ return fmtNum.format(Math.max(0, Math.round(n))); }
+  function decimal(n){ return n.toFixed(1).replace('.', ','); }
+  function el(id){ return document.getElementById(id); }
+
+  // ── Botões de faixa de porte ──
+  FAIXAS.forEach(function(f, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = f.label;
+    b.setAttribute('aria-pressed', i === faixa ? 'true' : 'false');
+    b.addEventListener('click', function(){
+      faixa = i;
+      Array.prototype.forEach.call(seg.children, function(node, j){
+        node.setAttribute('aria-pressed', j === i ? 'true' : 'false');
+      });
+      calcular();
+    });
+    seg.appendChild(b);
+  });
+
+  // ── Marcações do medidor ──
+  var ticksGroup = el('roi-ticks');
+  var N_TICKS = 44;
+  var ticks = [];
+  for(var i = 0; i < N_TICKS; i++){
+    var t   = i / (N_TICKS - 1);
+    var rad = (180 - t * 180) * Math.PI / 180;
+    var ln  = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    ln.setAttribute('x1', (210 + 178 * Math.cos(rad)).toFixed(2));
+    ln.setAttribute('y1', (210 - 178 * Math.sin(rad)).toFixed(2));
+    ln.setAttribute('x2', (210 + 196 * Math.cos(rad)).toFixed(2));
+    ln.setAttribute('y2', (210 - 196 * Math.sin(rad)).toFixed(2));
+    ln.setAttribute('stroke-width', '3');
+    ln.setAttribute('stroke-linecap', 'round');
+    ticksGroup.appendChild(ln);
+    ticks.push({ el: ln, t: t });
+  }
+
+  var arc = el('roi-arc');
+  var dot = el('roi-dot');
+  var ARC_LEN = Math.PI * 150;
+  arc.style.strokeDasharray = ARC_LEN;
+
+  var inHoras  = el('in-horas');
+  var inCusto  = el('in-custo');
+  var inRetrab = el('in-retrab');
+
+  function pintar(input, fill, chip, texto){
+    var pct = (input.value - input.min) / (input.max - input.min);
+    fill.style.width = (pct * 100).toFixed(2) + '%';
+    chip.textContent = texto;
+  }
+
+  function calcular(){
+    var f      = FAIXAS[faixa];
+    var horas  = +inHoras.value;
+    var custo  = +inCusto.value;
+    var retrab = +inRetrab.value / 100;
+
+    pintar(inHoras,  el('fill-horas'),  el('chip-horas'),  horas + 'h');
+    pintar(inCusto,  el('fill-custo'),  el('chip-custo'),  brl(custo));
+    pintar(inRetrab, el('fill-retrab'), el('chip-retrab'), inRetrab.value + '%');
+
+    var custoHora        = custo / HORAS_UTEIS_MES;
+    var horasManuaisMes  = f.pessoas * horas * SEMANAS_MES;
+    var horasPerdidasMes = horasManuaisMes * (1 + retrab);
+    var horasRecupMes    = horasPerdidasMes * TAXA_AUTOMACAO;
+
+    var economiaMes   = horasRecupMes * custoHora;
+    var deploy        = DEPLOY_BASE * f.fator;
+    var recorrenteMes = deploy * RECORRENTE_PCT;
+    var liquidoMes    = economiaMes - recorrenteMes;
+
+    var ano1     = liquidoMes * 12 - deploy;
+    var tresAnos = liquidoMes * 36 - deploy;
+    var folhaMes = f.pessoas * custo;
+    var payback  = liquidoMes > 0 ? deploy / liquidoMes : Infinity;
+
+    // Abaixo de certa escala a automação não se paga. Dizer isso é mais
+    // honesto — e mais útil — do que exibir um zero sem explicação.
+    var compensa = liquidoMes > 0;
+    var elAno1 = el('out-ano1');
+    elAno1.classList.toggle('is-negativo', !compensa);
+
+    if(compensa){
+      elAno1.textContent          = brl(ano1);
+      el('out-mes').textContent   = 'São ' + brl(liquidoMes) + ' de volta no caixa todo mês.';
+      el('out-3anos').textContent = brl(tresAnos);
+      el('out-payback').textContent = payback < 1
+        ? 'menos de 1 mês'
+        : decimal(payback) + ' meses';
+    } else {
+      elAno1.textContent          = 'Ainda não compensa';
+      el('out-mes').textContent   = 'Nessa escala, manter a automação custa mais do que ela devolve. Vale conversar antes de investir.';
+      el('out-3anos').textContent = '—';
+      el('out-payback').textContent = 'não se paga';
+    }
+
+    el('out-horas').textContent    = num(horasRecupMes) + ' h';
+    el('out-invest').textContent   = brl(deploy) + ' + ' + brl(recorrenteMes) + '/mês';
+    el('out-folha').textContent    = Math.round(economiaMes / folhaMes * 100) + '% da folha';
+    el('out-realoc').textContent   = decimal(horasRecupMes / HORAS_UTEIS_MES);
+    el('out-horasano').textContent = num(horasRecupMes * 12) + ' h';
+
+    // Medidor: curva de potência para que operações típicas ocupem o meio da escala
+    var t = Math.pow(Math.min(Math.max(ano1, 0) / ESCALA_GAUGE, 1), 0.55);
+    t = Math.min(0.98, Math.max(0.04, t));
+
+    arc.style.strokeDashoffset = ARC_LEN * (1 - t);
+    var rad = (180 - t * 180) * Math.PI / 180;
+    dot.setAttribute('cx', (210 + 150 * Math.cos(rad)).toFixed(2));
+    dot.setAttribute('cy', (210 - 150 * Math.sin(rad)).toFixed(2));
+    ticks.forEach(function(k){
+      k.el.setAttribute('stroke', k.t <= t ? 'rgba(155,107,255,.85)' : 'rgba(124,77,219,.20)');
+    });
+  }
+
+  [inHoras, inCusto, inRetrab].forEach(function(input){
+    input.addEventListener('input', calcular);
+  });
+  calcular();
 })();
 </script>
 
