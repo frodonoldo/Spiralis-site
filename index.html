@@ -243,7 +243,13 @@
     /* ── HERO ────────────────────────────────────── */
     #hero-section {
       position: relative; min-height: 100dvh;
-      background: var(--bg) url('spiral-hero.png.png') center / cover no-repeat;
+      /* A espiral estática saiu: quem desenha o hero é o canvas WebGL da orbe.
+         O gradiente abaixo só aparece quando o WebGL não sobe (aceleração de
+         hardware desligada, GPU na blocklist), para o hero não virar um bloco
+         chapado. Ele fica sob o canvas e nunca é visto no caminho feliz. */
+      background:
+        radial-gradient(58% 62% at 76% 55%, rgba(124,77,219,.42), rgba(124,77,219,0) 70%),
+        var(--bg);
       display: flex; flex-direction: column;
       justify-content: space-between;
       padding: 7rem var(--gutter) 4rem;
@@ -303,6 +309,9 @@
     .nav-pill,
     .svc-link,
     .btn-fill,
+    .btn-outline,
+    .dx-go,
+    .fm-go,
     .roi-close a {
       --pill-line:      rgba(255,255,255,.4);
       --pill-text:      #fff;
@@ -332,6 +341,9 @@
     .nav-pill:hover,      .nav-pill:focus-visible,
     .svc-link:hover,      .svc-link:focus-visible,
     .btn-fill:hover,      .btn-fill:focus-visible,
+    .btn-outline:hover,   .btn-outline:focus-visible,
+    .dx-go:hover,         .dx-go:focus-visible,
+    .fm-go:hover,         .fm-go:focus-visible,
     .roi-close a:hover,   .roi-close a:focus-visible {
       background-size: 100% 100%;
       color: var(--pill-fill-text);
@@ -353,11 +365,6 @@
     }
     .hero-cta-link .arr { display: inline-block; }
     .hero-info { text-align: right; max-width: 380px; }
-    .hero-est {
-      font-family: var(--ff-mono); font-size: .6rem;
-      letter-spacing: .15em; text-transform: uppercase;
-      color: var(--text-dim); margin-bottom: .75rem;
-    }
     .hero-desc { font-size: clamp(.8rem,1.1vw,.95rem); line-height: 1.65; color: var(--text); }
     .hero-scroll {
       position: absolute; bottom: 0; left: 50%;
@@ -831,10 +838,14 @@
       12%, 82% { opacity: 1 }
       100%     { transform: translateY(56px); opacity: 0 }
     }
-    .svc-art .tick { stroke-dasharray: 46; stroke-dashoffset: 46; animation: artTick 3.6s var(--ease-soft) infinite; }
+    /* pathLength="100" no SVG: o traço fecha inteiro mesmo se o path mudar.
+       O check desenha depois que a varredura passa e some antes de o ciclo
+       reiniciar, para não haver salto de "riscado" para "apagado".        */
+    .svc-art .tick { stroke-dasharray: 100; stroke-dashoffset: 100; animation: artTick 3.6s var(--ease-soft) infinite; }
     @keyframes artTick {
-      0%, 55%  { stroke-dashoffset: 46 }
-      75%,100% { stroke-dashoffset: 0 }
+      0%, 55%   { stroke-dashoffset: 100; opacity: 1 }
+      75%, 88%  { stroke-dashoffset: 0;   opacity: 1 }
+      97%, 100% { stroke-dashoffset: 0;   opacity: 0 }
     }
     @media (prefers-reduced-motion: reduce) {
       .svc-art * { animation: none !important; }
@@ -1327,7 +1338,10 @@
       border: 1px solid rgba(124,77,219,.28);
       border-radius: 999px; padding: .7rem 1.4rem;
     }
-    @media (max-width: 820px), (prefers-reduced-motion: reduce) {
+    /* O voo roda em qualquer largura: o palco é sticky, não pinado por JS,
+       e o trilho já é reescalado por viewport. O que derruba para a grade
+       estática é só o pedido de movimento reduzido, não o tamanho da tela. */
+    @media (prefers-reduced-motion: reduce) {
       .clients { height: auto; }
       .clients-stage {
         position: static; height: auto; min-height: 0;
@@ -1340,6 +1354,12 @@
       }
       .client-item, .clients-hint { display: none; }
       .clients-fallback { display: block; }
+    }
+    /* No celular o mesmo voo cabe em menos scroll: o dedo percorre mais
+       tela por gesto, e 700vh viraria uma travessia longa demais. */
+    @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+      .clients { height: 450vh; }
+      .clients-stage { perspective: 900px; }
     }
 
     /* ── CTA ──────────────────────────────────────── */
@@ -1386,13 +1406,210 @@
       margin: 0 .04em 0 .06em;
     }
     .cta-acts { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; justify-content: center; }
+    /* Ícone dentro da pílula: herda a cor do texto, então acompanha o wipe
+       do hover sem regra extra. Traço vazado, sem preenchimento. */
+    .btn-ico { width: 1.15em; height: 1.15em; flex: none; }
     /* Herda o botão padrão na variante preenchida */
     .btn-fill { padding: 1rem 2.5rem; }
-    .btn-ghost-link {
-      display: inline-flex; align-items: center; min-height: 44px;
-      font-family: var(--ff-mono); font-size: .68rem;
-      letter-spacing: .1em; color: #493B63;
-      border-bottom: 1px solid rgba(73,59,99,.45); padding-bottom: .2rem;
+    /* Variante de contorno, para seção clara: mesma mecânica de wipe do
+       botão padrão, só com os tokens virados para o violeta profundo.
+       Fica ao lado da pílula cheia do WhatsApp sem competir com ela.  */
+    .btn-outline {
+      --pill-line:      rgba(35,8,77,.3);
+      --pill-text:      var(--ink-deep);
+      --pill-fill:      var(--ink-deep);
+      --pill-fill-text: #fff;
+      padding: 1rem 2.5rem; cursor: pointer;
+    }
+
+    /* ── POPUP DE DIAGNÓSTICO ──────────────────────
+       Card flutuante, não modal. Quem chega aqui já está na frente do
+       botão de conversa: cobrir a tela com um overlay atrapalharia
+       justamente quem decidiu clicar. Ele entra pelo canto, some com
+       Esc ou com o X, e não volta por 14 dias.
+       Pilha: fica sob a nav (1000) e sob o menu mobile (999), para não
+       tapar a navegação enquanto está aberto.                        */
+    .dx-pop {
+      position: fixed; z-index: 990;
+      right: clamp(1rem, 2.5vw, 2.25rem);
+      bottom: clamp(1rem, 2.5vw, 2.25rem);
+      width: min(24.5rem, calc(100vw - 2rem));
+      padding: 2.1rem 1.9rem 1.6rem;
+      border-radius: 26px;
+      border: 1px solid rgba(228,216,255,.16);
+      background: linear-gradient(165deg,#1C0940 0%, var(--violet-900) 54%, #10032A 100%);
+      box-shadow: 0 30px 70px -28px rgba(8,3,20,.85);
+      color: var(--text);
+      opacity: 0; visibility: hidden;
+      transform: translateY(14px) scale(.985);
+      transition: opacity .4s ease,
+                  transform .55s var(--ease-soft),
+                  visibility .4s;
+    }
+    .dx-pop.is-open { opacity: 1; visibility: visible; transform: none; }
+    .dx-close {
+      position: absolute; top: .6rem; right: .6rem;
+      width: 44px; height: 44px;
+      display: grid; place-items: center;
+      background: none; border: 0; cursor: pointer;
+      color: rgba(235,228,246,.6);
+      transition: color .2s ease;
+    }
+    .dx-close:hover { color: var(--text); }
+    .dx-close svg { width: 14px; height: 14px; }
+    .dx-mark { display: block; width: 30px; height: 30px; margin-bottom: 1.15rem; }
+    .dx-title {
+      font-family: var(--ff-head); font-weight: 500;
+      font-size: 1.5rem; line-height: 1.15; letter-spacing: -.01em;
+      color: #fff; margin-bottom: .7rem; text-wrap: balance;
+    }
+    .dx-desc {
+      font-size: .92rem; line-height: 1.6;
+      color: rgba(235,228,246,.8);
+      margin-bottom: 1.6rem; text-wrap: pretty;
+    }
+    /* Herda a mecânica de wipe do botão padrão; só troca os tokens.
+       Preenche com o violeta claro porque o card já é escuro.       */
+    .dx-go {
+      --pill-line:      var(--violet-400);
+      --pill-text:      #fff;
+      --pill-fill:      var(--violet-100);
+      --pill-fill-text: var(--violet-900);
+      width: 100%; background-color: var(--violet);
+    }
+    .dx-later {
+      display: block; width: 100%; min-height: 44px; margin-top: .5rem;
+      background: none; border: 0; cursor: pointer;
+      font-family: var(--ff-mono); font-size: .64rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: rgba(235,228,246,.58);
+      transition: color .2s ease;
+    }
+    .dx-later:hover { color: rgba(235,228,246,.9); }
+    @media (max-width: 640px) {
+      .dx-pop {
+        left: .75rem; right: .75rem; bottom: .75rem;
+        width: auto; border-radius: 22px;
+        padding: 1.7rem 1.35rem 1.25rem;
+        max-height: 80dvh; overflow-y: auto;
+      }
+      .dx-title { font-size: 1.35rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .dx-pop { transform: none; transition: opacity .2s linear, visibility .2s; }
+    }
+    html[data-theme="light"] .dx-pop { box-shadow: 0 30px 70px -30px rgba(26,11,51,.4); }
+
+    /* ── MODAL DE MENSAGEM ─────────────────────────
+       Este é aberto pelo visitante, ao contrário do popup de diagnóstico,
+       então aqui o modal com fundo escurecido é o formato certo: prende o
+       foco e o formulário pede atenção. Mesma família visual do card de
+       diagnóstico para os dois lerem como a mesma coisa.              */
+    .fm-shell {
+      position: fixed; inset: 0; z-index: 1100;
+      display: grid; place-items: center;
+      padding: clamp(1rem, 4vw, 2.5rem);
+      opacity: 0; visibility: hidden;
+      /* visibility comuta em 0s, atrasada no fechamento para o fade ainda
+         acontecer. Não depender da transição de visibility para ficar
+         visível evita o card abrir invisível se a página estiver com os
+         quadros suspensos (aba em segundo plano, por exemplo). */
+      transition: opacity .3s ease, visibility 0s linear .3s;
+    }
+    .fm-shell.is-open {
+      opacity: 1; visibility: visible;
+      transition: opacity .3s ease, visibility 0s linear 0s;
+    }
+    .fm-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(8,3,20,.72);
+      backdrop-filter: blur(6px);
+    }
+    .fm-card {
+      position: relative;
+      width: min(30rem, 100%);
+      max-height: 88dvh; overflow-y: auto;
+      padding: 2.4rem 2.1rem 1.9rem;
+      border-radius: 26px;
+      border: 1px solid rgba(228,216,255,.16);
+      background: linear-gradient(165deg,#1C0940 0%, var(--violet-900) 54%, #10032A 100%);
+      box-shadow: 0 40px 90px -30px rgba(8,3,20,.9);
+      color: var(--text);
+      transform: translateY(16px) scale(.98);
+      transition: transform .45s var(--ease-soft);
+    }
+    .fm-shell.is-open .fm-card { transform: none; }
+    .fm-close {
+      position: absolute; top: .6rem; right: .6rem;
+      width: 44px; height: 44px; display: grid; place-items: center;
+      background: none; border: 0; cursor: pointer;
+      color: rgba(235,228,246,.6); transition: color .2s ease;
+    }
+    .fm-close:hover { color: var(--text); }
+    .fm-close svg { width: 14px; height: 14px; }
+    .fm-title {
+      font-family: var(--ff-head); font-weight: 500;
+      font-size: 1.5rem; line-height: 1.15; letter-spacing: -.01em;
+      color: #fff; margin-bottom: .55rem; text-wrap: balance;
+    }
+    .fm-sub {
+      font-size: .9rem; line-height: 1.55;
+      color: rgba(235,228,246,.78); margin-bottom: 1.6rem;
+    }
+    .fm-grid { display: grid; gap: 1rem; }
+    @media (min-width: 480px) { .fm-dupla { grid-template-columns: 1fr 1fr; } }
+    .fm-campo { display: grid; gap: .4rem; }
+    .fm-campo label {
+      font-family: var(--ff-mono); font-size: .6rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(235,228,246,.68);
+    }
+    .fm-campo input,
+    .fm-campo textarea {
+      width: 100%; min-height: 44px;
+      padding: .7rem .9rem;
+      font-family: var(--ff-body); font-size: .92rem;
+      color: var(--text);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(228,216,255,.18);
+      border-radius: 12px;
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .fm-campo textarea { resize: vertical; min-height: 104px; line-height: 1.5; }
+    .fm-campo input:focus,
+    .fm-campo textarea:focus {
+      outline: none;
+      border-color: var(--violet-400);
+      background: rgba(255,255,255,.08);
+    }
+    .fm-campo input:focus-visible,
+    .fm-campo textarea:focus-visible { outline: 2px solid var(--violet-400); outline-offset: 2px; }
+    .fm-go { width: 100%; margin-top: 1.4rem; }
+    .fm-go[disabled] { opacity: .6; pointer-events: none; }
+    .fm-erro {
+      margin-top: 1rem; padding: .7rem .9rem;
+      font-size: .82rem; line-height: 1.45;
+      color: #FFD9D9;
+      background: rgba(180,40,60,.18);
+      border: 1px solid rgba(255,120,140,.35);
+      border-radius: 12px;
+    }
+    .fm-nota {
+      margin-top: 1rem; font-size: .72rem; line-height: 1.5;
+      color: rgba(235,228,246,.55); text-align: center;
+    }
+    /* estado de sucesso: o card vira recibo, sem trocar de página */
+    .fm-ok { text-align: center; padding: 1.5rem 0 .5rem; }
+    .fm-ok-mark {
+      width: 46px; height: 46px; margin: 0 auto 1.2rem;
+      display: grid; place-items: center;
+      border-radius: 50%; border: 1px solid var(--violet-400);
+      color: var(--violet-100);
+    }
+    .fm-ok-mark svg { width: 20px; height: 20px; }
+    @media (prefers-reduced-motion: reduce) {
+      .fm-shell, .fm-card { transition: opacity .2s linear, visibility .2s; }
+      .fm-card { transform: none; }
     }
 
     /* ── FOOTER ───────────────────────────────────── */
@@ -1557,7 +1774,6 @@
       --pill-fill-text: #fff;
     }
     html[data-theme="light"] .hero-desc { color: var(--text); }
-    html[data-theme="light"] .hero-est { color: var(--text-dim); }
     html[data-theme="light"] .svc-img-bg.s1 { background: linear-gradient(145deg,#D8CCFA,#A07AE8,#6B3FC0); }
     html[data-theme="light"] .svc-img-bg.s2 { background: linear-gradient(145deg,#EDE8F8,#B89AF0,#7C4DDB); }
     html[data-theme="light"] .svc-img-bg.s3 { background: linear-gradient(145deg,#D8CCFA,#9870E0,#5A2DB0); }
@@ -1922,7 +2138,6 @@
       Iniciar projeto <span class="arr">→</span>
     </a>
     <div class="hero-info">
-      <div class="hero-est">Automação de processos · Sistemas sob medida · Cibersegurança</div>
       <p class="hero-desc">Desenvolvimento de sistemas sob medida, automação de processos e cibersegurança para empresas que precisam operar com confiança.</p>
     </div>
   </div>
@@ -1954,7 +2169,7 @@
       A Spiralis reúne gestão organizacional, engenharia de automação e cibersegurança. O resultado é uma empresa que entrega do diagnóstico ao deploy seguro, sem terceirizar nenhuma etapa pelo caminho.
     </p>
     <div class="about-bottom-row">
-      <p class="about-sub">Atendemos empresas de porte médio e alto que querem parar de perder dinheiro com processos manuais, retrabalho e sistemas vulneráveis. Sem template. Sem genérico. Cada solução construída para o seu problema.</p>
+      <p class="about-sub">Atendemos empresas que querem parar de perder dinheiro com processos manuais, retrabalho e sistemas vulneráveis. Sistemas e soluções moldadas para a realidade da sua operação.</p>
       <a href="#servicos" class="about-link">Ver serviços →</a>
     </div>
   </div>
@@ -2069,11 +2284,6 @@
             <span class="roi-row-v" id="out-3anos">—</span>
           </div>
           <div class="roi-row">
-            <span class="roi-row-k">Investimento estimado</span>
-            <span class="roi-row-line"></span>
-            <span class="roi-row-v" id="out-invest">—</span>
-          </div>
-          <div class="roi-row">
             <span class="roi-row-k">Peso na folha da operação</span>
             <span class="roi-row-line"></span>
             <span class="roi-row-v" id="out-folha">—</span>
@@ -2098,8 +2308,10 @@
       </div>
 
       <div class="roi-close">
-        <p>Cálculo estimado. O número real sai do diagnóstico, já com a arquitetura de segurança decidida.</p>
-        <a href="#contato">Quero o diagnóstico →</a>
+        <p>Cálculo estimado. O número real sai do diagnóstico, já com a arquitetura e fluxo decidido.</p>
+        <a href="https://wa.me/5548991800311?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Spiralis%20e%20quero%20agendar%20o%20diagn%C3%B3stico%20gratuito."
+           target="_blank" rel="noopener noreferrer"
+           aria-label="Agendar o diagnóstico pelo WhatsApp (abre em nova aba)">Quero o diagnóstico →</a>
       </div>
     </div>
   </div>
@@ -2111,7 +2323,7 @@
     <div class="svc-intro-rail">
       <header class="svc-intro">
         <p class="svc-kicker">Nossos serviços</p>
-        <h2 class="svc-heading">Diferentes disciplinas. Um padrão de excelência.</h2>
+        <h2 class="svc-heading">Especialidades que se completam.</h2>
       </header>
     </div>
 
@@ -2270,7 +2482,7 @@
                 <rect class="scan" x="52" y="96" width="96" height="26" fill="url(#scanGrad)"/>
               </g>
               <path class="stroke" d="M100 44 143 61v43c0 27-21 44-43 52-22-8-43-25-43-52V61z" stroke="#7C4DDB" stroke-width="1.8"/>
-              <path class="stroke tick" d="M84 100l11 11 22-24" stroke="#E4D8FF" stroke-width="3"/>
+              <path class="stroke tick" pathLength="100" d="M84 100l11 11 22-24" stroke="#E4D8FF" stroke-width="3"/>
             </svg>
           </div>
           <div class="svc-tint"></div>
@@ -2375,12 +2587,7 @@
 
       <details class="faq-item">
         <summary>De quem é o código-fonte?<span class="faq-sinal" aria-hidden="true"></span></summary>
-        <div class="faq-resposta">Seu. Repositório, documentação e credenciais são entregues ao final do projeto. Não prendemos ninguém em licença, plataforma ou dependência de fornecedor.</div>
-      </details>
-
-      <details class="faq-item">
-        <summary>E se a Spiralis sumir?<span class="faq-sinal" aria-hidden="true"></span></summary>
-        <div class="faq-resposta">É a pergunta certa para fazer a qualquer fornecedor, e a resposta está na anterior. Com o código, a documentação e os acessos na sua mão, qualquer equipe consegue dar continuidade. Nosso objetivo é ser escolha, não dependência.</div>
+        <div class="faq-resposta">Fica decidido em contrato, antes da primeira linha de código. Em alguns projetos ele nasce exclusivo seu; em outros, parte da base é nossa e você recebe licença de uso, o que costuma reduzir o custo. Os dois caminhos entram na proposta e a escolha é sua. Em qualquer um deles a entrega é a mesma: documentação e credenciais na sua mão, sem prisão em licença, plataforma ou fornecedor.</div>
       </details>
 
       <details class="faq-item">
@@ -2389,8 +2596,8 @@
       </details>
 
       <details class="faq-item">
-        <summary>Vocês atendem empresas do meu porte?<span class="faq-sinal" aria-hidden="true"></span></summary>
-        <div class="faq-resposta">Trabalhamos com empresas de porte médio e alto que já têm operação rodando e estão perdendo dinheiro com processo manual, retrabalho ou sistema vulnerável. Se é o seu caso, o diagnóstico é o ponto de partida.</div>
+        <summary>Como sei se o meu caso é para vocês?<span class="faq-sinal" aria-hidden="true"></span></summary>
+        <div class="faq-resposta">O que define não é o tamanho da empresa, é o problema. Se tem processo manual consumindo hora de gente qualificada, retrabalho que volta todo mês ou sistema que ninguém garante estar seguro, é o nosso caso. O diagnóstico existe justamente para responder isso antes de qualquer proposta.</div>
       </details>
     </div>
   </div>
@@ -2434,10 +2641,98 @@
          só dígitos, sem +, espaço ou traço. -->
     <a href="https://wa.me/5548991800311?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Spiralis%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto."
        class="btn-fill" target="_blank" rel="noopener noreferrer"
-       aria-label="Iniciar conversa no WhatsApp (abre em nova aba)">Iniciar conversa</a>
-    <a href="mailto:contato@spiraliscompany.com.br" class="btn-ghost-link">contato@spiraliscompany.com.br</a>
+       aria-label="Chamar a equipe no WhatsApp (abre em nova aba)">Chamar no WhatsApp<svg
+         class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M3.4 20.6l1.4-4.2a8.6 8.6 0 1 1 3.3 3.2l-4.7 1z"/>
+        <path d="M9.2 8.5c.2-.5.4-.5.6-.5h.5c.2 0 .4 0 .6.4l.7 1.6c.1.2 0 .4-.1.5l-.4.5c-.1.2-.2.3-.1.5.3.6 1.4 1.9 2.6 2.4.2.1.4.1.5-.1l.5-.5c.2-.2.4-.2.6-.1l1.5.8c.3.2.4.3.4.5v.5c0 .3-.3.9-.9 1.1-.5.2-1.3.3-2.6-.2-2-.8-3.7-2.6-4.4-4.6-.4-1.2-.3-2 0-2.5z"/>
+      </svg></a>
+    <button type="button" class="btn-outline" id="fm-abrir">Enviar mensagem pelo site</button>
   </div>
 </section>
+
+<!-- ══════════════ MODAL DE MENSAGEM ══════════════
+     Substitui o mailto:, que não leva a lugar nenhum para quem usa
+     webmail e não tem cliente de e-mail configurado na máquina. -->
+<div class="fm-shell" id="fm-shell" aria-hidden="true" inert>
+  <div class="fm-backdrop" data-fm-fechar></div>
+  <div class="fm-card" role="dialog" aria-modal="true" aria-labelledby="fm-title">
+    <button class="fm-close" type="button" aria-label="Fechar" data-fm-fechar>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"
+           stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+    </button>
+
+    <div id="fm-conteudo">
+      <h2 class="fm-title" id="fm-title">Conte o que está travando.</h2>
+      <p class="fm-sub">Escreva o problema com as suas palavras. Lemos tudo e respondemos em até 1 dia útil.</p>
+
+      <form id="fm-form" novalidate>
+        <div class="fm-grid">
+          <div class="fm-grid fm-dupla">
+            <div class="fm-campo">
+              <label for="fm-nome">Nome</label>
+              <input id="fm-nome" name="nome" type="text" required autocomplete="name">
+            </div>
+            <div class="fm-campo">
+              <label for="fm-email">E-mail</label>
+              <input id="fm-email" name="email" type="email" required autocomplete="email">
+            </div>
+          </div>
+          <div class="fm-grid fm-dupla">
+            <div class="fm-campo">
+              <label for="fm-empresa">Empresa</label>
+              <input id="fm-empresa" name="empresa" type="text" autocomplete="organization">
+            </div>
+            <div class="fm-campo">
+              <label for="fm-fone">WhatsApp (opcional)</label>
+              <input id="fm-fone" name="whatsapp" type="tel" autocomplete="tel">
+            </div>
+          </div>
+          <div class="fm-campo">
+            <label for="fm-msg">Mensagem</label>
+            <textarea id="fm-msg" name="mensagem" required></textarea>
+          </div>
+        </div>
+
+        <!-- armadilha de robô: humano nunca preenche um campo escondido -->
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" hidden aria-hidden="true">
+        <input type="hidden" name="_subject" value="Contato pelo site da Spiralis">
+
+        <button type="submit" class="fm-go" id="fm-enviar">Enviar mensagem</button>
+        <div class="fm-erro" id="fm-erro" role="alert" hidden></div>
+        <p class="fm-nota">Os dados vão direto para a caixa de entrada da Spiralis, pelo Formspree. Não entram em lista de disparo.</p>
+      </form>
+    </div>
+
+    <div class="fm-ok" id="fm-ok" hidden>
+      <div class="fm-ok-mark">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg>
+      </div>
+      <h2 class="fm-title" id="fm-ok-titulo" tabindex="-1">Mensagem recebida.</h2>
+      <p class="fm-sub">Respondemos em até 1 dia útil, no e-mail que você deixou. Se for urgente, o WhatsApp é mais rápido.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ POPUP DE DIAGNÓSTICO ══════════════
+     Fica logo depois da CTA para cair na ordem de tabulação certa:
+     quem navega por teclado chega nele depois dos dois contatos, não
+     antes. As regras de quando ele aparece estão no script no fim. -->
+<aside class="dx-pop" id="dx-pop" role="dialog" aria-modal="false"
+       aria-labelledby="dx-title" aria-hidden="true" inert>
+  <button class="dx-close" id="dx-close" type="button" aria-label="Fechar">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4"
+         stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+  </button>
+  <img src="spiralis-simbolo-branco.svg" class="dx-mark" alt="" aria-hidden="true" width="30" height="30">
+  <h2 class="dx-title" id="dx-title">Comece pelo diagnóstico.</h2>
+  <p class="dx-desc">Trinta minutos sobre a sua operação. Você sai com o mapa do que dá para automatizar, do que precisa de segurança e de por onde começar. Sem custo e sem compromisso.</p>
+  <a class="dx-go" id="dx-go" target="_blank" rel="noopener noreferrer"
+     href="https://wa.me/5548991800311?text=Ol%C3%A1%2C%20vim%20pelo%20site%20da%20Spiralis%20e%20quero%20agendar%20o%20diagn%C3%B3stico%20gratuito."
+     aria-label="Agendar o diagnóstico pelo WhatsApp (abre em nova aba)">Quero o diagnóstico</a>
+  <button class="dx-later" id="dx-later" type="button">Agora não</button>
+</aside>
 </main>
 
 <!-- FOOTER -->
@@ -2782,8 +3077,10 @@
     });
   }
 
-  /* ── MAGNETIC BUTTONS ───────────────────── */
-  document.querySelectorAll('.btn-fill,.nav-pill').forEach(btn => {
+  /* ── MAGNETIC BUTTONS ─────────────────────
+     Só nos CTAs de conteúdo. A pílula da nav fica parada de propósito:
+     é âncora fixa do cabeçalho e o ímã atrapalhava o clique.          */
+  document.querySelectorAll('.btn-fill').forEach(btn => {
     btn.addEventListener('mousemove', e => {
       const r = btn.getBoundingClientRect();
       gsap.to(btn, {
@@ -2831,7 +3128,7 @@
       {revealAt: .36, op0: .07}, {revealAt: .42, op0: .05}
     ];
 
-    cMatch.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+    cMatch.add('(prefers-reduced-motion: no-preference)', () => {
       const heading = document.getElementById('clients-heading');
       const words = [...clientsStage.querySelectorAll('.clients-word')];
 
@@ -3645,7 +3942,6 @@
     }
 
     el('out-horas').textContent    = num(horasRecupMes) + ' h';
-    el('out-invest').textContent   = brl(deploy) + ' + ' + brl(recorrenteMes) + '/mês';
     el('out-folha').textContent    = Math.round(economiaMes / folhaMes * 100) + '% da folha';
     el('out-realoc').textContent   = decimal(horasRecupMes / HORAS_UTEIS_MES);
     el('out-horasano').textContent = num(horasRecupMes * 12) + ' h';
@@ -3667,6 +3963,260 @@
     input.addEventListener('input', calcular);
   });
   calcular();
+})();
+</script>
+
+<!-- ══════════════ POPUP DE DIAGNÓSTICO ══════════════
+     Só aparece para quem chegou na CTA rolando a página. Duas guardas,
+     porque uma sozinha não basta:
+
+     1. Clique em âncora que leva ao fim. As âncoras do site são
+        animadas por 1,2s (SMOOTH ANCHOR acima), então o scroll passa
+        por todas as seções e cruzaria o gatilho sem o leitor ter lido
+        nada. Um clique em algo que aponta para #contato desarma o
+        popup de vez nesta visita.
+     2. Distância percorrida de verdade. Só conta o scroll fora das
+        janelas de animação de âncora; é preciso ter percorrido 55% da
+        página no braço para o popup armar.
+
+     Fechado, fica 14 dias fora do ar (localStorage). Quem clica em
+     "quero o diagnóstico" ou já iniciou conversa também não vê mais. -->
+<script>
+(function(){
+  var pop = document.getElementById('dx-pop');
+  var cta = document.getElementById('contato');
+  if(!pop || !cta) return;
+
+  var CHAVE = 'spiralis:diagnostico', PRAZO = 14*24*60*60*1000;
+  function jaVisto(){
+    try {
+      var t = +localStorage.getItem(CHAVE);
+      return t && (Date.now() - t) < PRAZO;
+    } catch(e){ return false; }
+  }
+  function registrar(){
+    try { localStorage.setItem(CHAVE, Date.now()); } catch(e){}
+  }
+  if(jaVisto()) return;
+
+  var desarmado  = location.hash === '#contato',
+      ateQuando  = 0,      // enquanto Date.now() < isto, o scroll é da âncora
+      percorrido = 0,
+      ultimoY    = window.scrollY,
+      aberto     = false,
+      resolvido  = false;
+
+  function meta(){
+    var total = document.documentElement.scrollHeight - window.innerHeight;
+    return Math.max(0, total) * 0.55;
+  }
+
+  /* "Chegou" e não "está vendo": quem rola até o rodapé passa da CTA, e
+     uma condição de visibilidade deixaria o popup preso justamente no
+     leitor mais engajado. Uma vez que o topo da CTA entrou na tela,
+     continua valendo daí para baixo.                                  */
+  function chegouNaCTA(){
+    return cta.getBoundingClientRect().top < window.innerHeight * 0.55;
+  }
+
+  /* Captura na fase de captura para rodar antes do handler de âncora. */
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a') : null;
+    if(!a) return;
+    var href = a.getAttribute('href') || '';
+    if(href.indexOf('wa.me') > -1 || href.indexOf('mailto:') === 0){
+      desarmado = true;               // já foi falar com a equipe
+      return;
+    }
+    if(href.charAt(0) !== '#' || href === '#') return;
+    if(href === '#contato') desarmado = true;
+    ateQuando = Date.now() + 1500;    // 1,2s do tween mais folga
+  }, true);
+
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY;
+    if(Date.now() > ateQuando) percorrido += Math.abs(y - ultimoY);
+    ultimoY = y;
+    tentar();
+  }, {passive:true});
+
+  function tentar(){
+    if(resolvido || aberto || desarmado) return;
+    if(Date.now() < ateQuando) return;
+    if(!chegouNaCTA()) return;
+    if(percorrido < meta()) return;
+    resolvido = true;
+    setTimeout(function(){
+      if(!desarmado && chegouNaCTA()) abrir(); else resolvido = false;
+    }, 900);
+  }
+
+  function abrir(){
+    aberto = true;
+    pop.removeAttribute('inert');
+    pop.setAttribute('aria-hidden','false');
+    pop.classList.add('is-open');
+  }
+  function fechar(){
+    if(!aberto) return;
+    aberto = false;
+    pop.classList.remove('is-open');
+    pop.setAttribute('aria-hidden','true');
+    pop.setAttribute('inert','');
+    registrar();
+  }
+
+  document.getElementById('dx-close').addEventListener('click', fechar);
+  document.getElementById('dx-later').addEventListener('click', fechar);
+  document.getElementById('dx-go').addEventListener('click', function(){
+    registrar();
+    aberto = false;
+    pop.classList.remove('is-open');
+    pop.setAttribute('aria-hidden','true');
+    pop.setAttribute('inert','');
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && aberto) fechar();
+  });
+})();
+</script>
+
+<!-- ══════════════ MODAL DE MENSAGEM ══════════════
+     Envio por Formspree: POST com Accept: application/json, então a
+     página não é trocada e o card vira recibo no lugar.
+
+     ENDPOINT é o formulário da Spiralis no formspree.io. Se um dia ele
+     voltar a ser um valor de exemplo, o envio falha de propósito e o
+     visitante é mandado para o WhatsApp, em vez de a mensagem sumir
+     no silêncio.                                                     -->
+<script>
+(function(){
+  var ENDPOINT = 'https://formspree.io/f/xnpazryz';
+
+  var shell = document.getElementById('fm-shell');
+  var abrirBtn = document.getElementById('fm-abrir');
+  if(!shell || !abrirBtn) return;
+
+  var card     = shell.querySelector('.fm-card');
+  var form     = document.getElementById('fm-form');
+  var conteudo = document.getElementById('fm-conteudo');
+  var sucesso  = document.getElementById('fm-ok');
+  var erroBox  = document.getElementById('fm-erro');
+  var enviar   = document.getElementById('fm-enviar');
+  var aberto   = false, ultimoFoco = null;
+
+  var FOCAVEIS = 'a[href],button:not([disabled]),input,textarea,select,[tabindex]:not([tabindex="-1"])';
+
+  function abrir(){
+    if(aberto) return;
+    aberto = true;
+    ultimoFoco = document.activeElement;
+    shell.removeAttribute('inert');
+    shell.setAttribute('aria-hidden','false');
+    shell.classList.add('is-open');
+    travarFundo(true);
+    /* leitura forçada para o estilo ser recalculado antes do foco: o
+       navegador não dá foco a elemento ainda marcado como invisível, e
+       esperar um quadro falharia com a aba em segundo plano. */
+    void shell.offsetHeight;
+    var alvo = sucesso.hidden ? document.getElementById('fm-nome')
+                              : document.getElementById('fm-ok-titulo');
+    if(alvo) alvo.focus({preventScroll:true});
+  }
+
+  function fechar(){
+    if(!aberto) return;
+    aberto = false;
+    shell.classList.remove('is-open');
+    shell.setAttribute('aria-hidden','true');
+    shell.setAttribute('inert','');
+    travarFundo(false);
+    /* volta para quem abriu. Se o foco tinha ficado no body (clique de
+       mouse em alguns navegadores), cai no próprio botão, senão ficaria
+       preso dentro do modal já marcado como inert. */
+    var voltar = (ultimoFoco && ultimoFoco.focus && ultimoFoco !== document.body)
+      ? ultimoFoco : abrirBtn;
+    voltar.focus({preventScroll:true});
+  }
+
+  /* O fundo trava com overflow no html. A compensação de padding evita o
+     pulo de ~15px que aparece quando a barra de rolagem some; a nav é
+     fixa em relação à viewport, então não precisa de ajuste. */
+  function travarFundo(travar){
+    var doc = document.documentElement;
+    if(travar){
+      var barra = window.innerWidth - doc.clientWidth;
+      doc.style.overflow = 'hidden';
+      if(barra > 0) doc.style.paddingRight = barra + 'px';
+    } else {
+      doc.style.overflow = '';
+      doc.style.paddingRight = '';
+    }
+  }
+
+  abrirBtn.addEventListener('click', abrir);
+  [].forEach.call(shell.querySelectorAll('[data-fm-fechar]'), function(el){
+    el.addEventListener('click', fechar);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(!aberto) return;
+    if(e.key === 'Escape'){ fechar(); return; }
+    if(e.key !== 'Tab') return;
+    var itens = [].filter.call(card.querySelectorAll(FOCAVEIS), function(el){
+      return el.offsetParent !== null || el === document.activeElement;
+    });
+    if(!itens.length) return;
+    var primeiro = itens[0], ultimo = itens[itens.length - 1];
+    if(e.shiftKey && document.activeElement === primeiro){ e.preventDefault(); ultimo.focus(); }
+    else if(!e.shiftKey && document.activeElement === ultimo){ e.preventDefault(); primeiro.focus(); }
+  });
+
+  function mostrarErro(msg){
+    erroBox.textContent = msg;
+    erroBox.hidden = false;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    erroBox.hidden = true;
+
+    // validação nativa: mensagens do próprio navegador, no idioma dele
+    if(!form.checkValidity()){ form.reportValidity(); return; }
+
+    if(ENDPOINT.indexOf('SEU_ID_AQUI') > -1){
+      console.warn('[Spiralis] Formspree ainda não configurado: troque ENDPOINT no index.html.');
+      mostrarErro('O envio ainda não está ativo neste site. Fale com a gente pelo WhatsApp (48) 99180-0311 enquanto isso.');
+      return;
+    }
+
+    var original = enviar.textContent;
+    enviar.disabled = true;
+    enviar.textContent = 'Enviando...';
+
+    fetch(ENDPOINT, {
+      method: 'POST',
+      headers: {'Accept': 'application/json'},
+      body: new FormData(form)
+    }).then(function(r){
+      if(r.ok) return null;
+      return r.json().then(function(d){
+        throw new Error((d.errors || []).map(function(x){ return x.message; }).join(' ')
+                        || 'Não foi possível enviar agora.');
+      });
+    }).then(function(){
+      conteudo.hidden = true;
+      sucesso.hidden = false;
+      document.getElementById('fm-ok-titulo').focus({preventScroll:true});
+    }).catch(function(err){
+      mostrarErro(err.message === 'Failed to fetch'
+        ? 'Sem conexão com o servidor. Tente de novo ou chame no WhatsApp (48) 99180-0311.'
+        : err.message);
+    }).then(function(){
+      enviar.disabled = false;
+      enviar.textContent = original;
+    });
+  });
 })();
 </script>
 
