@@ -2048,7 +2048,15 @@
       .cs-perspective { perspective: 800px; }
       .cs-screen { aspect-ratio: 3 / 4; }
       .sys { font-size: 10px; }
+      /* O painel fica inerte para o dedo rolar a página por cima dele, mas os
+         controles precisam responder ao toque: sem esta exceção o dashboard
+         inteiro vira imagem no celular. */
       .sys { pointer-events: none; }
+      .sys-sector,
+      .sys-nav,
+      .sys-btn,
+      .sys-add-item,
+      .sys-w-x { pointer-events: auto; }
       .sys-side { width: 2.9em; }
       .sys-nav { justify-content: center; padding: .55em; }
       .sys-nav span { display: none; }
@@ -2066,7 +2074,8 @@
       }
       .fade-in,
       .hero-heading .blur-word,
-      .hero-bottom {
+      .hero-bottom,
+      .journey-event-body {
         opacity: 1 !important;
         filter: none !important;
         transform: none !important;
@@ -3068,6 +3077,13 @@
       }
     }, {rootMargin: '200px 0px'});
     journeyObserver.observe(journeyTimeline);
+  } else if (journeyTimeline) {
+    /* O reveal dos passos mora dentro do bloco animado acima. Sem este ramo,
+       quem navega com "reduzir movimento" ligado (o modo de economia de
+       bateria do Android liga sozinho) recebe a seção inteira em opacity 0:
+       reduzir movimento tira a animação, nunca o conteúdo. */
+    journeyEvents.forEach(event => event.classList.add('visible'));
+    if (journeyFill) journeyFill.style.height = '100%';
   }
 
   /* ── HERO BLUR-IN (word by word) ────────── */
@@ -4248,7 +4264,7 @@
   var cv = document.getElementById('gradient-canvas');
   var pe = document.querySelector('#nav .mark path');
   if(!cv || !pe || !window.OrbEngine) return;
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hero = document.getElementById('hero-section');
 
   var engine = OrbEngine.create(cv, {
@@ -4275,7 +4291,15 @@
   }
   window.addEventListener('resize', layout);
   layout();
-  engine.start();
+  if(reduceMotion){
+    /* Com "reduzir movimento" o orbe fica parado, não ausente: sair pelo return
+       deixava o canvas em branco e o hero parecia quebrado. Congela o morph e
+       pinta um único quadro. */
+    engine.controls.pin(1);
+    engine.renderOnce();
+  } else {
+    engine.start();
+  }
 })();
 </script>
 </body>
