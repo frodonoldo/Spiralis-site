@@ -10,14 +10,26 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
   <meta property="og:site_name" content="Spiralis">
+  <meta property="og:url" content="https://spiraliscompany.com.br/">
   <meta property="og:title" content="Spiralis — Sistemas, Automação e Cibersegurança">
   <meta property="og:description" content="Do diagnóstico ao deploy: sistemas sob medida, automação e segurança incorporada em cada etapa.">
-  <meta property="og:image" content="spiral-hero.png.png">
+  <!-- Card de compartilhamento: a marca branca sobre o violeta da Spiralis.
+       A URL precisa ser absoluta — WhatsApp, LinkedIn e Facebook não resolvem
+       caminho relativo e mostram o card sem imagem. Gerado a partir de
+       _og-card.html em 1200x630; para trocar, edita lá e rasteriza de novo. -->
+  <meta property="og:image" content="https://spiraliscompany.com.br/og-spiralis.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Spiralis">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Spiralis — Sistemas, Automação e Cibersegurança">
   <meta name="twitter:description" content="Sistemas sob medida, automação de processos e cibersegurança ponta a ponta.">
-  <meta name="twitter:image" content="spiral-hero.png.png">
+  <meta name="twitter:image" content="https://spiraliscompany.com.br/og-spiralis.jpg">
+  <meta name="twitter:image:alt" content="Spiralis">
   <link rel="icon" href="spiralis-simbolo-branco.svg" type="image/svg+xml">
+  <!-- iOS ignora favicon SVG: precisa de PNG para o atalho na tela de início -->
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -1333,10 +1345,17 @@
       margin-top: 3rem;
     }
     .clients-fallback-grid span {
+      display: inline-flex; align-items: center; justify-content: center;
       font-family: var(--ff-head); font-weight: 700;
       font-size: 1rem; color: var(--text);
       border: 1px solid rgba(124,77,219,.28);
       border-radius: 999px; padding: .7rem 1.4rem;
+    }
+    /* O fallback nasceu só com o nome em texto. Reduzir movimento tira o voo,
+       não as marcas: a logo entra aqui no lugar do rótulo. */
+    .clients-fallback-grid img {
+      display: block; height: 2rem; width: auto;
+      max-width: 9.5rem; object-fit: contain;
     }
     /* O voo roda em qualquer largura: o palco é sticky, não pinado por JS,
        e o trilho já é reescalado por viewport. O que derruba para a grade
@@ -2048,15 +2067,10 @@
       .cs-perspective { perspective: 800px; }
       .cs-screen { aspect-ratio: 3 / 4; }
       .sys { font-size: 10px; }
-      /* O painel fica inerte para o dedo rolar a página por cima dele, mas os
-         controles precisam responder ao toque: sem esta exceção o dashboard
-         inteiro vira imagem no celular. */
-      .sys { pointer-events: none; }
-      .sys-sector,
-      .sys-nav,
-      .sys-btn,
-      .sys-add-item,
-      .sys-w-x { pointer-events: auto; }
+      /* O painel já foi inerte no celular (pointer-events: none) para o dedo
+         rolar por cima dele. O demo não tem handler de arraste, então o toque
+         nunca competia com o scroll: o único efeito era transformar o
+         dashboard inteiro numa imagem. Fica igual ao desktop. */
       .sys-side { width: 2.9em; }
       .sys-nav { justify-content: center; padding: .55em; }
       .sys-nav span { display: none; }
@@ -2942,6 +2956,31 @@
       }, {threshold: [.5]});
       mobileMedia.forEach(item => mobileVideoObserver.observe(item));
 
+      /* No desktop as linhas se empilham com pin. No celular esse mesmo pin
+         viraria uma travessia longa e sequestraria o gesto, então a seção
+         ficava completamente estática: nenhuma entrada, nada acontecendo ao
+         rolar. A entrada por scroll dá o mesmo ritmo sem prender o dedo. */
+      if (!noMotion) {
+        svcRows.forEach(row => {
+          const alvos = [
+            row.querySelector('.svc-copy'),
+            row.querySelector('.svc-media')
+          ].filter(Boolean);
+          gsap.fromTo(alvos,
+            {opacity: 0, y: 30},
+            {
+              opacity: 1, y: 0,
+              duration: .7, ease: 'power3.out', stagger: .1,
+              scrollTrigger: {
+                trigger: row,
+                start: 'top 85%',
+                toggleActions: 'play none none none'
+              }
+            }
+          );
+        });
+      }
+
       return () => mobileVideoObserver.disconnect();
     });
   }
@@ -3084,6 +3123,43 @@
        reduzir movimento tira a animação, nunca o conteúdo. */
     journeyEvents.forEach(event => event.classList.add('visible'));
     if (journeyFill) journeyFill.style.height = '100%';
+
+    /* O rastro em espiral também só existia dentro do bloco animado, então a
+       seção perdia o traço inteiro. Aqui a mesma curva é desenhada uma única
+       vez, parada: sem requestAnimationFrame e sem depender do scroll. */
+    if (journeyInk) {
+      const desenharRastro = () => {
+        journeyInk.textContent = '';
+        const eixo = journeyTrack
+          ? journeyTrack.offsetLeft + journeyTrack.offsetWidth / 2
+          : journeyTimeline.offsetWidth / 2;
+        const altura = journeyTimeline.offsetHeight;
+        const folga = 6;
+        /* mesma amplitude do voo animado: o menor lado livre, nunca um valor
+           fixo, senão metade da volta sai da tela no celular. */
+        const sway = Math.max(8, Math.min(
+          52,
+          eixo - folga,
+          journeyTimeline.offsetWidth - eixo - folga
+        ));
+        const pontos = [];
+        for (let i = 0; i <= 160; i++) {
+          const t = i / 160;
+          pontos.push(
+            `${(eixo + Math.sin(t * Math.PI * 2 * 6) * sway).toFixed(1)},` +
+            `${(t * altura).toFixed(1)}`
+          );
+        }
+        const traco = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        traco.setAttribute('d', 'M' + pontos.join(' L'));
+        traco.setAttribute('stroke', 'hsla(272, 80%, 66%, .5)');
+        traco.setAttribute('stroke-width', '2');
+        traco.setAttribute('fill', 'none');
+        journeyInk.appendChild(traco);
+      };
+      desenharRastro();
+      window.addEventListener('resize', desenharRastro);
+    }
   }
 
   /* ── HERO BLUR-IN (word by word) ────────── */
@@ -3149,7 +3225,12 @@
   if (clientsFallback) {
     CLIENTES.forEach(c => {
       const s = document.createElement('span');
-      s.textContent = c.nome;
+      const img = document.createElement('img');
+      img.src = c.logo;
+      img.alt = c.nome;
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      s.appendChild(img);
       clientsFallback.appendChild(s);
     });
   }
@@ -3808,14 +3889,14 @@
 
   render();
 
-  var compactDemo = window.matchMedia('(max-width: 720px)');
-  function syncDemoInteraction(){
-    mount.inert = compactDemo.matches;
-    if(compactDemo.matches) mount.setAttribute('aria-hidden','true');
-    else mount.removeAttribute('aria-hidden');
-  }
-  syncDemoInteraction();
-  compactDemo.addEventListener?.('change', syncDemoInteraction);
+  /* O demo era marcado inert + aria-hidden abaixo de 720px, o que o reduzia a
+     enfeite: os botões continuavam pintados, mas nenhum toque chegava neles.
+     inert remove o subtree inteiro do hit-test, e nenhum ajuste de
+     pointer-events reverte isso — só a chamada programática de click() ainda
+     passava. No celular o dashboard é justamente o que se quer explorar, então
+     ele fica interativo em qualquer largura. */
+  mount.inert = false;
+  mount.removeAttribute('aria-hidden');
 })();
 </script>
 

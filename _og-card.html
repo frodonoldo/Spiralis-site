@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Spiralis — OG card source</title>
+<!--
+  Source for the social share card (og:image / twitter:image).
+  Rendered at exactly 1200x630 and rasterized to og-spiralis.png.
+  This file is a build input, not a published page.
+-->
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+  .card {
+    position: relative;
+    width: 1200px; height: 630px;
+    display: flex; align-items: center; justify-content: center;
+    /* Spiralis brand violets, same ramp as the site loader */
+    background:
+      radial-gradient(62% 78% at 50% 44%, rgba(124,77,219,.55), transparent 72%),
+      linear-gradient(135deg, #23084D 0%, #4918A5 52%, #330F6E 100%);
+    overflow: hidden;
+  }
+
+  /* soft vignette so the white mark keeps contrast at the edges */
+  .card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(78% 88% at 50% 50%, transparent 46%, rgba(10,5,15,.42) 100%);
+  }
+
+  .mark {
+    position: relative; z-index: 1;
+    width: 720px;
+    filter: drop-shadow(0 18px 60px rgba(10,5,15,.45));
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="mark" src="spiralis-logo-completo-branco.svg" alt="Spiralis">
+  </div>
+</body>
+</html>
