@@ -1,5 +1,16 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<!--
+  data-motion controla se o site consulta "reduzir movimento" do sistema.
+
+    completo  (atual) — anima sempre, ignorando a preferência do sistema
+    sistema            — respeita a preferência, degradando para versões estáticas
+
+  Está em "completo" por decisão do dono do site: no iOS a economia de bateria
+  e o Reduzir Movimento ligam essa preferência sozinhos, e a página inteira
+  virava um documento parado no celular. Trocar o valor abaixo é o único passo
+  para voltar atrás — CSS e JS leem este mesmo atributo.
+-->
+<html lang="pt-BR" data-theme="dark" data-motion="completo">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +41,14 @@
   <link rel="icon" href="spiralis-simbolo-branco.svg" type="image/svg+xml">
   <!-- iOS ignora favicon SVG: precisa de PNG para o atalho na tela de início -->
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <script>
+    /* Fonte única sobre movimento, lida por todos os scripts abaixo. O CSS lê
+       o mesmo data-motion do <html>, onde está a explicação da escolha. */
+    window.movimentoReduzido = function () {
+      return document.documentElement.dataset.motion === 'sistema'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    };
+  </script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -750,27 +769,28 @@
     }
     .svc-row.is-active .svc-copy,
     .svc-row.is-active .svc-media { pointer-events: auto; }
-    @media (min-width: 821px) and (prefers-reduced-motion: no-preference) {
+    @media (min-width: 821px) {
       .svc-row:not(:first-child) .svc-copy,
       .svc-row:not(:first-child) .svc-media {
         opacity: 0;
       }
     }
-    @media (min-width: 821px) and (prefers-reduced-motion: reduce) {
-      .svc-shell {
+    /* Degradação estática do empilhamento: só entra com data-motion="sistema". */
+    @media (min-width: 821px) {
+      html[data-motion="sistema"] .svc-shell {
         height: auto;
         min-height: 0;
         overflow: visible;
         padding: 7rem var(--gutter);
       }
-      .svc-intro-rail {
+      html[data-motion="sistema"] .svc-intro-rail {
         position: static;
         padding: 0;
         margin-bottom: 5rem;
       }
-      .svc-intro { width: min(100%,620px); }
-      .svc-rows { position: static; }
-      .svc-row {
+      html[data-motion="sistema"] .svc-intro { width: min(100%,620px); }
+      html[data-motion="sistema"] .svc-rows { position: static; }
+      html[data-motion="sistema"] .svc-row {
         position: static;
         height: auto;
         min-height: 560px;
@@ -778,9 +798,9 @@
         margin-bottom: 5rem;
         pointer-events: auto;
       }
-      .svc-row:last-child { margin-bottom: 0; }
-      .svc-copy,
-      .svc-media {
+      html[data-motion="sistema"] .svc-row:last-child { margin-bottom: 0; }
+      html[data-motion="sistema"] .svc-copy,
+      html[data-motion="sistema"] .svc-media {
         opacity: 1 !important;
         transform: none !important;
         pointer-events: auto;
@@ -859,11 +879,9 @@
       75%, 88%  { stroke-dashoffset: 0;   opacity: 1 }
       97%, 100% { stroke-dashoffset: 0;   opacity: 0 }
     }
-    @media (prefers-reduced-motion: reduce) {
-      .svc-art * { animation: none !important; }
-      .svc-art .cl { opacity: 1; transform: none; }
-      .svc-art .tick { stroke-dashoffset: 0; }
-    }
+    html[data-motion="sistema"] .svc-art * { animation: none !important; }
+    html[data-motion="sistema"] .svc-art .cl { opacity: 1; transform: none; }
+    html[data-motion="sistema"] .svc-art .tick { stroke-dashoffset: 0; }
     .svc-tint {
       position: absolute; inset: 0; pointer-events: none;
       background: linear-gradient(160deg, rgba(35,8,77,.4), rgba(73,24,165,.22) 55%, rgba(10,5,15,.35));
@@ -1258,10 +1276,8 @@
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: none; }
     }
-    @media (prefers-reduced-motion: reduce) {
-      .faq-resposta { animation: none; }
-      .faq-sinal { transition: none; }
-    }
+    html[data-motion="sistema"] .faq-resposta { animation: none; }
+    html[data-motion="sistema"] .faq-sinal { transition: none; }
     @media (max-width: 900px) {
       .faq-wrap { grid-template-columns: 1fr; }
       .faq-aside { position: static; }
@@ -1360,23 +1376,22 @@
     /* O voo roda em qualquer largura: o palco é sticky, não pinado por JS,
        e o trilho já é reescalado por viewport. O que derruba para a grade
        estática é só o pedido de movimento reduzido, não o tamanho da tela. */
-    @media (prefers-reduced-motion: reduce) {
-      .clients { height: auto; }
-      .clients-stage {
-        position: static; height: auto; min-height: 0;
-        padding: 5.5rem var(--gutter);
-        perspective: none;
-      }
-      .clients-heading {
-        position: static; inset: auto;
-        padding: 0; display: block; text-align: center;
-      }
-      .client-item, .clients-hint { display: none; }
-      .clients-fallback { display: block; }
+    html[data-motion="sistema"] .clients { height: auto; }
+    html[data-motion="sistema"] .clients-stage {
+      position: static; height: auto; min-height: 0;
+      padding: 5.5rem var(--gutter);
+      perspective: none;
     }
+    html[data-motion="sistema"] .clients-heading {
+      position: static; inset: auto;
+      padding: 0; display: block; text-align: center;
+    }
+    html[data-motion="sistema"] .client-item,
+    html[data-motion="sistema"] .clients-hint { display: none; }
+    html[data-motion="sistema"] .clients-fallback { display: block; }
     /* No celular o mesmo voo cabe em menos scroll: o dedo percorre mais
        tela por gesto, e 700vh viraria uma travessia longa demais. */
-    @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+    @media (max-width: 820px) {
       .clients { height: 450vh; }
       .clients-stage { perspective: 900px; }
     }
@@ -1514,9 +1529,7 @@
       }
       .dx-title { font-size: 1.35rem; }
     }
-    @media (prefers-reduced-motion: reduce) {
-      .dx-pop { transform: none; transition: opacity .2s linear, visibility .2s; }
-    }
+    html[data-motion="sistema"] .dx-pop { transform: none; transition: opacity .2s linear, visibility .2s; }
     html[data-theme="light"] .dx-pop { box-shadow: 0 30px 70px -30px rgba(26,11,51,.4); }
 
     /* ── MODAL DE MENSAGEM ─────────────────────────
@@ -1626,10 +1639,9 @@
       color: var(--violet-100);
     }
     .fm-ok-mark svg { width: 20px; height: 20px; }
-    @media (prefers-reduced-motion: reduce) {
-      .fm-shell, .fm-card { transition: opacity .2s linear, visibility .2s; }
-      .fm-card { transform: none; }
-    }
+    html[data-motion="sistema"] .fm-shell,
+    html[data-motion="sistema"] .fm-card { transition: opacity .2s linear, visibility .2s; }
+    html[data-motion="sistema"] .fm-card { transform: none; }
 
     /* ── FOOTER ───────────────────────────────────── */
     /* Fecha no mesmo claro da CTA, sem fio separando: as duas leem como
@@ -2079,23 +2091,23 @@
       .sys-panel.sys-aside { display: none; }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: .01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: .01ms !important;
-        scroll-behavior: auto !important;
-      }
-      .fade-in,
-      .hero-heading .blur-word,
-      .hero-bottom,
-      .journey-event-body {
-        opacity: 1 !important;
-        filter: none !important;
-        transform: none !important;
-      }
-      #loader { display: none !important; }
+    html[data-motion="sistema"] *,
+    html[data-motion="sistema"] *::before,
+    html[data-motion="sistema"] *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+      scroll-behavior: auto !important;
     }
+    html[data-motion="sistema"] .fade-in,
+    html[data-motion="sistema"] .hero-heading .blur-word,
+    html[data-motion="sistema"] .hero-bottom,
+    html[data-motion="sistema"] .journey-event-body {
+      opacity: 1 !important;
+      filter: none !important;
+      transform: none !important;
+    }
+    html[data-motion="sistema"] #loader { display: none !important; }
   </style>
 </head>
 <body>
@@ -2845,7 +2857,7 @@
   /* ── ABOUT TEXT CHAR SCRUB ──────────────── */
   const aboutEl = document.getElementById('about-text');
   if(aboutEl){
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    if(window.movimentoReduzido()){
       gsap.set(aboutEl, {color:'#EBE4F6'});
     } else {
       const chars = splitChars(aboutEl);
@@ -2865,7 +2877,7 @@
 
   /* ── SERVICES PINNED INTERNAL TRACKS ─────── */
   const svcRows = gsap.utils.toArray('.svc-row');
-  const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const noMotion = window.movimentoReduzido();
   let activeSvc = 0;
 
   /* a arte de cada serviço é SVG próprio: animação roda só no card ativo,
@@ -2878,7 +2890,8 @@
   if (svcRows.length) {
     const svcMatch = gsap.matchMedia();
 
-    svcMatch.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+    svcMatch.add('(min-width: 821px)', () => {
+      if (noMotion) return;
       const copies = svcRows.map(row => row.querySelector('.svc-copy'));
       const media = svcRows.map(row => row.querySelector('.svc-media'));
 
@@ -3165,7 +3178,7 @@
   /* ── HERO BLUR-IN (word by word) ────────── */
   const heroWords = document.querySelectorAll('.hero-heading .blur-word');
   if (heroWords.length) {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = window.movimentoReduzido();
     if (reduce) {
       gsap.set(heroWords, {opacity:1, filter:'blur(0px)', y:0});
     } else {
@@ -3246,7 +3259,8 @@
       {revealAt: .36, op0: .07}, {revealAt: .42, op0: .05}
     ];
 
-    cMatch.add('(prefers-reduced-motion: no-preference)', () => {
+    cMatch.add('all', () => {
+      if (window.movimentoReduzido()) return;
       const heading = document.getElementById('clients-heading');
       const words = [...clientsStage.querySelectorAll('.clients-word')];
 
@@ -3453,7 +3467,7 @@
   var head = document.querySelector('#showcase .cs-head');
   if(!card || !window.gsap || !window.ScrollTrigger) return;
   gsap.registerPlugin(ScrollTrigger);
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  if(window.movimentoReduzido()){
     gsap.set(card, {rotateX:0, scale:1});
     return;
   }
@@ -4345,7 +4359,7 @@
   var cv = document.getElementById('gradient-canvas');
   var pe = document.querySelector('#nav .mark path');
   if(!cv || !pe || !window.OrbEngine) return;
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduceMotion = window.movimentoReduzido();
   var hero = document.getElementById('hero-section');
 
   var engine = OrbEngine.create(cv, {
