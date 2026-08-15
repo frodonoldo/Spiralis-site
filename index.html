@@ -2945,12 +2945,25 @@
     ? [...journeyTimeline.querySelectorAll('.journey-event')]
     : [];
   const journeyInk = document.getElementById('journey-ink');
+  const journeyTrack = journeyTimeline
+    ? journeyTimeline.querySelector('.journey-track')
+    : null;
 
   if (journeyTimeline && journeyInk && !noMotion) {
+    /* O eixo do rastro é lido do trilho, não escrito aqui: no celular o CSS
+       move .journey-track para 20px da borda e um valor fixo no JS sairia do
+       lugar no instante em que o layout mudasse. offsetLeft já é relativo ao
+       mesmo padding box que ancora o SVG, então as duas medidas coincidem. */
+    const eixoTrilho = () => journeyTrack
+      ? journeyTrack.offsetLeft + journeyTrack.offsetWidth / 2
+      : journeyTimeline.offsetWidth / 2;
+
     const trailLength = 80;
     const trailPaths = [];
     const trailPoints = [];
-    const trailTarget = {x: journeyTimeline.offsetWidth / 2, y: 0};
+    /* semeia os pontos NO eixo: seguir o centro do palco fazia o rastro
+       nascer no meio da tela e ser chicoteado até o trilho na entrada. */
+    const trailTarget = {x: eixoTrilho(), y: 0};
 
     for (let i = 0; i < trailLength; i++) {
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -2995,9 +3008,17 @@
           );
         });
 
-        const isMobile = window.innerWidth < 768;
-        const trackX = isMobile ? 20 : journeyTimeline.offsetWidth / 2;
-        const sway = isMobile ? 21 : 52;
+        /* A amplitude é o menor lado livre, não um número por breakpoint: com
+           o eixo a 20px da borda, oscilar 21px jogava metade da volta para
+           fora da tela. No desktop as duas folgas são largas e o laço mantém
+           os mesmos 52px de antes. */
+        const trackX = eixoTrilho();
+        const folga = 6;
+        const sway = Math.max(8, Math.min(
+          52,
+          trackX - folga,
+          journeyTimeline.offsetWidth - trackX - folga
+        ));
         trailTarget.x = trackX + Math.sin(progress * Math.PI * 2 * 6) * sway;
         trailTarget.y = progress * journeyTimeline.offsetHeight;
 
