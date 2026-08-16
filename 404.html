@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+  Página de endereço inexistente.
+
+  Sem este arquivo, qualquer endereço inventado no domínio devolvia 200 com a
+  home inteira. Para o buscador isso significa infinitas páginas válidas com
+  conteúdo idêntico, o que dilui o ranqueamento do site de verdade. Com o
+  arquivo presente, o Cloudflare Pages passa a responder 404 de fato.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página não encontrada — Spiralis</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="icon" href="/spiralis-simbolo-branco.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0A050F;
+      --text: #EBE4F6;
+      --text-dim: #9B92AD;
+      --violet: #4918A5;
+      --violet-400: #7C4DDB;
+      --ff-head: 'Comfortaa', sans-serif;
+      --ff-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    body {
+      min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.5rem;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      font-family: var(--ff-body);
+      background: var(--bg);
+      color: var(--text);
+      background-image:
+        radial-gradient(60% 60% at 50% 40%, rgba(73,24,165,.32), transparent 70%);
+    }
+    .mark { width: 54px; height: 54px; }
+    .code {
+      font-family: var(--ff-body); font-size: .7rem; font-weight: 600;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--violet-400);
+    }
+    h1 {
+      font-family: var(--ff-head);
+      font-size: clamp(1.6rem, 1.2rem + 2vw, 2.6rem);
+      font-weight: 700; letter-spacing: -.02em; line-height: 1.15;
+    }
+    p { max-width: 30rem; line-height: 1.6; color: var(--text-dim); }
+    a.voltar {
+      margin-top: .5rem;
+      display: inline-block;
+      padding: .85rem 1.9rem; border-radius: 999px;
+      font-size: .9rem; font-weight: 600;
+      color: #fff; text-decoration: none;
+      background: linear-gradient(135deg, var(--violet), var(--violet-400));
+      transition: filter .3s;
+    }
+    a.voltar:hover { filter: brightness(1.15); }
+    a.voltar:focus-visible { outline: 2px solid var(--violet-400); outline-offset: 4px; }
+  </style>
+</head>
+<body>
+  <img class="mark" src="/spiralis-simbolo-branco.svg" alt="" aria-hidden="true" width="54" height="54">
+  <span class="code">Erro 404</span>
+  <h1>Esta página não existe.</h1>
+  <p>O endereço pode ter mudado ou nunca ter existido. O caminho de volta está logo abaixo.</p>
+  <a class="voltar" href="/">Voltar para o início</a>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Cloudflare Pages — cabeçalhos de resposta
+# Regra por caminho, cabeçalhos indentados abaixo dela.
+
+/*
+  # Impede que o site seja embutido em iframe de terceiro (clickjacking).
+  X-Frame-Options: SAMEORIGIN
+  # Impede o navegador de adivinhar o tipo de um arquivo servido.
+  X-Content-Type-Options: nosniff
+  # Envia a origem, nunca o caminho completo, ao navegar para fora.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Nenhuma dessas APIs é usada pelo site.
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+# Sem regra de cache aqui, e isso é decisão, não esquecimento. O padrão do
+# Pages já é o certo para este site: HTML sem cache e assets por 4 horas.
+# Cache longo só vale quando o arquivo muda de nome ao mudar de conteúdo, e
+# aqui gsap.min.js e as imagens têm nome fixo — um max-age de um ano deixaria
+# o visitante preso numa versão velha sem forma de saber disso.

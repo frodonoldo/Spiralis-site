@@ -1,0 +1,10 @@
+# Cloudflare Pages — redirecionamentos
+# Uma regra por linha: origem, destino, código.
+
+# Endereço único. Hoje spiraliscompany.com.br e www.spiraliscompany.com.br
+# respondem os dois com 200, sem redirecionamento entre eles, e para o
+# buscador isso são duas páginas idênticas dividindo a mesma força de
+# ranqueamento. 301 é permanente e transfere o histórico para o destino,
+# coisa que um 302 não faz. O destino é o mesmo endereço já declarado no
+# canonical e no og:url do index.html.
+https://www.spiraliscompany.com.br/* https://spiraliscompany.com.br/:splat 301!
