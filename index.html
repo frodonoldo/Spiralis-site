@@ -49,6 +49,69 @@
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     };
   </script>
+
+  <!-- ══════════════ MEDIÇÃO (GA4) ══════════════
+       O GA4 grava cookie e envia dado pessoal para fora do país, então sob a
+       LGPD ele só pode disparar depois do aceite. O Consent Mode v2 abaixo
+       nega tudo ANTES do gtag carregar: sem aceite o Google recebe no máximo
+       um ping sem cookie e sem identificador. O aceite fica no localStorage,
+       e o banner só aparece para quem ainda não respondeu.
+
+       Para ativar: troque GA_ID pelo ID da propriedade (Admin > Fluxos de
+       dados > Web). Enquanto for o placeholder, nada é carregado. -->
+  <script>
+    window.GA_ID = 'G-4MDY5CN006';   // propriedade spiraliscompany.com.br
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+
+    (function () {
+      var CHAVE = 'spiralis:consentimento';
+      var salvo = null;
+      try { salvo = localStorage.getItem(CHAVE); } catch (e) { /* modo privado */ }
+
+      /* Negado por padrão: o default precisa ser registrado antes de qualquer
+         evento, senão o primeiro hit sai antes da decisão do visitante. */
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: salvo === 'aceito' ? 'granted' : 'denied',
+        wait_for_update: 500
+      });
+
+      window.spiralisConsentimento = {
+        chave: CHAVE,
+        estado: salvo,
+        /* 'aceito' libera o cookie de analytics; 'recusado' mantém negado e
+           só encerra o banner. Nos dois casos a resposta é registrada para
+           não perguntar de novo a cada visita. */
+        responder: function (resposta) {
+          this.estado = resposta;
+          try { localStorage.setItem(CHAVE, resposta); } catch (e) {}
+          gtag('consent', 'update', {
+            analytics_storage: resposta === 'aceito' ? 'granted' : 'denied'
+          });
+        }
+      };
+
+      if (window.GA_ID.indexOf('XXXX') > -1) {
+        console.warn('[Spiralis] GA4 ainda não configurado: troque GA_ID no index.html.');
+        return;
+      }
+
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.GA_ID;
+      document.head.appendChild(s);
+
+      gtag('js', new Date());
+      /* anonymize_ip corta o último octeto antes de gravar: reduz o dado
+         pessoal que sai do país, que é o ponto sensível sob a LGPD. */
+      gtag('config', window.GA_ID, { anonymize_ip: true });
+    })();
+  </script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -1642,6 +1705,59 @@
     html[data-motion="sistema"] .fm-shell,
     html[data-motion="sistema"] .fm-card { transition: opacity .2s linear, visibility .2s; }
     html[data-motion="sistema"] .fm-card { transform: none; }
+
+    /* ── AVISO DE COOKIES ──────────────────────────
+       Barra baixa em vez de modal: a decisão é do visitante, mas ela não pode
+       sequestrar a primeira dobra nem bloquear a leitura. Some assim que ele
+       responde e não volta mais — a resposta fica no localStorage. */
+    .ck-bar {
+      position: fixed; z-index: 10500;
+      left: 50%; bottom: 1.25rem;
+      transform: translateX(-50%) translateY(1rem);
+      width: min(100% - 2rem, 660px);
+      display: none; align-items: center; gap: 1rem 1.25rem;
+      flex-wrap: wrap;
+      padding: 1.05rem 1.25rem;
+      border: 1px solid rgba(124,77,219,.3);
+      border-radius: 14px;
+      background: rgba(22,17,31,.94);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 60px -28px rgba(10,5,15,.9);
+      opacity: 0;
+      transition: opacity .4s var(--ease-soft), transform .4s var(--ease-soft);
+    }
+    .ck-bar.is-shown { display: flex; }
+    .ck-bar.is-open { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .ck-text {
+      flex: 1 1 300px;
+      font-size: .84rem; line-height: 1.55;
+      color: var(--text-dim);
+    }
+    .ck-text a { color: var(--violet-100); text-decoration: underline; }
+    .ck-acts { display: flex; gap: .6rem; flex: 0 0 auto; }
+    .ck-btn {
+      font-family: var(--ff-body); font-size: .8rem; font-weight: 600;
+      padding: .6rem 1.1rem; border-radius: 999px;
+      border: 1px solid rgba(124,77,219,.4);
+      background: transparent; color: var(--text);
+      cursor: pointer;
+      transition: background .3s, border-color .3s;
+    }
+    .ck-btn:hover { border-color: var(--violet-400); background: rgba(124,77,219,.14); }
+    .ck-btn.ck-sim {
+      border-color: transparent;
+      background: linear-gradient(135deg, var(--violet), var(--violet-400));
+      color: #fff;
+    }
+    @media (max-width: 560px) {
+      .ck-bar { bottom: .75rem; padding: .95rem 1rem; }
+      .ck-acts { width: 100%; }
+      .ck-btn { flex: 1; }
+    }
+    html[data-motion="sistema"] .ck-bar { transition: opacity .2s linear; transform: translateX(-50%); }
+    html[data-theme="light"] .ck-bar { background: rgba(255,255,255,.96); }
+    html[data-theme="light"] .ck-text { color: var(--ink-deep); }
+    html[data-theme="light"] .ck-text a { color: var(--violet); }
 
     /* ── FOOTER ───────────────────────────────────── */
     /* Fecha no mesmo claro da CTA, sem fio separando: as duas leem como
@@ -4395,6 +4511,182 @@
   } else {
     engine.start();
   }
+})();
+</script>
+
+<!-- ══════════════ AVISO DE COOKIES ══════════════ -->
+<aside class="ck-bar" id="ck-bar" role="dialog" aria-live="polite"
+       aria-label="Aviso sobre cookies" hidden>
+  <p class="ck-text" id="ck-text">
+    Usamos cookies de medição para entender como o site é usado. Nada é gravado
+    antes de você aceitar, e recusar não limita nenhuma parte do site.
+  </p>
+  <div class="ck-acts">
+    <button type="button" class="ck-btn" id="ck-nao">Recusar</button>
+    <button type="button" class="ck-btn ck-sim" id="ck-sim">Aceitar</button>
+  </div>
+</aside>
+
+<script>
+/* ── CONSENTIMENTO + EVENTOS DE CONVERSÃO ─────────
+   O banner só existe para quem ainda não respondeu. O Consent Mode já foi
+   configurado como negado no <head>: aqui só registramos a resposta.       */
+(function(){
+  var consent = window.spiralisConsentimento;
+  var barra = document.getElementById('ck-bar');
+  if(!consent || !barra) return;
+
+  if(!consent.estado){
+    barra.hidden = false;
+    barra.classList.add('is-shown');
+    // um quadro entre exibir e animar, senão a transição não tem estado inicial
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){ barra.classList.add('is-open'); });
+    });
+  }
+
+  function responder(resposta){
+    consent.responder(resposta);
+    barra.classList.remove('is-open');
+    setTimeout(function(){
+      barra.hidden = true;
+      barra.classList.remove('is-shown');
+    }, 400);
+  }
+
+  document.getElementById('ck-sim').addEventListener('click', function(){ responder('aceito'); });
+  document.getElementById('ck-nao').addEventListener('click', function(){ responder('recusado'); });
+})();
+
+/* Conversões. Sem isto o GA4 conta visita e nada mais: o que interessa é
+   quantos chamaram no WhatsApp e quantos mandaram mensagem, não quantos
+   passaram por aqui.                                                      */
+(function(){
+  function evento(nome, dados){
+    if(typeof window.gtag === 'function') window.gtag('event', nome, dados || {});
+  }
+  window.spiralisEvento = evento;
+
+  /* De onde saiu o clique importa mais que o total: diz qual seção convence.
+     A captura é delegada porque o popup de diagnóstico nasce depois do load. */
+  var ORIGENS = [
+    {sel: '#hero-section',  nome: 'hero'},
+    {sel: '#contato',       nome: 'cta'},
+    {sel: '#dx-pop',        nome: 'popup_diagnostico'},
+    {sel: 'footer',         nome: 'rodape'},
+    {sel: '#nav',           nome: 'menu'}
+  ];
+
+  function origemDe(el){
+    for(var i = 0; i < ORIGENS.length; i++){
+      if(el.closest(ORIGENS[i].sel)) return ORIGENS[i].nome;
+    }
+    return 'outro';
+  }
+
+  document.addEventListener('click', function(e){
+    var a = e.target.closest ? e.target.closest('a') : null;
+    if(!a) return;
+    var href = a.getAttribute('href') || '';
+    if(href.indexOf('wa.me') > -1){
+      evento('contato_whatsapp', {origem: origemDe(a)});
+    } else if(href.indexOf('mailto:') === 0){
+      evento('contato_email', {origem: origemDe(a)});
+    }
+  });
+
+  /* O formulário só conta quando o Formspree responde ok: o painel de sucesso
+     sair do hidden é o único sinal confiável de envio aceito. */
+  var sucesso = document.getElementById('fm-ok');
+  if(sucesso && window.MutationObserver){
+    new MutationObserver(function(muts){
+      for(var i = 0; i < muts.length; i++){
+        if(!sucesso.hidden){
+          evento('formulario_enviado', {});
+          return;
+        }
+      }
+    }).observe(sucesso, {attributes: true, attributeFilter: ['hidden']});
+  }
+
+  var pop = document.getElementById('dx-pop');
+  if(pop && window.MutationObserver){
+    new MutationObserver(function(){
+      if(pop.getAttribute('aria-hidden') === 'false'){
+        evento('diagnostico_exibido', {});
+      }
+    }).observe(pop, {attributes: true, attributeFilter: ['aria-hidden']});
+  }
+})();
+
+/* ── CORE WEB VITALS ──────────────────────────────
+   PerformanceObserver nativo em vez da biblioteca web-vitals: são três
+   métricas e o site já auto-hospeda tudo. Manda para o GA4 como evento
+   próprio, porque o GA4 não coleta LCP, CLS nem INP sozinho.
+
+   Neste site importa mais que a média: o pin de 700vh, o flythrough e o
+   canvas WebGL são exatamente o tipo de coisa que estraga INP e CLS.      */
+(function(){
+  if(!window.PerformanceObserver) return;
+
+  function reportar(metrica, valor){
+    if(typeof window.spiralisEvento !== 'function') return;
+    window.spiralisEvento('web_vitals', {
+      metrica: metrica,
+      // GA4 não guarda decimal em métrica: CLS vai multiplicado por 1000
+      valor: Math.round(metrica === 'CLS' ? valor * 1000 : valor)
+    });
+  }
+
+  function observar(tipo, fn, opcoes){
+    try {
+      var po = new PerformanceObserver(fn);
+      po.observe(Object.assign({type: tipo, buffered: true}, opcoes || {}));
+      return po;
+    } catch(e){ return null; }   // navegador sem suporte a este tipo
+  }
+
+  var lcp = 0;
+  observar('largest-contentful-paint', function(l){
+    var e = l.getEntries();
+    lcp = e[e.length - 1].startTime;
+  });
+
+  /* CLS é a maior janela de 5s, não a soma total: é assim que o Google
+     pontua desde 2021. */
+  var cls = 0, janela = 0, primeira = 0, ultima = 0;
+  observar('layout-shift', function(l){
+    l.getEntries().forEach(function(entrada){
+      if(entrada.hadRecentInput) return;   // deslocamento que o usuário causou não conta
+      if(janela && entrada.startTime - ultima < 1000 && entrada.startTime - primeira < 5000){
+        janela += entrada.value;
+      } else {
+        janela = entrada.value;
+        primeira = entrada.startTime;
+      }
+      ultima = entrada.startTime;
+      if(janela > cls) cls = janela;
+    });
+  });
+
+  var inp = 0;
+  observar('event', function(l){
+    l.getEntries().forEach(function(entrada){
+      if(entrada.duration > inp) inp = entrada.duration;
+    });
+  }, {durationThreshold: 40});
+
+  /* Envia uma vez, quando a aba sai de cena. visibilitychange é o único
+     gancho confiável no celular: pagehide e unload não disparam sempre. */
+  var enviado = false;
+  function fechar(){
+    if(enviado || document.visibilityState !== 'hidden') return;
+    enviado = true;
+    if(lcp) reportar('LCP', lcp);
+    if(inp) reportar('INP', inp);
+    reportar('CLS', cls);
+  }
+  document.addEventListener('visibilitychange', fechar);
 })();
 </script>
 </body>
