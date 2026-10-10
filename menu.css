@@ -1,0 +1,166 @@
+/* ══════════════ MENU ══════════════
+   Painel de vidro que desce abaixo da nav, compartilhado pela home e pelas
+   páginas de serviço. Depende dos tokens do :root de cada página (--violet-*,
+   --ff-*, --ease-*, --gutter).
+
+   Abrir: o painel desce e acende a partir do topo, e os links
+   entram em cascata, saindo do desfoque. Hover: cada letra do link pulsa um
+   desfoque curto, em sequência da esquerda para a direita. As letras são
+   embrulhadas em span pelo menu.js; sem JS o link continua texto comum. */
+
+#nav-menu-toggle {
+  display: flex;
+  width: 44px; height: 44px;
+  border: 1px solid rgba(255,255,255,.4);
+  border-radius: 50%;
+  background: none; color: currentColor;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 4px;
+  cursor: pointer;
+  transition: border-color .25s ease, background-color .25s ease;
+}
+#nav-menu-toggle:hover { background-color: rgba(255,255,255,.08); }
+#nav-menu-toggle span {
+  display: block; width: 16px; height: 1px;
+  background: currentColor;
+  transition: transform .45s var(--ease-expo);
+}
+#nav-menu-toggle[aria-expanded="true"] span:first-child { transform: translateY(2.5px) rotate(45deg); }
+#nav-menu-toggle[aria-expanded="true"] span:last-child  { transform: translateY(-2.5px) rotate(-45deg); }
+
+.site-menu {
+  --menu-top: 84px;
+  position: fixed;
+  top: var(--menu-top);
+  left: clamp(.75rem, 2vw, 1.5rem);
+  right: clamp(.75rem, 2vw, 1.5rem);
+  z-index: 999;
+  max-height: calc(100dvh - var(--menu-top) - 1rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  color: #fff;
+  background: rgba(10,5,15,.62);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 24px;
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  /* Revelação por transform/opacity. clip-path fica de fora de propósito:
+     junto com backdrop-filter o Chromium deixa de pintar o painel inteiro. */
+  opacity: 0;
+  transform: translateY(-14px) scale(.985);
+  transform-origin: 50% 0;
+  visibility: hidden;
+  transition:
+    opacity .3s ease,
+    transform .45s var(--ease-expo),
+    visibility 0s linear .45s;
+}
+.site-menu.open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition:
+    opacity .35s ease,
+    transform .7s var(--ease-soft),
+    visibility 0s;
+}
+
+.sm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 1rem clamp(2rem, 6vw, 6rem);
+}
+.sm-label {
+  margin-bottom: .6rem;
+  font-family: var(--ff-mono); font-size: .62rem; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--violet-400);
+}
+.sm-list { list-style: none; }
+.sm-list li { border-bottom: 1px solid rgba(255,255,255,.06); }
+.sm-link {
+  display: flex; align-items: center; gap: 1rem;
+  min-height: 64px;
+  font-family: var(--ff-body); font-weight: 400;
+  font-size: clamp(1.15rem, 1.9vw, 1.6rem);
+  letter-spacing: -.01em; line-height: 1.15;
+  color: rgba(255,255,255,.92);
+  transition: color .25s ease;
+}
+.sm-link:hover, .sm-link:focus-visible,
+.sm-link[aria-current="page"] { color: #fff; }
+.sm-num {
+  flex: none; width: 2ch;
+  font-family: var(--ff-mono); font-size: .68rem;
+  letter-spacing: .1em; color: var(--text-dim, #9B92AD);
+}
+.sm-txt { flex: 1; }
+.sm-arr {
+  flex: none;
+  font-size: .9em; color: var(--violet-400);
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity .3s ease, transform .45s var(--ease-soft);
+}
+.sm-link:hover .sm-arr,
+.sm-link:focus-visible .sm-arr,
+.sm-link[aria-current="page"] .sm-arr { opacity: 1; transform: none; }
+
+.sm-foot {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: .25rem 1.5rem;
+  margin-top: 1.5rem;
+}
+.sm-foot a {
+  display: inline-flex; align-items: center; min-height: 34px;
+  font-family: var(--ff-mono); font-size: .72rem;
+  letter-spacing: .04em; color: rgba(255,255,255,.62);
+  transition: color .2s ease;
+}
+.sm-foot a:hover, .sm-foot a:focus-visible { color: #fff; }
+
+/* Cascata de entrada: cada item recebe --i pelo menu.js */
+.site-menu .sm-in {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(14px);
+  transition: opacity .2s ease, filter .2s ease, transform .2s ease;
+}
+.site-menu.open .sm-in {
+  opacity: 1; filter: blur(0); transform: none;
+  transition:
+    opacity .6s ease,
+    filter .6s ease,
+    transform .7s var(--ease-soft);
+  transition-delay: calc(.12s + var(--i, 0) * .045s);
+}
+
+/* Desfoque por letra no hover (mesma curva do efeito de referência) */
+.char-blur { display: inline-block; filter: blur(0); white-space: pre; }
+.is-char-hovering .char-blur {
+  animation: charBlurPulse .2s;
+  animation-delay: calc(var(--ci) * .035s);
+}
+@keyframes charBlurPulse {
+  0%   { filter: blur(0);   animation-timing-function: cubic-bezier(.25,.46,.45,.94); }
+  50%  { filter: blur(2px); animation-timing-function: cubic-bezier(.25,.46,.45,.94); }
+  100% { filter: blur(0); }
+}
+
+body.menu-open { overflow: hidden; }
+
+@media (max-width: 760px) {
+  .sm-grid { grid-template-columns: 1fr; gap: 1.75rem; }
+  .sm-link { min-height: 56px; }
+}
+@media (max-width: 480px) {
+  .site-menu { --menu-top: 76px; }
+}
+
+/* Só com data-motion="sistema" (ver comentário no topo do index.html) */
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion="sistema"] .site-menu,
+  html[data-motion="sistema"] .site-menu .sm-in { transition-duration: 0s !important; transition-delay: 0s !important; }
+  html[data-motion="sistema"] .is-char-hovering .char-blur { animation: none; }
+}
