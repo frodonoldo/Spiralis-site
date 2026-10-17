@@ -771,7 +771,10 @@ html:has(.sp-subnav) { scroll-padding-top: 8.5rem; }
 .is-light .sp-recebe span { color: var(--violet-claro); }
 
 /* Outros serviços: um card por serviço, cada um com a arte animada dele */
-.sp-outros { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: clamp(1rem, 2.5vw, 2rem); }
+.sp-outros {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0,1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
 .sp-outros-card { display: flex; flex-direction: column; color: #1A0B33; }
 .sp-outros-arte {
   position: relative; overflow: hidden;
@@ -795,6 +798,16 @@ html:has(.sp-subnav) { scroll-padding-top: 8.5rem; }
 .sp-outros-go { margin-top: auto; padding-top: 1rem; font-size: .9rem; font-weight: 600; color: var(--violet-claro); }
 .sp-outros-go span { display: inline-block; transition: transform .4s var(--ease-soft); }
 .sp-outros-card:hover .sp-outros-go span { transform: translateX(4px); }
-@media (max-width: 900px) { .sp-outros { grid-template-columns: 1fr; gap: 2.5rem; } }
+/* Tela estreita: continuam lado a lado, numa fileira que desliza */
+@media (max-width: 900px) {
+  .sp-outros {
+    grid-auto-columns: min(78%, 320px);
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter) .5rem;
+    scroll-padding: 0 var(--gutter);
+  }
+  .sp-outros::-webkit-scrollbar { display: none; }
+  .sp-outros-card { scroll-snap-align: start; }
+}
 @media (max-width: 1000px) { .sp-painel.is-3 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .sp-painel.is-3 { grid-template-columns: 1fr; } }
